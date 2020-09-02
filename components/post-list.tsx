@@ -1,6 +1,3 @@
-// @jsx jsx
-import { jsx, Box, Link as A } from 'theme-ui'
-import Link from 'next/link'
 import PostLink from './post-link'
 import { getRecentPosts } from '../lib/api'
 

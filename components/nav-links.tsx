@@ -1,34 +1,25 @@
-// @jsx jsx
-import { jsx, Link as A } from 'theme-ui'
+import { Nav, A } from './stitches'
 import Link from 'next/link'
 
 export default function NavLinks() {
   return (
-    <nav
-      sx={{
+    <Nav
+      aria-label="Pages"
+      css={{
         display: 'flex',
         alignItems: 'center',
-        gap: 3,
-        '& a': {
-          py: [1, 3],
-        },
+        gap: '$3',
       }}
     >
       <Link href="/">
-        <A variant="nav" sx={{ cursor: 'pointer' }}>
-          Home
-        </A>
+        <A type="nav">Home</A>
       </Link>
       <Link href="/about">
-        <A variant="nav" sx={{ cursor: 'pointer' }}>
-          About
-        </A>
+        <A type="nav">About</A>
       </Link>
       <Link href="/archive">
-        <A variant="nav" sx={{ cursor: 'pointer' }}>
-          Archive
-        </A>
+        <A type="nav">Archive</A>
       </Link>
-    </nav>
+    </Nav>
   )
 }

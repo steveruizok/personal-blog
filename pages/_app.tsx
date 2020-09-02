@@ -1,37 +1,59 @@
-// @jsx jsx
-import { jsx, ThemeProvider, Container } from 'theme-ui'
 import { MDXProvider } from '@mdx-js/react'
-import { Global } from '@emotion/core'
-import HeadingLink from '../components/heading-link'
 import Figure from '../components/figure'
-import theme from '../components/theme'
+import {
+  Container,
+  Heading1,
+  Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
+  A,
+  Paragraph,
+  Pre,
+  Code,
+  THead,
+  TD,
+  TR,
+  Table,
+  Blockquote,
+  OrderedList,
+  UnorderedList,
+  Footnote,
+} from '../components/stitches'
 import '../components/styles.css'
 
 function MyApp({ Component, pageProps }) {
   return (
-    <ThemeProvider theme={theme}>
-      <Global
-        styles={(theme) => ({
-          color: theme.colors.text,
-          background: theme.colors.background,
-        })}
-      />
+    <>
       <Container>
         <MDXProvider
           components={{
             img: Figure,
-            // h1: (props) => <HeadingLink {...props} as="h2" />,
-            // h2: (props) => <HeadingLink {...props} as="h3" />,
-            // h3: (props) => <HeadingLink {...props} as="h4" />,
-            // h4: (props) => <HeadingLink {...props} as="h5" />,
-            // h5: (props) => <HeadingLink {...props} as="h6" />,
-            // h6: (props) => <HeadingLink {...props} as="h6" />,
+            h1: Heading1,
+            h2: Heading2,
+            h3: Heading3,
+            h4: Heading4,
+            h5: Heading5,
+            h6: Heading6,
+            p: Paragraph,
+            a: A,
+            pre: Pre,
+            code: Code,
+            table: Table,
+            thead: THead,
+            tr: TR,
+            td: TD,
+            blockquote: Blockquote,
+            ol: OrderedList,
+            ul: UnorderedList,
+            footnote: Footnote,
           }}
         >
           <Component {...pageProps} />
         </MDXProvider>
       </Container>
-    </ThemeProvider>
+    </>
   )
 }
 

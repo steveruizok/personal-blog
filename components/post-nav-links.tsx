@@ -1,5 +1,4 @@
-// @jsx jsx
-import { jsx, Box, Text, Link as A } from 'theme-ui'
+import { Nav, Heading3, Box, Text, A } from './stitches'
 import Link from 'next/link'
 import { getNeighborPosts } from '../lib/api'
 
@@ -11,10 +10,10 @@ export default function PostNavLinks({ slug }: Props) {
   const { prev, next } = getNeighborPosts(slug)
 
   return (
-    <nav
+    <Nav
       aria-label="Previous and Next Posts"
-      sx={{
-        my: 5,
+      css={{
+        my: '$5',
         width: '100%',
         padding: '1em 0',
         display: 'grid',
@@ -24,38 +23,42 @@ export default function PostNavLinks({ slug }: Props) {
       {prev && (
         <Link href={'/' + prev.slug}>
           <Box
-            sx={{
+            css={{
               gridColumn: 1,
               cursor: 'pointer',
-              '&:hover': { bg: 'muted' },
-              m: -2,
-              p: 2,
+              '&:hover': { bg: '$gray200' },
+              m: '-$3',
+              p: '$3',
               borderRadius: 4,
             }}
           >
-            <Text variant="textStyles.ui">« Prev</Text>
-            <A>{prev.title}</A>
+            <Text type="ui">« Prev</Text>
+            <A>
+              <Heading3>{prev.title}</Heading3>
+            </A>
           </Box>
         </Link>
       )}
       {next && (
         <Link href={'/' + next.slug}>
           <Box
-            sx={{
+            css={{
               gridColumn: 3,
               textAlign: 'right',
               cursor: 'pointer',
-              '&:hover': { bg: 'muted' },
-              m: -2,
-              p: 2,
+              '&:hover': { bg: '$gray200' },
+              m: '-$3',
+              p: '$3',
               borderRadius: 4,
             }}
           >
-            <Text variant="textStyles.ui">Next »</Text>
-            <A>{next.title}</A>
+            <Text type="ui">Next »</Text>
+            <A>
+              <Heading3>{next.title}</Heading3>
+            </A>
           </Box>
         </Link>
       )}
-    </nav>
+    </Nav>
   )
 }

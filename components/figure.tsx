@@ -1,6 +1,5 @@
-// @jsx jsx
 import Link from 'next/link'
-import { jsx, Box, Image, Text } from 'theme-ui'
+import { Image, Text } from './stitches'
 
 export default function Figure(props: {
   src: string
@@ -10,17 +9,16 @@ export default function Figure(props: {
   return (
     <>
       <Link href={props.src}>
-        <span sx={{ textAlign: 'center', display: 'block', mx: [-3, 0] }}>
-          <Image variant="article" {...props} sx={{ mt: 4 }} />
-        </span>
+        <Text css={{ textAlign: 'center', display: 'block' }}>
+          <Image {...props} css={{ mt: '$4' }} />
+        </Text>
       </Link>
       <Text
-        as="span"
-        variant="textStyles.ui"
-        sx={{
+        type="ui"
+        css={{
           display: 'block',
           color: 'secondaryFill',
-          mb: 4,
+          mb: '$4',
           textAlign: 'center',
         }}
       >

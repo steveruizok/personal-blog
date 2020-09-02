@@ -1,1 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans:wght@300;400;600&family=Lora:wght@400;600&display=swap');
+
+html,
+* {
+  box-sizing: border-box;
+}

@@ -1,8 +1,8 @@
-// @jsx jsx
-import { jsx, Heading, Divider } from 'theme-ui'
+import { Divider } from './stitches'
 import NavLinks from './nav-links'
 import Footer from './footer'
 import Head from 'next/head'
+import { Heading1 } from '../components/stitches'
 
 type Props = Pick<Blog.Post, 'keywords' | 'description' | 'title'> & {
   children: React.ReactNode
@@ -27,12 +27,10 @@ export default function Layout({
       </Head>
       <header>
         <NavLinks />
-        <Heading as="h1" sx={{ mt: 4, mb: 3 }} variant="textStyles.display">
-          {title}
-        </Heading>
+        <Heading1>{title}</Heading1>
       </header>
       <main>{children}</main>
-      <Divider sx={{ mt: 6 }} />
+      <Divider css={{ mt: '$6' }} />
       <Footer />
     </>
   )

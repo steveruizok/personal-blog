@@ -1,5 +1,4 @@
-// @jsx jsx
-import { jsx, Grid, Text, Box, Link as A } from 'theme-ui'
+import { Grid, Footer, Heading2, Text, Box, A } from './stitches'
 import Link from 'next/link'
 
 export default function PostLink({
@@ -13,22 +12,22 @@ export default function PostLink({
     <Link href={slug}>
       <article>
         <Grid
-          sx={{
+          css={{
             cursor: 'pointer',
             gridTemplateColumns: '128px 1fr',
             gridAutoFlow: 'column',
-            gap: 2,
-            p: 3,
-            mx: -3,
+            gap: '$2',
+            p: '$3',
+            mx: '-$3',
             borderRadius: 4,
             transition: 'all .18s',
-            '&: hover': {
-              bg: 'muted',
+            '&:hover': {
+              backgroundColor: '$gray200',
             },
           }}
         >
           <Box
-            sx={{
+            css={{
               backgroundColor: '#ccc',
               borderRadius: 4,
               backgroundPosition: 'center center',
@@ -36,24 +35,23 @@ export default function PostLink({
               backgroundImage: `url(${hero})`,
             }}
           />
-          <Box sx={{ minHeight: 96 }}>
+          <Box css={{ minHeight: 96 }}>
             <header>
-              <Text sx={{ fontSize: 4 }}>{title}</Text>
-              <Text variant="textStyles.detail" sx={{ color: 'secondaryFill' }}>
+              <Heading2 css={{ fontSize: '$5', mt: 0, mb: '$1' }}>
+                {title}
+              </Heading2>
+              <Text type="detail" css={{ color: '$secondaryFill' }}>
                 {date}
               </Text>
             </header>
-            <Text
-              variant="textStyles.detail"
-              sx={{ mt: 2, color: 'secondaryFill' }}
-            >
+            <Text type="detail" css={{ mt: '$2', color: '$secondaryFill' }}>
               {description}
             </Text>
-            <footer>
+            <Footer css={{ mt: '$3' }}>
               <Link href={slug}>
-                <A sx={{ fontFamily: 'ui', fontSize: 2 }}>Read more »</A>
+                <A css={{ font: '$ui', fontSize: '$2' }}>Read more »</A>
               </Link>
-            </footer>
+            </Footer>
           </Box>
         </Grid>
       </article>

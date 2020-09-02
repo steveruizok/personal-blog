@@ -9,8 +9,8 @@
     "refresh": "rm -rf .next/cache/next-babel-loader"
   },
   "dependencies": {
-    "@emotion/core": "^10.0.35",
     "@mapbox/rehype-prism": "^0.5.0",
+    "@state-designer/react": "^1.2.26",
     "@stitches/react": "^0.0.1",
     "@types/theme-ui": "^0.3.6",
     "babel-plugin-import-glob-array": "^0.2.0",
@@ -23,7 +23,6 @@
     "remark-code-titles": "^0.1.1",
     "remark-sectionize": "^1.1.1",
     "remark-slug": "^6.0.0",
-    "theme-ui": "^0.3.1",
     "unist-util-visit": "^2.0.3"
   },
   "devDependencies": {

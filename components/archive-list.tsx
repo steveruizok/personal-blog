@@ -1,10 +1,7 @@
-// @jsx jsx
-import { jsx } from 'theme-ui'
-import Link from 'next/link'
 import { getAllPosts } from '../lib/api'
 import PostLink from './post-link'
 
-export default function ArchiveList({ postCount = 10 }) {
+export default function ArchiveList() {
   const posts = getAllPosts()
 
   return (

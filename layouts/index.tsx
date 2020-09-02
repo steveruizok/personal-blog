@@ -1,8 +1,7 @@
-// @jsx jsx
-import Link from 'next/link'
-import { jsx, Flex, Avatar, Box, Text, Image } from 'theme-ui'
+import { Box, Text, A, Avatar, Flex, Image } from '../components/stitches'
 import Layout from '../components/layout'
 import PostNavLinks from '../components/post-nav-links'
+import useTheme from '../components/hooks/useTheme'
 
 export default function DefaultLayout({ children, frontMatter }) {
   const {
@@ -10,6 +9,7 @@ export default function DefaultLayout({ children, frontMatter }) {
     description,
     location,
     title,
+    author,
     date,
     hero,
     twitter,
@@ -17,20 +17,24 @@ export default function DefaultLayout({ children, frontMatter }) {
     slug,
   } = frontMatter
 
+  const { theme, cycleTheme } = useTheme()
+
   return (
     <Layout title={title} description={description} keywords={keywords}>
-      <Flex sx={{ alignItems: 'center', mb: 6 }}>
+      <Flex css={{ alignItems: 'center', mb: '$6' }}>
         <Avatar src={avatar} />
-        <Box sx={{ ml: 2 }}>
-          <Text variant="textStyles.detail">
+        <Box css={{ ml: '$2' }}>
+          <Text type="detail">
             <time dateTime={date}>{date}</time>
           </Text>
-          <Text variant="textStyles.detail">{location}</Text>
+          <Text type="detail">
+            <A href={`https://twitter.com/${twitter}`}>{author}</A>, {location}
+          </Text>
         </Box>
       </Flex>
       {hero && (
-        <span sx={{ textAlign: 'center', display: 'block', mx: [-3, 0] }}>
-          <Image variant="article" src={hero} alt={title} title={title} />
+        <span style={{ textAlign: 'center', display: 'block' }}>
+          <Image src={hero} alt={title} title={title} />
         </span>
       )}
       <article>{children}</article>
