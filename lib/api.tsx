@@ -2,11 +2,15 @@
 import { frontMatter as posts } from '../pages/posts/*.mdx'
 
 const allPosts: Blog.Post[] = (posts as Blog.Post[]).sort(
-  (a, b) => a.date - b.date
+  (a, b) => a.dateTime - b.dateTime
 )
 
 export function getAllPosts() {
   return allPosts
+}
+
+export function getRecentPosts(num = 5) {
+  return allPosts.slice(0, num)
 }
 
 export function getPostBySlug(slug: string) {

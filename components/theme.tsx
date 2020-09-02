@@ -7,12 +7,30 @@ const heading = {
   lineHeight: 'heading',
 }
 
+const ui = {
+  fontFamily: 'ui',
+  fontWeight: 'ui',
+  lineHeight: 'ui',
+}
+
+const body = {
+  fontFamily: 'body',
+  fontWeight: 'body',
+  lineHeight: 'body',
+  fontSize: [2, 3],
+  mt: 3,
+  mb: 2,
+}
+
 export const theme = {
   useCustomProperties: true,
   colors: {
     text: '#000',
+    primaryFill: '#000',
+    secondaryFill: '#3d3d3d',
+    tertiaryFill: '#a3a3a3',
     background: '#fff',
-    primary: '#33e',
+    primary: 'rgba(78, 4, 252, 1.000)',
     secondary: '#119',
     muted: '#f6f6f6',
     highlight: '#efeffe', // '#ffffcc',
@@ -20,29 +38,46 @@ export const theme = {
     accent: '#609',
   },
   fonts: {
-    body:
-      'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
-    heading: 'inherit',
-    monospace: 'Menlo, monospace',
+    ui: "'Fira Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    body: '"Lora", Georgia, sans-serif',
+    heading: '"Lora", Georgia, sans-serif',
+    monospace: '"Fira Code", Menlo, monospace',
   },
-  fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 72],
+  space: [0, 8, 16, 24, 32, 40, 48, 64, 72],
+  fontSizes: [12, 14, 16, 20, 24, 28, 36, 40, 48, 64, 72],
   fontWeights: {
+    ui: 500,
     body: 400,
-    heading: 700,
-    display: 900,
+    heading: 600,
+    display: 400,
   },
   lineHeights: {
-    body: 1.5,
+    ui: 1.5,
+    body: 1.75,
     heading: 1.25,
+    code: 1.5,
   },
   textStyles: {
-    heading,
     display: {
-      variant: 'textStyles.heading',
-      fontSize: [5, 6],
+      fontFamily: 'body',
       fontWeight: 'display',
-      letterSpacing: '-0.03em',
+      letterSpacing: '-0.015em',
+      fontSize: [6, 8],
       mt: 3,
+    },
+    heading: {
+      ...heading,
+      mt: 5,
+      mb: 3,
+    },
+    ui: {
+      ...ui,
+      fontSize: 2,
+    },
+    detail: {
+      fontSize: 2,
+      lineHeight: 1.2,
+      fontFamily: 'ui',
     },
   },
   layout: {
@@ -53,53 +88,33 @@ export const theme = {
   },
   styles: {
     root: {
-      fontFamily: 'body',
-      lineHeight: 'body',
-      fontWeight: 'body',
-    },
-    h1: {
-      variant: 'textStyles.display',
-    },
-    h2: {
-      variant: 'textStyles.heading',
-      fontSize: 5,
-    },
-    h3: {
-      variant: 'textStyles.heading',
-      fontSize: 4,
-    },
-    h4: {
-      variant: 'textStyles.heading',
-      fontSize: 3,
-    },
-    h5: {
-      variant: 'textStyles.heading',
-      fontSize: 2,
-    },
-    h6: {
-      variant: 'textStyles.heading',
-      fontSize: 1,
+      ...body,
     },
     a: {
       color: 'primary',
+      cursor: 'pointer',
+      textDecoration: 'none',
       '&:hover': {
-        color: 'secondary',
+        textDecoration: 'underline',
       },
     },
     pre: {
       fontFamily: 'monospace',
-      fontSize: 1,
+      fontWeight: 500,
       p: 3,
-      borderRadius: 4,
+      my: 4,
+      mx: [-3, 0],
+      borderRadius: [0, 4],
       overflow: 'auto',
       ...prismTheme,
+      fontSize: 2,
+      lineHeight: 'code',
       code: {
         color: 'inherit',
       },
     },
     code: {
       fontFamily: 'monospace',
-      fontSize: 1,
     },
     inlineCode: {
       fontFamily: 'monospace',
@@ -134,15 +149,98 @@ export const theme = {
       borderBottom: '1px solid',
       borderColor: 'muted',
     },
-    img: {
-      maxWidth: '100%',
-    },
     blockquote: {
       mx: 0,
       px: 4,
       borderLeft: '2px solid',
-      borderColor: 'muted',
+      borderColor: 'tertiaryFill',
     },
+    h1: {
+      variant: 'textStyles.heading',
+      letterSpacing: '-0.01em',
+      fontSize: [5, 6],
+    },
+    h2: {
+      variant: 'textStyles.heading',
+      letterSpacing: '-0.01em',
+      fontSize: [4, 5],
+    },
+    h3: {
+      variant: 'textStyles.heading',
+      fontSize: [3, 4],
+    },
+    h4: {
+      variant: 'textStyles.heading',
+      fontSize: [2, 3],
+    },
+    h5: {
+      variant: 'textStyles.heading',
+      fontSize: [2, 3],
+      fontFamily: 'ui',
+    },
+    h6: {
+      variant: 'textStyles.heading',
+      fontSize: [1, 2],
+      fontFamily: 'ui',
+    },
+  },
+  links: {
+    nav: {
+      cursor: 'pointer',
+      fontFamily: 'ui',
+      fontWeight: 'ui',
+      fontSize: 2,
+      textDecoration: 'none',
+      '&:hover': {
+        color: 'primary',
+        textDecoration: 'underline',
+      },
+    },
+    heading: {
+      cursor: 'pointer',
+      '&:hover': {
+        color: 'primary',
+        '&::before': {
+          display: 'inline-block',
+          content: '" "',
+          ml: ['-24px', '-20px'],
+          mr: ['8px', '4px'],
+          position: 'relative',
+          backgroundImage: 'url("/icons/link.svg")',
+          backgroundSize: '16px',
+          height: '16px',
+          width: '16px',
+          opacity: [0, 1],
+          color: 'primary',
+        },
+      },
+    },
+  },
+  images: {
+    avatar: {
+      borderRadius: 6,
+      bg: 'muted',
+      height: 40,
+      width: 40,
+    },
+    article: {
+      maxWidth: '100%',
+      width: ['auto', 'auto'],
+      maxHeight: '500px',
+      borderRadius: [0, 4],
+      cursor: 'pointer',
+      transition: 'all .2s',
+      '&:hover': {
+        filter: 'brightness(1.1)',
+      },
+    },
+  },
+  figure: {
+    my: 4,
+  },
+  figureCaption: {
+    fontSize: 1,
+    textAlign: 'center',
   },
 }
 

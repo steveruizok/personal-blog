@@ -1,11 +1,11 @@
 // @jsx jsx
-import { jsx, Box, Link as A } from 'theme-ui'
+import { jsx } from 'theme-ui'
 import Link from 'next/link'
+import { getAllPosts } from '../lib/api'
 import PostLink from './post-link'
-import { getRecentPosts } from '../lib/api'
 
-export default function PostList({ postCount = 5 }) {
-  const posts = getRecentPosts(postCount)
+export default function ArchiveList({ postCount = 10 }) {
+  const posts = getAllPosts()
 
   return (
     <>

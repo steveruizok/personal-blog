@@ -1,5 +1,5 @@
 // @jsx jsx
-import { jsx } from 'theme-ui'
+import { jsx, Box, Text, Link as A } from 'theme-ui'
 import Link from 'next/link'
 import { getNeighborPosts } from '../lib/api'
 
@@ -13,20 +13,47 @@ export default function PostNavLinks({ slug }: Props) {
   return (
     <nav
       aria-label="Previous and Next Posts"
-      style={{
+      sx={{
+        my: 5,
+        width: '100%',
         padding: '1em 0',
-        display: 'flex',
-        justifyContent: 'space-between',
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr auto',
       }}
     >
       {prev && (
         <Link href={'/' + prev.slug}>
-          <a>« {prev.title}</a>
+          <Box
+            sx={{
+              gridColumn: 1,
+              cursor: 'pointer',
+              '&:hover': { bg: 'muted' },
+              m: -2,
+              p: 2,
+              borderRadius: 4,
+            }}
+          >
+            <Text variant="textStyles.ui">« Prev</Text>
+            <A>{prev.title}</A>
+          </Box>
         </Link>
       )}
       {next && (
         <Link href={'/' + next.slug}>
-          <a>» {next.title}</a>
+          <Box
+            sx={{
+              gridColumn: 3,
+              textAlign: 'right',
+              cursor: 'pointer',
+              '&:hover': { bg: 'muted' },
+              m: -2,
+              p: 2,
+              borderRadius: 4,
+            }}
+          >
+            <Text variant="textStyles.ui">Next »</Text>
+            <A>{next.title}</A>
+          </Box>
         </Link>
       )}
     </nav>
