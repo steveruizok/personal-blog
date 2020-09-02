@@ -11,6 +11,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.35",
     "@mapbox/rehype-prism": "^0.5.0",
+    "@stitches/react": "^0.0.1",
     "@types/theme-ui": "^0.3.6",
     "babel-plugin-import-glob-array": "^0.2.0",
     "next": "9.5.2",
