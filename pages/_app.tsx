@@ -20,40 +20,40 @@ import {
   OrderedList,
   UnorderedList,
   Footnote,
-} from '../components/stitches'
+  Divider,
+} from '../components/theme'
 import '../components/styles.css'
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
-      <Container>
-        <MDXProvider
-          components={{
-            img: Figure,
-            h1: Heading1,
-            h2: Heading2,
-            h3: Heading3,
-            h4: Heading4,
-            h5: Heading5,
-            h6: Heading6,
-            p: Paragraph,
-            a: A,
-            pre: Pre,
-            code: Code,
-            table: Table,
-            thead: THead,
-            tr: TR,
-            td: TD,
-            blockquote: Blockquote,
-            ol: OrderedList,
-            ul: UnorderedList,
-            footnote: Footnote,
-          }}
-        >
-          <Component {...pageProps} />
-        </MDXProvider>
-      </Container>
-    </>
+    <Container>
+      <MDXProvider
+        components={{
+          img: Figure,
+          h1: Heading1,
+          h2: Heading2,
+          h3: Heading3,
+          h4: Heading4,
+          h5: Heading5,
+          h6: Heading6,
+          p: Paragraph,
+          a: A,
+          pre: Pre,
+          code: Code,
+          table: Table,
+          thead: THead,
+          tr: TR,
+          td: TD,
+          hr: Divider,
+          blockquote: Blockquote,
+          ol: OrderedList,
+          ul: UnorderedList,
+          footnote: Footnote,
+        }}
+      >
+        <Component {...pageProps} />
+      </MDXProvider>
+    </Container>
   )
 }
 

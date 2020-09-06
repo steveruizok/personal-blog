@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Image, Text } from './stitches'
+import { Image, Span, A } from './theme'
 
 export default function Figure(props: {
   src: string
@@ -9,21 +9,26 @@ export default function Figure(props: {
   return (
     <>
       <Link href={props.src}>
-        <Text css={{ textAlign: 'center', display: 'block' }}>
-          <Image {...props} css={{ mt: '$4' }} />
-        </Text>
+        <A
+          css={{
+            textAlign: 'center',
+            display: 'block',
+            mx: '-$1',
+            sm: {
+              mx: '-$1',
+            },
+            md: {
+              mx: '-$2',
+            },
+            lg: {
+              mx: '-$2',
+            },
+          }}
+        >
+          <Image {...props} css={{ mt: '$3' }} />
+        </A>
       </Link>
-      <Text
-        type="ui"
-        css={{
-          display: 'block',
-          color: 'secondaryFill',
-          mb: '$4',
-          textAlign: 'center',
-        }}
-      >
-        {props.title}
-      </Text>
+      <Span variant="caption">{props.title}</Span>
     </>
   )
 }

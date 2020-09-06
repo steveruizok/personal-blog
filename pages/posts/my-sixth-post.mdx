@@ -5,6 +5,43 @@ date: '08/27/2020'
 
 This is my first blog post.
 
+```tsx
+// A comment here
+const btn = document.getElementById('btn')
+let count = 0
+function render() {
+  btn.innerText = `Count: ${count}`
+}
+btn.addEventListener('click', () => {
+  // Count from 1 to 10.
+  if (count < 10) {
+    count += 1
+    render()
+  }
+})
+
+export default function PostNavLinks({ slug }: Props) {
+  const { prev, next } = getNeighborPosts(slug)
+
+  const [state, setState] = useState(0)
+
+  return (
+    <Container aria-label="Previous and Next Posts">
+      {prev && (
+        <PostNavLink href={prev.slug} direction="prev">
+          {prev.title}
+        </PostNavLink>
+      )}
+      {next && (
+        <PostNavLink href={next.slug} direction="next">
+          {next.title}
+        </PostNavLink>
+      )}
+    </Container>
+  )
+}
+```
+
 ## Heading 2
 
 And more

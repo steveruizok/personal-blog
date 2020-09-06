@@ -16,6 +16,12 @@ declare namespace Blog {
     slug: string
     layout: string
     keywords?: string
+    readingTime: {
+      text: string
+      minutes: number
+      time: number
+      words: number
+    }
     __resourcePath: string
   }
 }

@@ -1,19 +1,19 @@
-import { Footer as F, A, Box, Text } from './stitches'
+import { Footer as F, A, Box, Text } from './theme'
 
 export default function Footer() {
   return (
     <F
       css={{
         py: 4,
-        opacity: 0.7,
-        transition: 'all .2s',
-        '&:hover': { opacity: 1 },
+        textAlign: 'center',
       }}
     >
-      <Text type="detail">
-        Made in London
-        <br />
-        <A href="https://twitter.com/steveruizok">Steve Ruiz</A> 2020
+      <Text variant="detail">
+        Made in London •{' '}
+        <A variant="author" href="https://twitter.com/steveruizok">
+          Steve Ruiz
+        </A>{' '}
+        • 2020
       </Text>
     </F>
   )

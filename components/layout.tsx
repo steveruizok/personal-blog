@@ -1,8 +1,7 @@
-import { Divider } from './stitches'
-import NavLinks from './nav-links'
+import { Divider } from './theme'
 import Footer from './footer'
 import Head from 'next/head'
-import { Heading1 } from '../components/stitches'
+import Header from './header'
 
 type Props = Pick<Blog.Post, 'keywords' | 'description' | 'title'> & {
   children: React.ReactNode
@@ -26,10 +25,9 @@ export default function Layout({
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <header>
-        <NavLinks />
-        <Heading1>{title}</Heading1>
+        <Header />
       </header>
-      <main>{children}</main>
+      {children}
       <Divider css={{ mt: '$6' }} />
       <Footer />
     </>

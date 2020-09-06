@@ -1,149 +1,998 @@
 ---
-title: 'Components'
+title: 'Witnessing the Jeep Grand Cherokee Hybrid Unveiling While on Acid at the Marcus Brothers Road Show in the Spring of 2008'
 date: '08/27/2020'
 ---
 
-# Intro to code components
+Hey, let's build Tetris in React.
 
-Hey, this is Steve, Design Educator for Framer.
+# Development Environment
 
-In this video, I’m going to introduce you to code components: a type of component that, as its name suggests, was written using code.
+For this project, I'm going to create a new react app...
 
-Code components are one of my favorite features in Framer, but they are also one of the most complex. This video will show you what they are and what they’re for, and how you can use them in your project.
+and I'm going to use the TypeScript template.
 
-## Components
+We're not going to be relying too much on types, but they should help us stay focused.
 
-Ok, let’s talk about **components**. In Framer, components are re-usable parts of your design. Things like a button, a card, a user card, things like that.
+I'll add a few more libraries, too.
 
-Framer has two different types of components.
+For utilities, I'll add lodash-es.
 
-The first is a **design component**, which is an re-usable arrangement of Frames, Graphics, Text, and other components, that we can create on the canvas. If you’d like to learn about Design Components, check out our video on Design Components in the Framer Crash Course.
+I'll also add styled-components to help us with styling.
 
-The second type of component is a **code component**. It’s also a re-usable arrangement of Frames, Graphics, Text and other components. However, unlike a design component, code component are written with code.
+And, since we're using typescript, I'll also add the types for both libraries.
 
-We’ll see in a moment what that looks like, and why you might want to do that, but if you just want to _use_ a code component — well, you probably already have. On the canvas, the Stack Tool, Page Tool, and all of the other interactive components — these are all code components.
+And finally, I'm going to be using my own library, State Designer, to manage our game's state and events. And that comes with its own types.
 
-You can also get code components from the store.
+Now, if you're planning to build your own version of Tetris, you don't have to use this library — or any of these libraries, really — but they'll make it easier for us to define how the project should look—and, in the case of State Designer, how the project should _work_.
 
-Here’s a code component I made — a scroll bar with a knob that shows how much of the scrolling content is actually in view.
+Ok, now I'll spin up the development server and we're ready to get building.
 
-We can drop it into a project, set it up on the canvas, and even set it up the way we want using the component’s property controls. The component — what it looks like, how it works, and even those controls — I made those things using code, but you don’t need code in order to use it.
+# Machine — what is Tetris?
 
-If you’re looking for something that needs to move, interact, or just have some extra brains, and if Framer’s starter components aren’t enough, then you might start by checking the store.
+Before we get into any presentation, let's set up our game's state.
 
-To learn more about packages, check out our video on Store Packages in the Crash Course.
+I'll create a folder here in source named game.
 
-## Making Code Components
+And, inside of this folder, create a file named index.ts.
 
-But hey, what about making code components yourself?
+This file is going to hold all of our game's state — and we're going to use state designer to define that state, so let's import `createStateDesigner` from state designer.
 
-We’re not going to go very deep at all here, but even still, I should point out that code components are one of Framer’s more advanced features, and you can get a lot out of Framer without ever needing to make one of these.
+I'll create an empty state called game...
 
-If you’re just getting started, or if this just isn’t your jam, feel free to skip code components and come back to it later.
+And I'll make this the file's default export.
 
-...
+Before we get into defining our state, though, we should probably review Tetris itself.
 
-Hey, welcome back, let’s create a code component.
+What is Tetris, and how does it work?
 
-To create a code component, first select the **Assets** tab, which will show your project's assets, what are all of the components and store packages that you can drop into our project. You'll see your Design Components here, too.
+# What is Tetris?
 
-To create a new asset, click on **Create Asset** button.
+Tetris is a game where you fit together shapes in order to fill rows of a grid.
 
-Enter a name for your component... and then select **Code component** as the type of asset that you want to create.
+When you fill up a row, that row disappears and you score points.
 
-Then click on **Create**.
+The more rows you clear, the faster the game goes.
 
-Here’s your new code component.
+And, if you run out of space, then it's game over.
 
-And hey, this might be your first time seeing code, either in Framer — or maybe anywhere else. If so, let’s break the ice.
+The game gets its name from the shapes, which are called tetrominos. A tetromino is a shape made up of four connected squares. There are seven types of tetrominos, named after their shapes — I, O, T, S and Z, and J and L.
 
-Open up the **preview**.
+Each of these shapes also has four rotations.
 
-What your see here is your component.
+The game's grid is made up of cells — twenty rows of ten columns each — and each cell can either be empty or filled by one of the tetromino types.
 
-Now, before we do anything else, let’s have some fun.
+The game starts with an empty grid and a current piece that the user can move left and right.
 
-Go into the code and change the font size from `16` to some other number.
+On an interval, this piece will move down one row.
 
-See how the component changes in the preview?
+If it can't move down — either because it's at the bottom of the screen, or because something is in the way — then the piece will lock into place.
 
-Very interesting.
+When it does, if this means that the grid now has one or more full rows, then we'll remove these rows, move down the rows above it... then change the user's score, level, and so on.
 
-Next, change the `scale` here to `.9`.
+Either way, the player will get a new piece to play.
 
-And hover over the component in the preview.
+This goes on until the player gives up or runs out of room and loses the game.
 
-Next, add a new line just below the curly braces here.
+So alright, that's kind of a lot. But we can start breaking down the game into the data that matters.
 
-Write `height={300}`.
+# Types
 
-One more — after the braced `text` here, write an exclamation point or two.
+I'm going to use TypeScript types to help us identify what all those parts of the game really are.
 
-You know what, maybe spend a minute playing around here. If you break the component, you can undo back to where it was before, or else just go ahead and make a new one.
+### Tetromino Types
 
-#### What did we just do?
+Let's start with our Tetromino types. I'll enumerate all of the seven types.
 
-So what’s going on here?
+```jsx
+export enum TetrominoType {
+  O = "O",
+  I = "I",
+  S = "S",
+  Z = "Z",
+  L = "L",
+  J = "J",
+  T = "T"
+}
+```
 
-Like the design component you made earlier, your code component can be a collection of Frames, Graphics, Text, and other content.
+### Cell and Matric
 
-The big difference is that, on the canvas, you could change these things directly — or at least, visually — whereas in a code component, you use _code_ to describe what you want and how you want it to be, and the computer takes care of the rest.
+The game's grid is going to be a 2D array — an array of rows, with each item in the array itself an array of columns. These columns, or **cells**, will either be empty — which we'll represent with the number zero, or full of one of our TetrominoType strings.
 
-For example, if you wanted to change the height a Frame on the canvas, you could just grab its bottom edge or one of its corners and start moving them around. However, in a code component, you would make that change using words and numbers that the computer knows how to understand — you know, code.
+```jsx
+export type Cell = 0 | TetrominoType
+```
 
-> Adds `height={400}`
+```jsx
+export type Matrix = Cell[][]
+```
 
-I know what you’re thinking, and you’re right: writing code is a real hassle for some things, like adjusting our height here. It’s much easier to do that on the canvas. But remember, even when we’re working on the canvas, we’re still working on the computer — under the hood, it’s all code. The canvas, like any application, is just a more human-friendly way to edit that code.
+### Tetromino
 
-So why would we use a Code Component instead of a Design Component?
+- Points represent positions, relative to an origin
 
-Why go through the hassle of defining things in code?
+```tsx
+export type Point = { x: number; y: number }
+```
 
-Well, there are some things that you can only do in code.
+- A tetromino is four points for each of the tetromino's four blocks
 
-- You can set up interactions, like our hover here.
-- You can define animations and events.
-- You can make components with multiple states, like on or off.
-- And you can add Property controls, which will let you or your teammates customize your code component on the canvas.
+```jsx
+export type Tetromino = [Point, Point, Point, Point]
+```
 
-- And, really, you can do anything you can imagine — the code you see here is the same code that powers websites, so if it works on the web, it will also work here in Framer.
+### Tetrominos
 
-So yeah, a bit of a hassle, but those things might worth the hassle.
+We'll also need a collection of all of the different Tetrominos. This will be an object where all of the keys are TetrominoTypes and all of the values are Tetrominos.
 
-Not everyone _loves_ to code, though I bet you’ll love what you can _do_ with code, and I’ll be you’ll be surprised at how quickly it starts making sense.
+But we're actually going to store an array of four Tetrominos for each type — one representing each rotation of the piece.
 
-#### Doing some magic
+```jsx
+export type Tetrominos = Record<TetrominoType, Tetromino[]>
+```
 
-If you’d like to go a little deeper, check out our examples projects, where you’ll find projects ready to start tweaking and changing. You can also find video tutorials here on Framer.com slash learn.
+### Tetrominos Static Object
 
-In this video, we learned about code components, which are reusable parts of your design in Framer that you can create from code.
+Before we continue with our types, let's go make that object.
 
-Once again, this is Steve, Design Educator for Framer. Thanks for watching and good luck!
+I'll create a new file named **static.ts**, that holds all the unchanging or "static" data that we'll rely on for our game.
 
----
+For now, we'll just add our tetromino pieces.
 
-#### Making Design Components
+We want to be sure to avoid collisions between the names of our types, and our other names, so let's bring in all of our exported types as Tetris.
 
-First, let’s talk about how they’re made.
+```jsx
+import * as Tetris from './types'
+```
 
-We’ll start with Design Components.
+It'll need to have all of our seven types here, and for each type, I'll make an array, representing all four of the piece's rotations. And for each rotation, I'll make an array, representing all four of that rotation's rows... and for each row, I'll make an array represnting that row's cells. If that cell would be full, then I'll add a 1, otherwise a zero.
 
-You create a Design Components on the canvas.
+```jsx
+export const tetrominos: Tetris.Tetrominos = {
+  [Tetris.TetrominoType.O]: [
+    [{ x: -1, y: 0 }, { x: 0, y: 0 }, { x: -1, y: 1 }, { x: 0, y: 1 }],
+    [{ x: -1, y: 0 }, { x: 0, y: 0 }, { x: -1, y: 1 }, { x: 0, y: 1 }],
+    [{ x: -1, y: 0 }, { x: 0, y: 0 }, { x: -1, y: 1 }, { x: 0, y: 1 }],
+    [{ x: -1, y: 0 }, { x: 0, y: 0 }, { x: -1, y: 1 }, { x: 0, y: 1 }]
+  ],
+	...
+}
+```
 
-You’ll need a Frame, and you can put any content inside of that Frame.
+I'll save you the trouble of watching me fill these out... but when I'm done, it will look like this.
 
-To turn this Frame into a design component, select the Frame, right click, and select **Create Component**.
+### Colors
 
-The Frame is now the **Master** for this component.
+- types.ts
 
-You can now create **Instances** of the Master.
+```jsx
+export type Colors = Record<TetrominoType, string>
+```
 
-You can tweak certain parts of an Instance without effecting the Master.
+- static.ts
 
-… but when you change parts of the Master, they’ll also change on the instance, unless you’ve tweaked them there.
+```jsx
+export const colors: Tetris.Colors = {
+  [Tetris.TetrominoType.O]: 'yellow',
+  [Tetris.TetrominoType.I]: 'cyan',
+  [Tetris.TetrominoType.S]: 'green',
+  [Tetris.TetrominoType.Z]: 'red',
+  [Tetris.TetrominoType.L]: 'orange',
+  [Tetris.TetrominoType.J]: 'blue',
+  [Tetris.TetrominoType.T]: 'purple',
+}
+```
 
-If you’ve used design tools before, chances are you’ve already seen this pattern. There are a few more tricks to Design Components, so if you’re curious, check out our videos on Design Components in the Crash Course.
+### Piece
 
-Ok, so that’s how you make Design Components.
+Finally, let's make a type for an actual piece in the game.
 
-How do you make code components?
+This will have a tetromino of a certain type...
+
+and a rotation — a number between 0 and 3.
+
+Finally, it will also have an origin — an object with an x and a y that we'll also type as a Point.
+
+```jsx
+export type Point = { x: number; y: number }
+
+export type Piece = {
+  type: TetrominoType
+  orientation: number
+  origin: Point
+}
+```
+
+### Data
+
+Okay, now that we have our data types defined, and we've even started on our static data, let's type all the data that our state will actually contain.
+
+First, let's add that Grid that we defined above — the 2D array containing either zeros or TetrominoTypes from locked-in or falling pieces.
+
+Next, we'll need a current piece, the falling piece that the user can control.
+
+We'll need a next piece too.
+
+And then we'll need a few numbers to keep track of the user's progress — their score, highscore, number of lines that they've cleared, and their current level.
+
+```jsx
+export type Data = {
+  matrix: Matrix
+  active: Piece
+  next: TetrominoType[]
+  score: number
+  highscore: number
+  lines: number
+  level: number
+}
+```
+
+And okay, that's all of our typing.
+
+Even though we haven't created any actual data yet, writing types like this really helps me build out a mental model of how everything will fit together.
+
+# State Data
+
+So right, now that we have our types worked out, let's start actually defining our game's state.
+
+## Initial Data
+
+Let's start with the game's data object. We'll need to define this
+
+- define above as initialData
+- pass to machine
+
+```jsx
+const initialData: Tetris.Data = {
+  matrix: range(20).map(() => range(10).map(() => 0)),
+  active: {
+    type: Tetris.TetrominoType.T,
+    orientation: 0,
+    origin: {
+      x: 2,
+      y: 1,
+    },
+  },
+  next: [
+    Tetris.TetrominoType.S,
+    Tetris.TetrominoType.O,
+    Tetris.TetrominoType.I,
+    Tetris.TetrominoType.Z,
+    Tetris.TetrominoType.T,
+    Tetris.TetrominoType.J,
+  ],
+  score: 0,
+  highscore: 0,
+  lines: 0,
+  level: 0,
+}
+```
+
+# Components
+
+### Grid
+
+- exports a **Container**, **Cell**, and **Piece**
+- used for Matrix — or Next cells
+- next cells will need to be smaller
+
+```tsx
+import * as React from 'react'
+import styled from 'styled-components'
+
+import * as Tetris from '../game/types'
+import * as Static from '../game/static'
+```
+
+### Container
+
+```tsx
+type ContainerProps = {
+  rows: number
+  columns: number
+  size: number
+}
+
+export const Container = styled.div<ContainerProps>((props) => ({
+  display: 'grid',
+  gridTemplateColumns: `repeat(${props.columns}, ${props.size}px)`,
+  gridTemplateRows: `repeat(${props.rows}, ${props.size}px)`,
+  gridGap: 2,
+}))
+```
+
+### Cell
+
+```tsx
+type CellProps = {
+  x: number
+  y: number
+  cell: Tetris.Cell
+}
+
+export const Cell: React.FC<CellProps> = ({ x, y, cell }) => (
+  <div
+    style={{
+      gridColumn: x + 1,
+      gridRow: y + 1,
+      backgroundColor: cell ? Static.colors[cell] : 'transparent',
+      border: '1px solid #ccc',
+    }}
+  />
+)
+```
+
+## Matrix
+
+- Without active piece
+
+```jsx
+import * as React from 'react'
+import { useStateDesigner } from 'state-designer'
+import game from '../game'
+
+import * as Grid from './Grid'
+
+const Matrix: React.FC = () => {
+  const { data } = useStateDesigner(game)
+  const { matrix, active } = data
+
+  return (
+    <Grid.Container size={24} rows={20} columns={10}>
+      {matrix.map((row, y) =>
+        row.map((cell, x) => (
+          <Grid.Cell key={y * 10 + x} x={x} y={y} cell={cell} />
+        ))
+      )}
+    </Grid.Container>
+  )
+}
+
+export default Matrix
+```
+
+- show in **App.tsx**
+
+```jsx
+import * as React from 'react'
+
+import Matrix from './components/Matrix'
+
+export default function App() {
+  return (
+    <div className="App">
+      <Matrix />
+    </div>
+  )
+}
+```
+
+## Piece
+
+- add to grid
+
+```tsx
+// Grid.tsx
+export const Piece: React.FC<Tetris.Piece> = ({
+  type,
+  orientation,
+  origin,
+}) => {
+  const tetromino = Static.tetrominos[type][orientation]
+
+  return (
+    <>
+      {tetromino.map((point, i) => (
+        <Cell
+          key={i}
+          x={origin.x + point.x}
+          y={origin.y + point.y}
+          cell={type}
+        />
+      ))}
+    </>
+  )
+}
+```
+
+- show in matrix
+
+```jsx
+// Matrix.tsx
+
+const Matrix: React.FC = () => {
+  const { data } = useStateDesigner(game)
+  const { matrix, active } = data
+
+  return (
+    <Grid.Container size={24} rows={20} columns={10}>
+      {matrix.map((row, y) =>
+        row.map((cell, x) => (
+          <Grid.Cell key={y * 10 + x} x={x} y={y} cell={cell} />
+        ))
+      )}
+      <Grid.Piece {...active} />
+    </Grid.Container>
+  )
+}
+```
+
+## Next
+
+- Shows a list of next pieces
+- Each piece has its own 4x4 grid
+- origin will need to be offset
+
+```tsx
+import * as React from 'react'
+import { useStateDesigner } from 'state-designer'
+import game from '../game'
+
+import * as Grid from './Grid'
+
+const Next: React.FC = () => {
+  const { data } = useStateDesigner(game)
+  const { next } = data
+
+  return (
+    <div>
+      {next.map((tetrominoType, i) => (
+        <Grid.Container key={i} rows={4} columns={4} size={16}>
+          <Grid.Piece
+            type={tetrominoType}
+            orientation={0}
+            origin={{ x: 2, y: 1 }}
+          />
+        </Grid.Container>
+      ))}
+    </div>
+  )
+}
+
+export default Next
+```
+
+- Show in App.tsx
+
+```tsx
+import * as React from 'react'
+
+import Next from './components/Next'
+import Matrix from './components/Matrix'
+
+export default function App() {
+  return (
+    <div className="App" style={{ display: 'flex' }}>
+      <Matrix />
+      <Next />
+    </div>
+  )
+}
+```
+
+# Gameplay
+
+- add states
+  - add repeat event to playing
+
+### Falling piece
+
+```jsx
+repeat: {
+  event: {
+    do: "moveActivePieceDown",
+  },
+  delay: 1
+},
+```
+
+## Only move if the next move fits
+
+- result
+  - use `cloneDeep` from lodash
+
+```tsx
+activePieceMovedDown(data) {
+  const piece = cloneDeep(data.active)
+  piece.origin.y += 1
+  return piece
+},
+```
+
+- condition
+
+```jsx
+pieceFitsInMatrix(data, _, piece: Tetris.Piece) {
+  const { type, orientation, origin } = piece
+  const tetromino = Static.tetrominos[type][orientation]
+
+  return tetromino.every(point => {
+
+    const matrixX = (origin.x + point.x)
+    const matrixY = (origin.y + point.y)
+
+    return data.matrix[matrixY]?.[matrixX] === 0
+  })
+},
+```
+
+- action
+
+```tsx
+moveActivePieceDown(data) {
+  data.active.origin.y++
+},
+```
+
+# Locking
+
+## Can move down
+
+```jsx
+currentCanMoveDown(data) {
+	const { type, orientation, origin } = data.active
+  const tetromino = Static.tetrominos[type][orientation]
+
+  return tetromino.every(point => {
+
+    const matrixX = (origin.x + point.x)
+    const matrixY = (origin.y + point.y) + 1
+
+    return data.matrix[matrixY]?.[matrixX] === 0
+  })
+}
+```
+
+## Lock active into place
+
+```tsx
+const { type, orientation, origin } = data.active
+const tetromino = Static.tetrominos[type][orientation]
+
+tetromino.forEach((point) => {
+  const matrixX = origin.x + point.x
+  const matrixY = origin.y + point.y
+
+  data.matrix[matrixY][matrixX] = type
+})
+```
+
+## Get next active piece
+
+```tsx
+setActivePiece(data) {
+  const type = data.next.shift() || Tetris.TetrominoType.S
+
+  data.active = {
+    type,
+    origin: { x: 2, y: 1},
+    orientation: 0
+  }
+},
+```
+
+## Add next piece
+
+- uses sample from lodash
+
+```tsx
+import sample from 'lodash-es/sample'
+```
+
+```tsx
+addNextPiece(data) {
+	const randomType = sample(Tetris.TetrominoType) || Tetris.TetrominoType.S
+
+  data.next.push(randomType)
+}
+```
+
+### Final event:
+
+```tsx
+repeat: {
+  event: [
+    "moveActivePieceDown",
+    {
+    unless: "activePieceCanMoveDown",
+    do: ["lockActivePieceIntoPlace", "setActivePiece", "addNextPiece"]
+  }],
+  delay: 1
+}
+```
+
+# Inputs
+
+- hook in app.tsx
+
+```tsx
+React.useEffect(() => {
+  function handleKeydown(event: KeyboardEvent) {}
+
+  document.body.addEventListener('keydown', handleKeydown)
+  return () => {
+    document.body.removeEventListener('keydown', handleKeydown)
+  }
+}, [])
+```
+
+- Switch key
+
+```tsx
+function handleKeydown(event: KeyboardEvent) {
+  switch (event.key) {
+    case 'ArrowLeft':
+      break
+    case 'ArrowRight':
+      break
+    case 'ArrowUp':
+      break
+    case 'ArrowDown':
+      break
+    default:
+      break
+  }
+}
+```
+
+- Send events to game
+- Start with left and right
+
+```tsx
+function handleKeydown(event: KeyboardEvent) {
+  switch (event.key) {
+    case "ArrowLeft":
+      game.send("MOVED_LEFT")
+      break
+    case "ArrowRight":
+      game.send("MOVED_RIGHT")
+      break
+		...
+  }
+}
+```
+
+- Add events to `playing` state
+
+```tsx
+on: {
+  MOVED_LEFT: {},
+  MOVED_RIGHT: {}
+}
+```
+
+### Add results
+
+- Return origin and orientation
+
+```tsx
+results: {
+  activePieceMovedLeft(data) {
+    const piece = cloneDeep(data.active)
+    piece.origin.x -= 1
+    return piece
+  },
+  activePieceMovedRight(data) {
+    const piece = cloneDeep(data.active)
+    piece.origin.x += 1
+    return piece
+  },
+	...
+},
+```
+
+### Actions
+
+```tsx
+moveActivePieceLeft(data) {
+  data.active.origin.x--
+},
+moveActivePieceRight(data) {
+  data.active.origin.x++
+},
+```
+
+# Rotation
+
+### Input
+
+```tsx
+case "ArrowUp":
+  game.send("ROTATED_CLOCKWISE")
+  break
+```
+
+### Event
+
+```tsx
+ROTATED_CLOCKWISE: {
+  get: "activePieceRotatedClockwise",
+  if: "pieceFitsInMatrix",
+  do: "rotateActivePieceClockwise"
+},
+```
+
+### Result
+
+```tsx
+activePieceRotatedClockwise(data) {
+  const piece = cloneDeep(data.active)
+  piece.orientation = (piece.orientation + 1) % 3
+  return piece
+},
+```
+
+### Action
+
+```tsx
+rotateActivePieceClockwise(data) {
+  data.active.orientation = (data.active.orientation + 1) % 3
+},
+```
+
+# Falling and Dropping
+
+- Player can speed up drop while holding the down arrow
+- Separate events for keydown and **keyup**
+- Add event for arrowdown
+
+```tsx
+function handleKeydown(event: KeyboardEvent) {
+  switch (event.key) {
+		...
+    case "ArrowDown":
+      game.send("STARTED_DROP")
+      break
+  }
+}
+```
+
+- Add keyup event listener / callback
+
+```tsx
+	...
+
+	function handleKeyup(event: KeyboardEvent) { }
+
+  document.body.addEventListener("keydown", handleKeydown)
+  document.body.addEventListener("keyup", handleKeyup)
+  return () => {
+    document.body.removeEventListener("keydown", handleKeydown)
+    document.body.removeEventListener("keyup", handleKeyup)
+  }
+```
+
+- With send event
+
+```tsx
+function handleKeyup(event: KeyboardEvent) {
+  switch (event.key) {
+    case 'ArrowDown':
+      game.send('STOPPED_DROP')
+      break
+    default:
+      break
+  }
+}
+```
+
+- Add slow drop and fast drop states
+- While the user holds down, enter "fast drop" state.
+
+```tsx
+playing: {
+	on: { ... },
+	initial: "falling",
+	states: {
+	  falling: {
+	    repeat: {
+	      event: [
+	        {
+	        get: "activePieceMovedDown",
+	        if: "pieceFitsInMatrix",
+	        do: "moveActivePieceDown",
+	        elseDo: ["lockActivePieceIntoPlace", "setActivePiece", "addNextPiece"],
+	      }],
+	      delay: 1
+	    },
+	    on: {
+	      STARTED_DROP: {
+	        to: "dropping"
+	      }
+	    }
+	  },
+	  dropping: {
+	    repeat: {
+	      event: [
+	        {
+	        get: "activePieceMovedDown",
+	        if: "pieceFitsInMatrix",
+	        do: "moveActivePieceDown",
+	        elseDo: ["lockActivePieceIntoPlace", "setActivePiece", "addNextPiece"],
+	      }],
+	      delay: .025
+	    },
+	    on: {
+		    STOPPED_DROP: {
+	        to: "falling"
+	      }
+	    }
+	  },
+	}
+}
+```
+
+## Hard Drop
+
+- Drops the piece all the way to the bottom and locks it
+- keydown event
+- add event to playing
+- same as regular falling event, but will repeat until its conditions fail, and then lock into place.
+
+```tsx
+HARD_DROPPED: {
+  get: "activePieceMovedDown",
+  if: "pieceFitsInMatrix",
+  do: "moveActivePieceDown",
+  send: "HARD_DROPPED",
+  elseDo: ["lockActivePieceIntoPlace", "setActivePiece", "addNextPiece"],
+}
+```
+
+## Clearing Lines
+
+- result
+
+```tsx
+fullLines(data) {
+  let lines: number[] = []
+
+  data.matrix.forEach((row, i) => {
+    if (row.every(Boolean)) {
+      lines.push(i)
+    }
+  })
+
+  return lines
+}
+```
+
+```tsx
+containsFullLines(data) {
+  return data.matrix.some(row => row.every(Boolean))
+},
+```
+
+- condition
+
+```tsx
+hasLines(data, _, lines: number[]) {
+  return lines.length > 0
+},
+```
+
+- Remove full lines
+- For each full line, move lines above it down,
+- Then clear the top row
+
+```tsx
+clearLines(data, _, lines: number[]) {
+  for (let i of lines) {
+    for (let j = i; j > 0; j--) {
+      data.matrix[j] = data.matrix[j - 1]
+    }
+  }
+
+  data.matrix[0] = range(10).map(() => 0)
+}
+```
+
+- Event
+
+```tsx
+event: [
+    {
+    get: "activePieceMovedDown",
+    if: "pieceFitsInMatrix",
+    do: "moveActivePieceDown",
+    elseDo: ["lockActivePieceIntoPlace", "setActivePiece", "addNextPiece"],
+  },{
+    get: "fullLines",
+    if: "hasLines",
+    do: "clearLines"
+  }],
+  delay: .025
+},
+```
+
+# Lines & Score
+
+- Update lines, score when lines are cleared
+- Add static scoes
+
+```tsx
+export const scores = [0, 40, 100, 300, 1200]
+```
+
+- Update player score
+
+```tsx
+updateScore(data, _, lines: number[]) {
+  data.score += Static.scores[lines.length]
+}
+```
+
+- Stats component
+
+```tsx
+import * as React from 'react'
+import { useStateDesigner } from 'state-designer'
+import game from '../game'
+
+const Stats: React.FC = () => {
+  const { data } = useStateDesigner(game)
+
+  return (
+    <div>
+      <section>Score: {data.score}</section>
+    </div>
+  )
+}
+
+export default Stats
+```
+
+- Add to app.tsx
+
+```tsx
+<div className="App" style={{ display: 'flex' }}>
+  <Matrix />
+  <Next />
+  <Stats />
+</div>
+```
+
+# Gameover
+
+Add `onEnter` to `playing`
+
+```tsx
+onEnter: [{
+  do: ["setActivePiece", "addNextPiece"],
+}, {
+  unless: "pieceFitsInMatrix",
+  to: "gameover"
+}],
+```
+
+# Vanish Zone
+
+- Add two extra "hidden" rows to matrix
+- make cells array 22 long
+- slice(-20) in matrix
+- `const matrixY = origin.y + point.y + 2`
+
+```tsx
+const Matrix: React.FC = () => {
+  const { data } = useStateDesigner(game)
+  const { matrix, active } = data
+
+  return (
+    <Grid.Container size={24} rows={20} columns={10}>
+      {matrix
+        .slice(-20)
+        .map((row, y) =>
+          row.map((cell, x) => (
+            <Grid.Cell key={y * 10 + x} x={x} y={y} cell={cell} />
+          ))
+        )}
+      <Grid.Piece
+        {...active}
+        origin={{ ...active.origin, y: active.origin.y - 2 }}
+      />
+    </Grid.Container>
+  )
+}
+```
+
+## Ghost piece
