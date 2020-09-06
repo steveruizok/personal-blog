@@ -13,13 +13,20 @@ const { styled, css } = createStyled({
       $codeText: '#24292e',
       $codeSelectionText: '#263238',
       $codeSelectionBg: '#cceae7',
-      $code0: '#22863a', // strings
-      $code1: '#d73a49', // keywords
-      $code2: '#005cc5', // numbers
-      $code3: '#39adb5', // punctuation
-      $code4: '#6f42c1', // class names / entities
-      $code5: '#6a737d', // comments
-      $code6: '#005cc5', // variables
+      $syntaxOperator: '#d63a4a',
+      $syntaxPunctuation: '#333a40',
+      $syntaxVariable: '#6f42c1',
+      $syntaxAltVariable: '#005cc5',
+      $syntaxKeyword: '#d73a49',
+      $syntaxAtom: '#005cc5',
+      $syntaxString: '#22863a',
+      $syntaxQualifier: '#6f42c1',
+      $syntaxType: '#d73a49',
+      $syntaxComment: '#6a737d',
+      $syntaxTag: '#005cc5',
+      $syntaxAttribute: '#6f42c1',
+      $syntaxLink: '#032f62',
+      $syntaxHeader: '#0000ff',
     },
     lineHeights: {
       $body: '1.62',
@@ -68,29 +75,43 @@ const lightTheme = css.theme({
   $codeText: '#24292e',
   $codeSelectionText: '#263238',
   $codeSelectionBg: '#cceae7',
-  $code0: '#22863a', // strings
-  $code1: '#d73a49', // keywords
-  $code2: '#005cc5', // numbers
-  $code3: '#d73a49', // punctuation
-  $code4: '#6f42c1', // class names / entities
-  $code5: '#6a737d', // comments
-  $code6: '#005cc5', // variables
+  $syntaxOperator: '#d63a4a',
+  $syntaxPunctuation: '#333a40',
+  $syntaxVariable: '#6f42c1',
+  $syntaxAltVariable: '#005cc5',
+  $syntaxKeyword: '#d73a49',
+  $syntaxAtom: '#005cc5',
+  $syntaxString: '#22863a',
+  $syntaxQualifier: '#6f42c1',
+  $syntaxType: '#d73a49',
+  $syntaxComment: '#6a737d',
+  $syntaxTag: '#005cc5',
+  $syntaxAttribute: '#6f42c1',
+  $syntaxLink: '#032f62',
+  $syntaxHeader: '#0000ff',
 })
 
 const darkTheme = css.theme({
   $background: '#010101',
   $text: '#ffffff',
-  $codeBg: '#1d1d1d',
-  $codeText: '#eeeeee',
+  $codeBg: '#141414',
+  $codeText: '#d1d5da',
   $codeSelectionText: '#eeeeee',
   $codeSelectionBg: '#363636',
-  $code0: '#a5e844',
-  $code1: '#c792ea',
-  $code2: '#f2ff00',
-  $code3: '#88ddff',
-  $code4: '#a5e844',
-  $code5: '#616161',
-  $code6: '#ff6666',
+  $syntaxOperator: '#d1d5da',
+  $syntaxPunctuation: '#79b8ff',
+  $syntaxVariable: '#b392f0',
+  $syntaxAltVariable: '#79b8ff',
+  $syntaxKeyword: '#f97583',
+  $syntaxAtom: '#79b8ff',
+  $syntaxString: '#ffab70',
+  $syntaxQualifier: '#b392f0',
+  $syntaxType: '#f97583',
+  $syntaxComment: '#959da5',
+  $syntaxTag: '#34d058',
+  $syntaxAttribute: '#b392f0',
+  $syntaxLink: '#79b8ff',
+  $syntaxHeader: '#f97583',
 })
 
 css.global({
@@ -112,21 +133,39 @@ css.global({
     backgroundColor: '$codeBg',
     color: '$codeText',
   },
-  '.token.attr-value,.attribute,.pseudo-element,.pseudo-class,.string': {
-    color: '$code0',
+  '.token .number': {
+    color: '$syntaxAtom',
   },
-  '.token.atrule,.boolean,.constant,.hexcode,.id,.important,.keyword,.symbol': {
-    color: '$code1',
+  '.token .attr-name,.attribute': {
+    color: '$syntaxAttribute',
   },
-  '.token.number,.hexcode,.unit,.property-access': { color: '$code2' },
-  '.token.attr-name,.builtin,.cdata,.class,.inserted,.operator,.interpolation-punctuation': {
-    color: '$code3',
+  '.token .attr-value,.pseudo-element,.pseudo-class,.string': {
+    color: '$syntaxString',
   },
-  '.token.class-name,.regex,.function,.method,.property-access': {
-    color: '$code4',
+  '.token .atrule,.boolean,.constant,.hexcode,.id,.important,.keyword,.symbol': {
+    color: '$syntaxKeyword',
   },
-  '.token.comment,.doctype,.prolog': { color: '$code5' },
-  '.token.deleted,.entity,.variable,.url,.tag,.selector': { color: '$code6' },
+  '.token .hexcode,.unit.builtin,.cdata,.class,.inserted,.interpolation-punctuation': {
+    color: '$syntaxAltVariable',
+  },
+  '.token .regex,.function,.method,.variable': {
+    color: '$syntaxAltVariable',
+  },
+  '.token .comment,.doctype,.prolog': {
+    color: '$syntaxComment',
+  },
+  '.token .deleted,.entity,.url,.selector,.maybe-class-name': {
+    color: '$syntaxVariable',
+  },
+  '.token > .tag, .token.tag > .punctuation': {
+    color: '$syntaxTag',
+  },
+  '.token.punctuation': {
+    color: '$syntaxPunctuation',
+  },
+  '.token.operator': {
+    color: '$syntaxOperator',
+  },
 })
 
 export { styled, css, lightTheme, darkTheme }

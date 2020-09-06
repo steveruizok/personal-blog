@@ -6,7 +6,11 @@ date: '08/27/2020'
 This is my first blog post.
 
 ```tsx
-// A comment here
+const themes: Record<ThemeName, any> = {
+  light: lightTheme,
+  dark: darkTheme,
+}
+
 const btn = document.getElementById('btn')
 let count = 0
 function render() {
@@ -18,26 +22,31 @@ btn.addEventListener('click', () => {
     count += 1
     render()
   }
-})
+```
 
-export default function PostNavLinks({ slug }: Props) {
-  const { prev, next } = getNeighborPosts(slug)
-
-  const [state, setState] = useState(0)
-
+```tsx
+export default function SecondaryPostLink({
+  title,
+  date,
+  readingTime,
+  slug,
+  hero,
+}: Blog.Post) {
   return (
-    <Container aria-label="Previous and Next Posts">
-      {prev && (
-        <PostNavLink href={prev.slug} direction="prev">
-          {prev.title}
-        </PostNavLink>
-      )}
-      {next && (
-        <PostNavLink href={next.slug} direction="next">
-          {next.title}
-        </PostNavLink>
-      )}
-    </Container>
+    <article>
+      <Link href={slug}>
+        <LinkContainer>
+          <TitleContainer>
+            <header>
+              <Heading3 css={{ m: 0, mb: '$0' }}>{title}</Heading3>
+            </header>
+            <Text variant="detail">
+              <time dateTime={date}>{date} </time> • {readingTime.text}
+            </Text>
+          </TitleContainer>
+        </LinkContainer>
+      </Link>
+    </article>
   )
 }
 ```
