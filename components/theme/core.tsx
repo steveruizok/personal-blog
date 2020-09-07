@@ -22,7 +22,7 @@ const { styled, css } = createStyled({
       $syntaxString: '#22863a',
       $syntaxQualifier: '#6f42c1',
       $syntaxType: '#d73a49',
-      $syntaxComment: '#6a737d',
+      $syntaxComment: '#63676a',
       $syntaxTag: '#005cc5',
       $syntaxAttribute: '#6f42c1',
       $syntaxLink: '#032f62',
@@ -76,7 +76,7 @@ const lightTheme = css.theme({
   $codeSelectionText: '#263238',
   $codeSelectionBg: '#cceae7',
   $syntaxOperator: '#d63a4a',
-  $syntaxPunctuation: '#333a40',
+  $syntaxPunctuation: '#444a40',
   $syntaxVariable: '#6f42c1',
   $syntaxAltVariable: '#005cc5',
   $syntaxKeyword: '#d73a49',
@@ -84,7 +84,7 @@ const lightTheme = css.theme({
   $syntaxString: '#22863a',
   $syntaxQualifier: '#6f42c1',
   $syntaxType: '#d73a49',
-  $syntaxComment: '#6a737d',
+  $syntaxComment: '#63676a',
   $syntaxTag: '#005cc5',
   $syntaxAttribute: '#6f42c1',
   $syntaxLink: '#032f62',
@@ -133,28 +133,28 @@ css.global({
     backgroundColor: '$codeBg',
     color: '$codeText',
   },
-  '.token .number': {
+  '.token.number': {
     color: '$syntaxAtom',
   },
-  '.token .attr-name,.attribute': {
+  '.token.attr-name,.attribute': {
     color: '$syntaxAttribute',
   },
-  '.token .attr-value,.pseudo-element,.pseudo-class,.string': {
+  '.token.attr-value,.pseudo-element,.pseudo-class,.string': {
     color: '$syntaxString',
   },
-  '.token .atrule,.boolean,.constant,.hexcode,.id,.important,.keyword,.symbol': {
+  '.token.atrule,.boolean,.constant,.hexcode,.id,.important,.keyword,.symbol': {
     color: '$syntaxKeyword',
   },
-  '.token .hexcode,.unit.builtin,.cdata,.class,.inserted,.interpolation-punctuation': {
+  '.token.hexcode,.unit,.cdata,.class,.inserted,.interpolation-punctuation': {
     color: '$syntaxAltVariable',
   },
-  '.token .regex,.function,.method,.variable': {
+  '.token.regex,.function,.method,.variable,.maybe-class-name': {
     color: '$syntaxAltVariable',
   },
-  '.token .comment,.doctype,.prolog': {
+  '.token.comment,.doctype,.prolog': {
     color: '$syntaxComment',
   },
-  '.token .deleted,.entity,.url,.selector,.maybe-class-name': {
+  '.token.deleted,.entity,.url,.selector,.type': {
     color: '$syntaxVariable',
   },
   '.token > .tag, .token.tag > .punctuation': {
@@ -165,6 +165,9 @@ css.global({
   },
   '.token.operator': {
     color: '$syntaxOperator',
+  },
+  '.token.builtin': {
+    color: '$syntaxLink',
   },
 })
 

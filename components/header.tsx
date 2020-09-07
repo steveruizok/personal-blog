@@ -6,7 +6,7 @@ import { Sun, Moon } from 'react-feather'
 import RotatingIcon from './rotating-icon'
 
 const Container = styled(Grid, {
-  mt: '$3',
+  mt: 0,
   mb: '$5',
   gridTemplateColumns: '1fr repeat(4, auto)',
   gridGap: 0,
@@ -15,6 +15,7 @@ const Container = styled(Grid, {
   font: '$ui',
   mr: '-$0',
   sm: {
+    mt: '$2',
     mr: '-$1',
   },
 })

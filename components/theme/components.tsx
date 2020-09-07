@@ -1,3 +1,4 @@
+import { useRef, useState, useEffect } from 'react'
 import { styled } from './core'
 
 /* --------------------- Layout --------------------- */
@@ -30,6 +31,22 @@ export const Container = styled('div', {
   },
   lg: {
     p: '$4',
+  },
+  '& sup > a': {
+    fontSize: '$0',
+    p: 2,
+    textDecoration: 'none',
+  },
+  '& .footnotes > ol': {
+    p: 0,
+    ml: '$1',
+  },
+  '& .footnotes .footnote-backref': {
+    ml: '$0',
+  },
+  '& .footnotes *': {
+    fontSize: '$1',
+    lineHeight: 1.32,
   },
 })
 
@@ -73,7 +90,7 @@ export const Blockquote = styled('blockquote', {
   },
 })
 
-export const Footnote = styled('div', {})
+export const Footnotes = styled('div', {})
 
 /* --------------------- Inputs --------------------- */
 
@@ -153,7 +170,7 @@ export const A = styled('a', {
   color: '$text',
   display: 'relative',
   textUnderlineOffset: '8px',
-  md: {
+  sm: {
     '&:hover': {
       color: '$accent',
     },
@@ -229,23 +246,25 @@ export const Pre = styled('pre', {
   font: '$monospace',
   lineHeight: '$code',
   fontSize: '$1',
-  my: '$3',
-  bg: '$codeBg',
-  borderRadius: 4,
   overflowX: 'scroll',
-  p: '$1',
+  bg: '$codeBg',
+  my: '$3',
   mx: '-$1',
+  px: '$1',
+  py: '$2',
   sm: {
-    p: '$1',
+    borderRadius: 4,
     mx: '-$1',
+    px: '$1',
+    py: '$2',
   },
   md: {
-    p: '$2',
     mx: '-$2',
+    p: '$2',
   },
   lg: {
-    p: '$3',
     mx: '-$3',
+    p: '$3',
   },
 })
 

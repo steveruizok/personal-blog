@@ -19,7 +19,7 @@ import {
   Blockquote,
   OrderedList,
   UnorderedList,
-  Footnote,
+  Footnotes,
   Divider,
 } from '../components/theme'
 import '../components/styles.css'
@@ -48,7 +48,6 @@ function MyApp({ Component, pageProps }) {
           blockquote: Blockquote,
           ol: OrderedList,
           ul: UnorderedList,
-          footnote: Footnote,
         }}
       >
         <Component {...pageProps} />

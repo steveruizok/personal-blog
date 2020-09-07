@@ -1,0 +1,90 @@
+---
+title: 'How I Built This Blog'
+date: '9/6/2020'
+hero: '/images/greyson-joralemon-A1g0oeX29ec-unsplash.jpg'
+---
+
+As a designer, I've spent my career borrowing development tools to build prototypes that needed a level of interactivity or data that couldn't be done in design tools alone. I was always more of a chainsaw artist than arborist, however, and so I skipped many of the projects that other developers start off with.
+
+Recently, as the tools have become easier and more interesting, I've started drifting moving from making models to building actual projects meant to be used in production. And I've wanted a place to write about what I'm learning...
+
+So welcome to my first blog.[^1]
+
+In the sections below, I'll describe how I built this blog. I'll first introduce the "stack" of technologies that I used, then I'll break down each part of this stack and explain how it works with other parts of the stack. Along the way, I'll give some insight into my reasoning behind the choices I've made.
+
+## The Stack in Brief
+
+I've built this website using the [Next.js](https://nextjs.org/) framework and I've deployed it to [Vercel](https://vercel.com/dashboard). I've written my [React](https://reactjs.org/) components in [TypeScript](https://www.typescriptlang.org/) and I've used [Stitches](https://stitches.dev/) for styling. I write my content in [MDX](https://mdxjs.com/).
+
+### Rendering Websites in React and Next.js
+
+Let's start with the choice to use [Next.js](https://nextjs.org/) as a framework. To learn about Next, we also need to learn a bit about React.
+
+[React](https://reactjs.org/) is a library for building user interfaces, created and maintained by Facebook. [Next.js](https://nextjs.org/) is a framework that builds on top of React in order to give developers more options in how they build and deploy websites.
+
+In a Next project, your website's pages are defined as individual files, each containing the code for a React component that defines what is on that page. Like all React components, this page component can be made up of HTML tags, like `<p>` to describe paragraphs, as well as other reusable components, like `<Header>`s, `<Button>`s and `<Menu>`s, that you've defined elsewhere in your project.
+
+```tsx
+// pages/my-page.jsx
+
+import Heading from '../components/heading'
+
+function MyPage() {
+  return (
+    <Layout>
+      <Title>My Blog</Title>
+      <Heading>My First Post</Heading>
+      <main>
+        <p>Welcome to my blog!</p>
+      </main>
+    </Layout>
+  )
+}
+```
+
+While React code is easy to read and write, browsers like Chrome and Safari can't actually read it. They only speak two languages—HTML for markup and CSS for styling—and so a component like the one above will eventually need to be "rendered", or turned into the HTML and CSS that the browser can actually read.
+
+```html
+<!-- my-page.html -->
+
+<html>
+  <head>
+    <title>My Blog</title>
+  </head>
+  <body>
+    <main>
+      <h1 className="post-header">My First Post</h1>
+      <p>Welcome to my blog!</p>
+    </main>
+  </body>
+</html>
+```
+
+In a "normal" React project, this "rendering" process happens on a user's machine. When a user visits a React website, their browser downloads the React code for the website along with instructions on how to turn it into HTML and CSS. The user's browser runs that code, builds the page that the user wants to see, and shows the result to the user.
+
+While this can result in bigger downloads and slower websites, this approach allows for highly "dynamic" pages that can easily render different content for different users. For example, a personalized news feed or a music app.
+
+By contrast, a Next project is designed to create "server rendered" pages. Each Next project includes a "build" step where pages are "pre-rendered" into their final HTML and CSS upfront. When a user visits a page created by a Next project, their browser will only download these pre-rendered files, saving the user from having to download the whole site in order to build and render it themselves.
+
+Server-side rendering can result in much smaller downloads and faster websites for projects with little or no dynamic content[^2]. And so, because this blog has no dynamic content, that choice was easy to make.
+
+### Writing Content in MDX
+
+The blog's content of the website is written in MDX, a markdown language for describing things like paragraphs and headings. It looks like this.
+
+```md
+---
+title: 'My First Blog Post'
+date: '9/1/2020'
+hero: '/images/my-hero-image.jpg'
+---
+
+## Tablet I
+
+He who has seen everything, I will make known to the lands. I will teach about him who experienced all things, alike, Anu granted him the totality of knowledge of all.
+```
+
+---
+
+[^1]: Sort of. In the late 2000s and early 2010s, I wrote about art in Chicago under the official-sounding name [Chicago Art Review](http://chicagoaNowrtreview.com/). The site began as a Wordpress theme. Over the years I modified the theme and tried writing my own but never with much success. The closest I'd really come to "building a blog" was when I built [The Visualist](http://www.thevisualist.org/), a visual arts calendar for the Chicago art community, with a design by [Chad Kouri](https://chadkouri.com/about/). That was also a Wordpress project, but the theme was more custom and pretty complex. I'm still not sure how I got it to work, but it's still running.
+[^2]: There is of course a tradeoff here: while static sites are perfect for blogs and other projects where each user will view the same content, they are harder to use for sites that need dynamic content. It can still be done, however, on a component-by-component basis; so unless _all_ of a site's content needs to be dynamic, this kind of partial SSR is probably a better choice!
