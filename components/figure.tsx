@@ -1,6 +1,5 @@
-// @jsx jsx
 import Link from 'next/link'
-import { jsx, Box, Image, Text } from 'theme-ui'
+import { Image, Span, A } from './theme'
 
 export default function Figure(props: {
   src: string
@@ -10,22 +9,26 @@ export default function Figure(props: {
   return (
     <>
       <Link href={props.src}>
-        <span sx={{ textAlign: 'center', display: 'block', mx: [-3, 0] }}>
-          <Image variant="article" {...props} sx={{ mt: 4 }} />
-        </span>
+        <A
+          css={{
+            textAlign: 'center',
+            display: 'block',
+            mx: '-$1',
+            sm: {
+              mx: '-$1',
+            },
+            md: {
+              mx: '-$2',
+            },
+            lg: {
+              mx: '-$2',
+            },
+          }}
+        >
+          <Image {...props} css={{ mt: '$3' }} />
+        </A>
       </Link>
-      <Text
-        as="span"
-        variant="textStyles.ui"
-        sx={{
-          display: 'block',
-          color: 'secondaryFill',
-          mb: 4,
-          textAlign: 'center',
-        }}
-      >
-        {props.title}
-      </Text>
+      <Span variant="caption">{props.title}</Span>
     </>
   )
 }

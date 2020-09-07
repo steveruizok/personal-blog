@@ -1,22 +1,20 @@
-// @jsx jsx
-import { jsx, Box, Text } from 'theme-ui'
+import { Footer as F, A, Box, Text } from './theme'
 
 export default function Footer() {
   return (
-    <Box
-      as="footer"
-      sx={{
+    <F
+      css={{
         py: 4,
-        opacity: 0.7,
-        transition: 'all .2s',
-        '&:hover': { opacity: 1 },
+        textAlign: 'center',
       }}
     >
-      <Text variant="textStyles.ui">
-        Made in London
-        <br />
-        <a href="https://twitter.com/steveruizok">Steve Ruiz</a> 2020
+      <Text variant="detail">
+        Made in London •{' '}
+        <A variant="author" href="https://twitter.com/steveruizok">
+          Steve Ruiz
+        </A>{' '}
+        • 2020
       </Text>
-    </Box>
+    </F>
   )
 }

@@ -1,12 +1,15 @@
+const readingTime = require('reading-time')
 const withMdxEnhanced = require('next-mdx-enhanced')
+const withPlugins = require('next-compose-plugins')
+const optimizedImages = require('next-optimized-images')
 
 const defaultFrontmatter = {
   title: 'Remember to add a title!',
   description: 'Remember to add a description!',
   author: 'Steve Ruiz',
   twitter: '@steveruizok',
-  avatar: '/avatars/@steveruizok.webp',
-  hero: '/images/article.webp',
+  avatar: '/avatars/@steveruizok.jpg',
+  hero: '/images/article.jpg',
   keywords: 'design',
   date: '1/1/2020',
   location: 'London',
@@ -19,7 +22,7 @@ module.exports = withMdxEnhanced({
   remarkPlugins: [require('remark-slug')],
   rehypePlugins: [require('@mapbox/rehype-prism')],
   extendFrontMatter: {
-    process: (_, frontMatter) => {
+    process: (mdxContent = '', frontMatter) => {
       const matter = {
         ...defaultFrontmatter,
         ...frontMatter,
@@ -32,13 +35,13 @@ module.exports = withMdxEnhanced({
         dateTime: date.getTime(),
         date: date.toLocaleDateString('en-us', {
           day: 'numeric',
-          month: 'long',
-          weekday: 'long',
+          month: 'short',
           year: 'numeric',
         }),
-        slug: matter.__resourcePath.replace(/\.mdx$/, ''),
+        readingTime: readingTime(mdxContent),
+        slug: '/' + matter.__resourcePath.replace(/\.mdx$/, ''),
       }
     },
     phase: 'both',
   },
-})({})
+})(withPlugins([[optimizedImages, {}]]))

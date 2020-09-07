@@ -1,5 +1,4 @@
-// @jsx jsx
-import { jsx, Box, Text, Link as A } from 'theme-ui'
+import { styled, Nav, Heading3, BoxLink, Text, A } from './theme'
 import Link from 'next/link'
 import { getNeighborPosts } from '../lib/api'
 
@@ -7,55 +6,56 @@ type Props = {
   slug?: Blog.Post['slug']
 }
 
+const Container = styled(Nav, {
+  my: '$3',
+  width: '100%',
+  padding: '1em 0',
+  display: 'grid',
+  gridTemplateColumns: 'auto minmax(48px, 1fr) auto',
+})
+
 export default function PostNavLinks({ slug }: Props) {
   const { prev, next } = getNeighborPosts(slug)
 
   return (
-    <nav
-      aria-label="Previous and Next Posts"
-      sx={{
-        my: 5,
-        width: '100%',
-        padding: '1em 0',
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr auto',
-      }}
-    >
+    <Container aria-label="Previous and Next Posts">
       {prev && (
-        <Link href={'/' + prev.slug}>
-          <Box
-            sx={{
-              gridColumn: 1,
-              cursor: 'pointer',
-              '&:hover': { bg: 'muted' },
-              m: -2,
-              p: 2,
-              borderRadius: 4,
-            }}
-          >
-            <Text variant="textStyles.ui">« Prev</Text>
-            <A>{prev.title}</A>
-          </Box>
-        </Link>
+        <PostNavLink href={prev.slug} direction="prev">
+          {prev.title}
+        </PostNavLink>
       )}
       {next && (
-        <Link href={'/' + next.slug}>
-          <Box
-            sx={{
-              gridColumn: 3,
-              textAlign: 'right',
-              cursor: 'pointer',
-              '&:hover': { bg: 'muted' },
-              m: -2,
-              p: 2,
-              borderRadius: 4,
-            }}
-          >
-            <Text variant="textStyles.ui">Next »</Text>
-            <A>{next.title}</A>
-          </Box>
-        </Link>
+        <PostNavLink href={next.slug} direction="next">
+          {next.title}
+        </PostNavLink>
       )}
-    </nav>
+    </Container>
+  )
+}
+
+function PostNavLink({
+  href,
+  direction,
+  children,
+}: {
+  href: string
+  direction: 'prev' | 'next'
+  children: React.ReactNode
+}) {
+  return (
+    <Link href={href}>
+      <BoxLink
+        href={href}
+        style={{
+          maxWidth: 400,
+          height: 'fit-content',
+          gridColumn: direction === 'prev' ? 1 : 3,
+          textAlign: direction === 'prev' ? 'left' : 'right',
+        }}
+      >
+        <Text variant="ui">{direction === 'prev' ? '« Prev' : 'Next »'}</Text>
+        <Heading3>{children}</Heading3>
+      </BoxLink>
+    </Link>
   )
 }

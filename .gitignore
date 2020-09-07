@@ -32,3 +32,4 @@ yarn-error.log*
 .mdx-data
 
 .vercel
+yarn.lock

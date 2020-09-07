@@ -1,62 +1,60 @@
-// @jsx jsx
-import { jsx, Grid, Text, Box, Link as A } from 'theme-ui'
+import { styled, Grid, Footer, Heading2, Text, BoxLink, A } from './theme'
 import Link from 'next/link'
+
+const LinkContainer = styled(BoxLink, {
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gridTemplateRows: '240px auto',
+  minHeight: 144,
+  gap: '$2',
+  gridAutoFlow: 'row',
+  my: '$2',
+  textDecoration: 'none',
+  sm: {
+    gridTemplateColumns: '128px 1fr',
+    gridTemplateRows: 'auto',
+    gap: '$2',
+    my: 0,
+  },
+})
+
+const TitleContainer = styled('div', {})
+
+const PostImage = styled('div', {
+  width: '100%',
+  height: '100%',
+  backgroundColor: '#ccc',
+  borderRadius: 4,
+  backgroundPosition: 'center center',
+  backgroundSize: 'cover',
+})
 
 export default function PostLink({
   title,
-  description,
   date,
+  readingTime,
   slug,
   hero,
 }: Blog.Post) {
   return (
-    <Link href={slug}>
-      <article>
-        <Grid
-          sx={{
-            cursor: 'pointer',
-            gridTemplateColumns: '128px 1fr',
-            gridAutoFlow: 'column',
-            gap: 2,
-            p: 3,
-            mx: -3,
-            borderRadius: 4,
-            transition: 'all .18s',
-            '&: hover': {
-              bg: 'muted',
-            },
-          }}
-        >
-          <Box
-            sx={{
-              backgroundColor: '#ccc',
-              borderRadius: 4,
-              backgroundPosition: 'center center',
-              backgroundSize: 'cover',
+    <article>
+      <Link href={slug}>
+        <LinkContainer href={slug}>
+          <PostImage
+            css={{
               backgroundImage: `url(${hero})`,
             }}
           />
-          <Box sx={{ minHeight: 96 }}>
+          <TitleContainer>
             <header>
-              <Text sx={{ fontSize: 4 }}>{title}</Text>
-              <Text variant="textStyles.detail" sx={{ color: 'secondaryFill' }}>
-                {date}
-              </Text>
+              <Heading2 css={{ mt: 0, mb: '$1' }}>{title}</Heading2>
             </header>
-            <Text
-              variant="textStyles.detail"
-              sx={{ mt: 2, color: 'secondaryFill' }}
-            >
-              {description}
+            <Text variant="detail">
+              <time dateTime={date}>{date} </time> • {readingTime.text}
             </Text>
-            <footer>
-              <Link href={slug}>
-                <A sx={{ fontFamily: 'ui', fontSize: 2 }}>Read more »</A>
-              </Link>
-            </footer>
-          </Box>
-        </Grid>
-      </article>
-    </Link>
+          </TitleContainer>
+        </LinkContainer>
+      </Link>
+    </article>
   )
 }
