@@ -1,1 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Fira+Sans:wght@300;400;600&family=Lora:wght@400;600&display=swap');
+
+@keyframes bounce {
+  from {
+    transform: translateY(-8px);
+  }
+  to {
+    transform: translateY(3px);
+  }
+}

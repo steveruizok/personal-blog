@@ -4,17 +4,16 @@ import utils from './utils'
 const { styled, css } = createStyled({
   tokens: {
     colors: {
-      $background: '#ffffff',
-      $text: '#000',
       $hover: 'rgba(11, 153, 234, .1)',
       $muted: 'rgba(144, 144, 144, .1)',
-      $accent: '#0e99eb',
+      $background: '#ffffff',
+      $text: '#000000',
       $codeBg: '#fafafa',
       $codeText: '#24292e',
       $codeSelectionText: '#263238',
       $codeSelectionBg: '#cceae7',
       $syntaxOperator: '#d63a4a',
-      $syntaxPunctuation: '#333a40',
+      $syntaxPunctuation: '#444a40',
       $syntaxVariable: '#6f42c1',
       $syntaxAltVariable: '#005cc5',
       $syntaxKeyword: '#d73a49',
@@ -68,32 +67,11 @@ const { styled, css } = createStyled({
   utils,
 })
 
-const lightTheme = css.theme({
-  $background: '#ffffff',
-  $text: '#000000',
-  $codeBg: '#fafafa',
-  $codeText: '#24292e',
-  $codeSelectionText: '#263238',
-  $codeSelectionBg: '#cceae7',
-  $syntaxOperator: '#d63a4a',
-  $syntaxPunctuation: '#444a40',
-  $syntaxVariable: '#6f42c1',
-  $syntaxAltVariable: '#005cc5',
-  $syntaxKeyword: '#d73a49',
-  $syntaxAtom: '#005cc5',
-  $syntaxString: '#22863a',
-  $syntaxQualifier: '#6f42c1',
-  $syntaxType: '#d73a49',
-  $syntaxComment: '#63676a',
-  $syntaxTag: '#005cc5',
-  $syntaxAttribute: '#6f42c1',
-  $syntaxLink: '#032f62',
-  $syntaxHeader: '#0000ff',
-})
+const lightTheme = css.theme({})
 
 const darkTheme = css.theme({
   $background: '#010101',
-  $text: '#ffffff',
+  $text: '#d9d9d9',
   $codeBg: '#141414',
   $codeText: '#d1d5da',
   $codeSelectionText: '#eeeeee',

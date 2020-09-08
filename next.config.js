@@ -19,7 +19,10 @@ module.exports = withMdxEnhanced({
   layoutPath: 'layouts',
   defaultLayout: true,
   fileExtensions: ['mdx', 'md'],
-  remarkPlugins: [require('remark-slug')],
+  remarkPlugins: [
+    require('@ngsctt/remark-smartypants'),
+    require('remark-slug'),
+  ],
   rehypePlugins: [require('@mapbox/rehype-prism')],
   extendFrontMatter: {
     process: (mdxContent = '', frontMatter) => {

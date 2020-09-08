@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
+    "@ngsctt/remark-smartypants": "^0.2.0",
     "@state-designer/react": "^1.2.26",
     "@stitches/react": "^0.0.1",
     "babel-plugin-import-glob-array": "^0.2.0",
