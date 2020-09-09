@@ -201,7 +201,6 @@ export const A = styled('a', {
   cursor: 'pointer',
   color: '$text',
   display: 'relative',
-  textUnderlineOffset: '8px',
   sm: {
     '&:hover': {
       color: '$accent',

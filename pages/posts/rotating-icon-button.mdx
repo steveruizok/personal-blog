@@ -1,8 +1,8 @@
 ---
-title: 'Rotating Icon Button in React'
+title: 'Making a Rotating Icon Button in React'
 date: '9/9/2020'
 hero: '/images/anastasia-taioglou-EEDLURXCpqg-unsplash.jpg'
-status: 'draft'
+status: 'published'
 ---
 
 import { Sun, CloudRain, Moon } from 'react-feather'
@@ -115,9 +115,9 @@ Now let's work out our button's state.
 
 ## The Button State
 
-Out button can have any number of children but we only want it to show one child at a time. The button will therefore need to keep track of which of these children is its _currently active_ child.
+Out button can have any number of children but we only want it to show one child at a time. The button will need to keep track of which of these children is its _currently active_ child.
 
-We can create this state using the `useState` React hook, and we'll store the array index of the button's currently active child. As we render each child, we can compare its index against this value in order to see whether that child is the currently active one.
+We can create this state using the `useState` React hook, and we'll store the array index of the button's currently active child. As we render each child, we can compare its index against this value to see whether that child is the currently active one.
 
 ```jsx
 function RotatingIconButton({ children }) {
@@ -128,7 +128,7 @@ function RotatingIconButton({ children }) {
       {React.Children.map(children, (child, i) => {
         const isCurrent = i === current
 
-        return <Icon>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>
       })}
     </Button>
   )
@@ -137,7 +137,7 @@ function RotatingIconButton({ children }) {
 
 We're not using this `isCurrent` variable yet, but we'll come back to it soon.
 
-Each time we click the button, we'll want to bump up that `current` value so that it cycles through the children. In our click event handler, we'll also need to check whether we're already at our maximum index (`children.length - 1`) so that we can loop back around to zero when we've reached the end.
+Each time we click the button, we'll want to bump up that `current` value so that it cycles through the children. In our click event handler, we'll also need to check whether we're already at our last index (`children.length - 1`) so that we can loop back around to zero when we've reached the end.
 
 ```jsx
 function RotatingIconButton({ children }) {
@@ -156,7 +156,7 @@ function RotatingIconButton({ children }) {
       {React.Children.map(children, (child, i) => {
         const isCurrent = i === current
 
-        return <Icon>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>
       })}
     </Button>
   )
@@ -171,11 +171,13 @@ On each render, we want our icons to perform two different animations depending 
 
 If the icon is our new currently active icon, we want it to move from below the button up to the center of the button. If not, we'll instead want it to move from the center of the button to up above the button; or, if it's already above the button, to stay where it is.
 
-We want this animation to be as snappy as possible, so we'll use the Icon element's `transfrom` property to make these moves. But we have two options for how to actually move the element: the `transition` property and the `animation` property.
+We'll use the Icon element's `transfrom` property to make these moves, but we have two options for how to actually animate the element: the `transition` property and the `animation` property.
 
 Let's look at `transition` first.
 
 ### Animating with Transition
+
+The `transition` property allows us to define an animation to apply whenever certain properties change. In React, we can define a different `transform` value on each update based on `isCurrent`.
 
 ```jsx
 export function RotatingIconButton({ children }) {
@@ -188,8 +190,9 @@ export function RotatingIconButton({ children }) {
 
         return (
           <Icon
+            key={i}
             style={{
-              transition: 'all .5s',
+              transition: 'transform .5s',
               transform: `translateY(${isCurrent ? 0 : -100}%)`,
             }}
           >
@@ -202,7 +205,7 @@ export function RotatingIconButton({ children }) {
 }
 ```
 
-And here's what we get:
+Here's what that code (with its snips unsnipped) will give us:
 
 <CodeBox>
   <Article.RotatingIconButtonWithTransition>
@@ -212,13 +215,15 @@ And here's what we get:
   </Article.RotatingIconButtonWithTransition>
 </CodeBox>
 
-This isn't really what we want. Rather than everything moving in and out from the top, we want the new active icon to come in from the bottom.
+That's admittedly fun—but it isn't what we wanted. Rather than everything moving in and out from the top, we wanted the new active icon to come in from the bottom.
 
-This is a problem for the `transition` property because it does not give us a way to "jump" to our "from" position before transitioning to our "to" position. We could do some clever tricks here with effects, `requestAnimationFrame`, and timings... but thankfully we have a better way through CSS animations.
+This is a problem for the `transition` property. It doesn't give us a way to "jump" to our "from" position before transitioning to our "to" position, so we've have no way of getting from above to below without crossing back down through the middle. We could do some clever tricks here with effect hooks, `requestAnimationFrame`, and timings... but we don't have to.
+
+We can use CSS animations instead.
 
 ### Animating with CSS Animations
 
-To use a CSS animation, we'll first need to define the animation as a set of keyframes.[^2] For this animatiom, we need two animations: `riseIn` will move an element from a lower position to its default position, and `riseOut` that move it from its default position to a higher position.
+To use a CSS animation, we'll first need to define the animation as a set of keyframes.[^2] For this animation, we need two sets of keyframes: `riseIn` will move an element from a lower position to its default position; and `riseOut` will move the element from its default position to a higher position.
 
 ```jsx
 import styled, { keyframes } from 'styled-components'
@@ -268,7 +273,7 @@ Let's see how that looks:
   </Article.RotatingIconButtonWithCSSAnimation>
 </CodeBox>
 
-And if we hide the overflow on the button...
+It may still look a little strange, but if we hide the overflow on the button...
 
 ```jsx
 const Button = styled.button`
@@ -291,11 +296,11 @@ Then we get this:
   </Article.RotatingIconButtonWithCSSAnimationNoOverflow>
 </CodeBox>
 
-That looks pretty good!
+There we go! We have our animation.
 
 ## Final Touches
 
-There are a few last touches before we're done.
+There are a few last details to take care of before I'll call this done.
 
 First, let's style up our button, getting rid of its background and border and giving it a hover effect.
 
@@ -330,7 +335,7 @@ const Button = styled.button`
 
 Though it's probably hard to tell this deep into the article, we also need to work out how we handle our animations when the component first loads. On this first render, we don't want _any_ of our animations to fire.
 
-To fix this, we'll need to keep track of whether we're in our first render through a second state. This property, `isInitial`, will start off as true and then we'll set it to false when we first cycle our `current` state.
+To fix this, we'll need to keep track of whether we're in our first render. For this, we can use a `useRef` hook together with a `useEffect` hook that sets the ref's value back to false after the initial render.
 
 ```jsx
 export function RotatingIconButton({ children }) {
@@ -346,7 +351,7 @@ export function RotatingIconButton({ children }) {
 }
 ```
 
-Next, we need to give our `Icon` component one more prop, `isInitial`, that sets its duration to zero when `isInitial` is true.
+To make use of this value, we'll give our `Icon` component one more prop, `isInitial`, that sets its animation duration to zero when `isInitial` is true.
 
 ```jsx
 const Icon = styled.div`
@@ -380,7 +385,7 @@ export function RotatingIconButton({ children }) {
         const isCurrent = i === current
 
         return (
-          <Icon isInitial={isInitial} isCurrent={isCurrent}>
+          <Icon key={i} isInitial={isInitial} isCurrent={isCurrent}>
             {child}
           </Icon>
         )
@@ -392,11 +397,13 @@ export function RotatingIconButton({ children }) {
 
 ## Final Component
 
-And that's it! Here it is, our final component:
+And that's it! Here it is, our final component in a sandbox:
 
 <CodeSandbox url="festive-fog-hnnqy" />
 
-This isn't _exactly_ how I implemented my theme switching button on this blog, but it's the basic idea. You can pass along more events to your button through its props, if you plan on doing more with clicks than just switching the icon. You might instead use hooks inside of the component to make changes to your theme or update the `current` state when the theme changes from elsewhere.
+Now this isn't _exactly_ how I implemented my theme switching button on this blog, but it's the basic idea. To make it work for your site, you might have to pass along events to your button through its props, especially if you plan on doing more with clicks than just switching the icon. Alternatively, you could use custom hooks inside of the component to control a theme or update the `current` state if the theme changed from elsewhere.
+
+If the tricky part was just the animation, then you should be good to go.
 
 Thanks for reading, and good luck!
 
