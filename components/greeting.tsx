@@ -15,12 +15,11 @@ const AuthorAvatar = styled(Avatar, {
   backgroundColor: '$muted',
 })
 
-export default function Greeting({ children }: { children: React.ReactNode }) {
+export default function Greeting() {
   return (
     <Container>
       <AuthorAvatar src="/avatars/@steveruizok.jpg" />
       <Text css={{ my: 0 }}>
-        {children}
         <b>Hi, I’m Steve.</b> I write about design, code, and creative tools. If
         you’d like to say hello, follow me on{' '}
         <A href="https://twitter.com/steveruizok">twitter</A> or{' '}

@@ -3,11 +3,13 @@ declare namespace Blog {
     title: string
   }
 
+  type Status = 'published' | 'draft'
+
   interface Post {
     author: string
     twitter: string
     avatar: string
-    title: string
+    title?: string
     location?: string
     hero: string
     date: string
@@ -16,6 +18,7 @@ declare namespace Blog {
     slug: string
     layout: string
     keywords?: string
+    status: Status
     readingTime: {
       text: string
       minutes: number

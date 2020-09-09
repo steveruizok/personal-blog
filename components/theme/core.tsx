@@ -7,8 +7,9 @@ const { styled, css } = createStyled({
       $hover: 'rgba(11, 153, 234, .1)',
       $muted: 'rgba(144, 144, 144, .1)',
       $background: '#ffffff',
+      $surface: '#eeeeee',
       $text: '#000000',
-      $codeBg: '#fafafa',
+      $codeBg: '#f9f9fa',
       $codeText: '#24292e',
       $codeSelectionText: '#263238',
       $codeSelectionBg: '#cceae7',
@@ -29,7 +30,7 @@ const { styled, css } = createStyled({
     },
     lineHeights: {
       $body: '1.7',
-      $code: '1.5',
+      $code: '1.55',
     },
     space: {
       $0: '8px',
@@ -45,6 +46,7 @@ const { styled, css } = createStyled({
     },
     fontSizes: {
       $0: '14px',
+      $code: '15px',
       $1: '16px',
       $2: '18px',
       $3: '20px',
@@ -72,7 +74,8 @@ const lightTheme = css.theme({})
 const dimTheme = css.theme({
   $background: '#2c2b33',
   $text: '#f9f9f5',
-  $codeBg: '#141414',
+  $surface: '#37363d',
+  $codeBg: '#232229',
   $codeText: '#d1d5da',
   $codeSelectionText: '#eeeeee',
   $codeSelectionBg: '#363636',
@@ -93,8 +96,11 @@ const dimTheme = css.theme({
 })
 
 const darkTheme = css.theme({
+  $hover: 'rgba(11, 153, 234, .14)',
+  $muted: 'rgba(144, 144, 144, .14)',
   $background: '#010101',
   $text: '#d9d9d9',
+  $surface: '#242222',
   $codeBg: '#141414',
   $codeText: '#d1d5da',
   $codeSelectionText: '#eeeeee',
@@ -131,6 +137,7 @@ css.global({
     margin: 0,
   },
   "pre[class*='language-']": {
+    fontSize: '$code',
     backgroundColor: '$codeBg',
     color: '$codeText',
   },

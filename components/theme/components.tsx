@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
+import useTheme from '../hooks/useTheme'
 import { styled } from './core'
 
 /* --------------------- Layout --------------------- */
@@ -72,21 +73,52 @@ export const Divider = styled('hr', {
 })
 
 export const Blockquote = styled('blockquote', {
-  borderLeft: '2px solid $muted',
-  p: '$1',
+  borderLeft: '2px solid $hover',
+  py: '$0',
+  pr: '$1',
   pl: '$3',
   m: 0,
-  sm: {
-    p: '$1',
+  md: {
+    py: '$1',
+    pr: '$2',
     pl: '$3',
+  },
+  opacity: 0.78,
+})
+
+export const CodeBox = styled('div', {
+  display: 'flex',
+  justifyContent: 'center',
+  position: 'relative',
+  bg: '$codeBg',
+  color: '$text',
+  my: '$3',
+  mx: '-$1',
+  px: '$1',
+  py: '$2',
+  sm: {
+    borderRadius: 4,
+    mx: '-$1',
+    px: '$1',
+    py: '$2',
   },
   md: {
+    mx: '-$2',
     p: '$2',
-    pl: '$3',
   },
   lg: {
-    p: '$2',
-    pl: '$3',
+    mx: '-$3',
+    p: '$3',
+  },
+  '&:after': {
+    fontFamily: '$ui',
+    fontSize: '$0',
+    color: '$text',
+    content: "'Interactive'",
+    position: 'absolute',
+    opacity: 0.3,
+    top: 8,
+    right: 12,
   },
 })
 
@@ -314,3 +346,33 @@ export const UnorderedList = styled('ul', {
     bg: '$codeBg',
   },
 })
+
+export function CodeSandbox({
+  url,
+  height = 500,
+}: {
+  url: string
+  height?: number
+}) {
+  const { current } = useTheme()
+
+  return (
+    <CodeBox>
+      <iframe
+        src={`https://codesandbox.io/embed/${url}?fontsize=14&hidenavigation=1&theme=${
+          current === 'light' ? 'light' : 'dark'
+        }`}
+        style={{
+          width: '100%',
+          height,
+          border: 'none',
+          borderRadius: '4px',
+          overflow: 'hidden',
+        }}
+        title={url}
+        allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+        sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+      ></iframe>
+    </CodeBox>
+  )
+}

@@ -1,0 +1,404 @@
+---
+title: 'Rotating Icon Button in React'
+date: '9/9/2020'
+hero: '/images/anastasia-taioglou-EEDLURXCpqg-unsplash.jpg'
+status: 'draft'
+---
+
+import { Sun, CloudRain, Moon } from 'react-feather'
+import * as Article from '../../components/articles/rotating-icon-button'
+
+If you haven't already, try changing the theme on this blog by clicking the button in the top right corner of the webpage. You'll notice a fun detail: as you cycle between the themes, the icons will "rotate" in from bottom to top.
+
+Kinda cool, right?
+
+In design, We call these little details _microinteractions_[^1]. Small, surprising and hopefully delightful, these animations can give an outsized amount of character to an otherwise boring, functional user interface.
+
+In this post, I'll show you how to build a rotating icon button like mine in React. If you're just looking for the code, feel free to skip to the end or [click here](https://codesandbox.io/s/festive-fog-hnnqy?from-embed) for the code sandbox.
+
+Ok, let's get started!
+
+## Setup
+
+> If you'd like to follow along, you can fork [this CodeSandbox](https://codesandbox.io/s/intelligent-goldwasser-z9szy?file=/src/App.js).
+
+Let's start by creating a new React app and adding our dependencies. For this article, I'll be using `styled-components` to handle styling and `react-feather` for icons. I'm going to use three icons: `Sun`, `CloudRain`, and `Moon`.
+
+We'll also need a component for our button, `RotatingIconButton`. Our app is going to return this button with our three icons as its children.
+
+```jsx
+import React from 'react'
+import { Sun, CloudRain, Moon } from 'react-feather'
+import styled from 'styled-components'
+
+export default function App() {
+  return (
+    <RotatingIconButton>
+      <Sun />
+      <CloudRain />
+      <Moon />
+    </RotatingIconButton>
+  )
+}
+
+function RotatingIconButton({ children }) {
+  return <button>{children}</button>
+}
+```
+
+This should give us something like this:
+
+<CodeBox>
+  <button>
+    <Sun />
+    <CloudRain />
+    <Moon />
+  </button>
+</CodeBox>
+
+Ok, that's good for now. Let's move on to our button's styles.
+
+## Styling the Button
+
+Before we get into our animations, let's first style up our button. By default, we want all of the button's children to be piled on top of one another in the center of the button.
+
+To get this done, I'll create our first styled component, `Button`.
+
+```jsx
+const Button = styled.button`
+  display: grid;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  padding: 0px;
+`
+```
+
+Next, I'll create a second component, `Icon`, that we'll use to wrap our icons. Here we're using a CSS grid to place all of our children on top of eachother.
+
+```jsx
+const Icon = styled.div`
+  grid-area: 1/1;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+```
+
+And now let's put these pieces together in the `RotatingIconButton` component.
+
+```jsx
+function RotatingIconButton({ children }) {
+  return (
+    <Button>
+      {React.Children.map(children, (child, i) => {
+        return <Icon>{child}</Icon>
+      })}
+    </Button>
+  )
+}
+```
+
+We should end up with a big pile of centered icons in the middle of our button:
+
+<CodeBox>
+  <Article.RotatingIconButtonSimple>
+    <Sun />
+    <CloudRain />
+    <Moon />
+  </Article.RotatingIconButtonSimple>
+</CodeBox>
+
+Now let's work out our button's state.
+
+## The Button State
+
+Out button can have any number of children but we only want it to show one child at a time. The button will therefore need to keep track of which of these children is its _currently active_ child.
+
+We can create this state using the `useState` React hook, and we'll store the array index of the button's currently active child. As we render each child, we can compare its index against this value in order to see whether that child is the currently active one.
+
+```jsx
+function RotatingIconButton({ children }) {
+  const [current, setCurrent] = React.useState(0)
+
+  return (
+    <Button>
+      {React.Children.map(children, (child, i) => {
+        const isCurrent = i === current
+
+        return <Icon>{child}</Icon>
+      })}
+    </Button>
+  )
+}
+```
+
+We're not using this `isCurrent` variable yet, but we'll come back to it soon.
+
+Each time we click the button, we'll want to bump up that `current` value so that it cycles through the children. In our click event handler, we'll also need to check whether we're already at our maximum index (`children.length - 1`) so that we can loop back around to zero when we've reached the end.
+
+```jsx
+function RotatingIconButton({ children }) {
+  const [current, setCurrent] = React.useState(0)
+
+  function cycleCurrent() {
+    if (current === children.length - 1) {
+      setCurrent(0)
+    } else {
+      setCurrent(current + 1)
+    }
+  }
+
+  return (
+    <Button onClick={cycleCurrent}>
+      {React.Children.map(children, (child, i) => {
+        const isCurrent = i === current
+
+        return <Icon>{child}</Icon>
+      })}
+    </Button>
+  )
+}
+```
+
+We now have everything we need to animate our icons.
+
+## Animating the Icons
+
+On each render, we want our icons to perform two different animations depending on whether that icon is active or not.
+
+If the icon is our new currently active icon, we want it to move from below the button up to the center of the button. If not, we'll instead want it to move from the center of the button to up above the button; or, if it's already above the button, to stay where it is.
+
+We want this animation to be as snappy as possible, so we'll use the Icon element's `transfrom` property to make these moves. But we have two options for how to actually move the element: the `transition` property and the `animation` property.
+
+Let's look at `transition` first.
+
+### Animating with Transition
+
+```jsx
+export function RotatingIconButton({ children }) {
+  /* snip */
+
+  return (
+    <Button onClick={cycleCurrent}>
+      {Children.map(children, (child, i) => {
+        const isCurrent = i === current
+
+        return (
+          <Icon
+            style={{
+              transition: 'all .5s',
+              transform: `translateY(${isCurrent ? 0 : -100}%)`,
+            }}
+          >
+            {child}
+          </Icon>
+        )
+      })}
+    </Button>
+  )
+}
+```
+
+And here's what we get:
+
+<CodeBox>
+  <Article.RotatingIconButtonWithTransition>
+    <Sun />
+    <CloudRain />
+    <Moon />
+  </Article.RotatingIconButtonWithTransition>
+</CodeBox>
+
+This isn't really what we want. Rather than everything moving in and out from the top, we want the new active icon to come in from the bottom.
+
+This is a problem for the `transition` property because it does not give us a way to "jump" to our "from" position before transitioning to our "to" position. We could do some clever tricks here with effects, `requestAnimationFrame`, and timings... but thankfully we have a better way through CSS animations.
+
+### Animating with CSS Animations
+
+To use a CSS animation, we'll first need to define the animation as a set of keyframes.[^2] For this animatiom, we need two animations: `riseIn` will move an element from a lower position to its default position, and `riseOut` that move it from its default position to a higher position.
+
+```jsx
+import styled, { keyframes } from 'styled-components'
+
+const riseIn = keyframes`
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+`
+
+const riseOut = keyframes`
+  from {
+    transform: translateY(0%);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+`
+```
+
+Now we can modify our `Icon` styled component to use these animations. We'll pass the `Icon` component a new prop, `isCurrent`, that will determine which animation it should use.
+
+```jsx
+const Icon = styled.div`
+  grid-area: 1/1;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation-fill-mode: 'forwards';
+  animation-duration: '400ms';
+  animation-name: ${(props) => (props.isCurrent ? riseIn : riseOut)};
+`
+```
+
+Let's see how that looks:
+
+<CodeBox>
+  <Article.RotatingIconButtonWithCSSAnimation>
+    <Sun />
+    <CloudRain />
+    <Moon />
+  </Article.RotatingIconButtonWithCSSAnimation>
+</CodeBox>
+
+And if we hide the overflow on the button...
+
+```jsx
+const Button = styled.button`
+  display: grid;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  padding: 0px;
+  overflow: hidden;
+`
+```
+
+Then we get this:
+
+<CodeBox>
+  <Article.RotatingIconButtonWithCSSAnimationNoOverflow>
+    <Sun />
+    <CloudRain />
+    <Moon />
+  </Article.RotatingIconButtonWithCSSAnimationNoOverflow>
+</CodeBox>
+
+That looks pretty good!
+
+## Final Touches
+
+There are a few last touches before we're done.
+
+First, let's style up our button, getting rid of its background and border and giving it a hover effect.
+
+```jsx
+const Button = styled.button`
+  color: currentColor;
+  cursor: pointer;
+  display: grid;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  padding: 0px;
+  overflow: hidden;
+  outline: none;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+
+  &:hover {
+    background: rgba(144, 144, 144, 0.1);
+  }
+`
+```
+
+<CodeBox>
+  <Article.RotatingIconButtonWithCSSAnimationFinal>
+    <Sun />
+    <CloudRain />
+    <Moon />
+  </Article.RotatingIconButtonWithCSSAnimationFinal>
+</CodeBox>
+
+Though it's probably hard to tell this deep into the article, we also need to work out how we handle our animations when the component first loads. On this first render, we don't want _any_ of our animations to fire.
+
+To fix this, we'll need to keep track of whether we're in our first render through a second state. This property, `isInitial`, will start off as true and then we'll set it to false when we first cycle our `current` state.
+
+```jsx
+export function RotatingIconButton({ children }) {
+  /* snip */
+
+  const isInitial = React.useRef(true)
+
+  React.useEffect(() => {
+    isInitial.current = false
+  }, [])
+
+  return <Button onClick={cycleCurrent}>{/* snip */}</Button>
+}
+```
+
+Next, we need to give our `Icon` component one more prop, `isInitial`, that sets its duration to zero when `isInitial` is true.
+
+```jsx
+const Icon = styled.div`
+  grid-area: 1/1;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation-fill-mode: forwards;
+  animation-duration: ${(props) => (props.isInitial ? 0 : 400)}ms;
+  animation-name: ${(props) => (props.isCurrent ? riseIn : riseOut)};
+`
+```
+
+And finally we can pass `isInitial` in through the `Icon`'s props.
+
+```jsx
+export function RotatingIconButton({ children }) {
+  /* snip */
+
+  const isInitial = React.useRef(true)
+
+  React.useEffect(() => {
+    isInitial.current = false
+  }, [])
+
+  return (
+    <Button onClick={cycleCurrent}>
+      {Children.map(children, (child, i) => {
+        const isCurrent = i === current
+
+        return (
+          <Icon isInitial={isInitial} isCurrent={isCurrent}>
+            {child}
+          </Icon>
+        )
+      })}
+    </Button>
+  )
+}
+```
+
+## Final Component
+
+And that's it! Here it is, our final component:
+
+<CodeSandbox url="festive-fog-hnnqy" />
+
+This isn't _exactly_ how I implemented my theme switching button on this blog, but it's the basic idea. You can pass along more events to your button through its props, if you plan on doing more with clicks than just switching the icon. You might instead use hooks inside of the component to make changes to your theme or update the `current` state when the theme changes from elsewhere.
+
+Thanks for reading, and good luck!
+
+[^1]: A cousin of the microinteraction is something I like to call the "fidget interaction", like the famous [chat room gem](https://diablo.fandom.com/wiki/Chat_Gem) in the Diablo video game. While microinteractions tend to reward or acknowledge certain user behaviors, fidget interactions are pointless: they don't _do_ anything except give us something to do. Try hovering over the black box at the top left of the header.
+[^2]: We could define these keyframes in a CSS file and just reference these animations by name, but since we're already using styled-components, let's stick to its way of handling keyframes. For the regular approach, see MDN's excellent guide to [Using CSS Animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations).

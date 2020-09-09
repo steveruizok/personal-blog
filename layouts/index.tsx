@@ -1,5 +1,6 @@
 import { Text, Box, Divider, Heading1, A, Image } from '../components/theme'
 import Link from 'next/link'
+import Greeting from '../components/greeting'
 import Layout from '../components/layout'
 import PostNavLinks from '../components/post-nav-links'
 
@@ -17,7 +18,7 @@ export default function DefaultLayout({ children, frontMatter }) {
   } = frontMatter
 
   return (
-    <Layout title={title} description={description} keywords={keywords}>
+    <Layout description={description} keywords={keywords}>
       <article>
         <header>
           <Link href={slug}>
@@ -37,6 +38,9 @@ export default function DefaultLayout({ children, frontMatter }) {
         </header>
         <main>{children}</main>
         <footer>
+          <Divider />
+          <Greeting />
+          <Divider />
           <PostNavLinks slug={slug} />
         </footer>
       </article>

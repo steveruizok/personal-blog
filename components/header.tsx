@@ -22,6 +22,9 @@ const Icon = styled(Box, {
   width: 32,
   my: '$1',
   backgroundColor: '$text',
+  '&:hover': {
+    animation: 'forwards .2s rotate',
+  },
 })
 
 const HeaderLink = styled('a', {

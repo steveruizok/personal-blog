@@ -2,7 +2,7 @@ import { styled, Button } from './theme'
 import useTheme, { themes, ThemeName } from '../components/hooks/useTheme'
 import NoSSR from 'react-no-ssr'
 import { Sun, Moon, CloudRain } from 'react-feather'
-import RotatingIcon from './rotating-icon'
+import RotatingIcons from './rotating-icons'
 
 const IconButton = styled(Button, {
   p: 0,
@@ -29,10 +29,11 @@ export default function LightDarkSwitch() {
   return (
     <IconButton onClick={cycleTheme}>
       <NoSSR>
-        <RotatingIcon
-          current={index}
-          states={{ light: <Sun />, dim: <CloudRain />, dark: <Moon /> }}
-        />
+        <RotatingIcons current={index}>
+          <Sun />
+          <CloudRain />
+          <Moon />
+        </RotatingIcons>
       </NoSSR>
     </IconButton>
   )

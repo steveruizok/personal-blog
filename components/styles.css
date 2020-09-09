@@ -9,20 +9,39 @@
   }
 }
 
-@keyframes rise {
+@keyframes rotate {
   from {
-    transform: translateY(48px);
+    transform: rotate(0deg);
   }
   to {
-    transform: translateY(0px);
+    transform: rotate(-90deg);
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
   }
 }
 
 @keyframes set {
   from {
-    transform: translateY(0px);
+    transform: translateY(0%);
   }
   to {
-    transform: translateY(-48px);
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes hide {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(100%);
   }
 }

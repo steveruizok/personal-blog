@@ -10,13 +10,13 @@ type Props = Pick<Blog.Post, 'keywords' | 'description' | 'title'> & {
 export default function Layout({
   keywords = '',
   description = '',
-  title = '',
+  title,
   children,
 }: Props) {
   return (
     <>
       <Head>
-        <title>{`${title} - Steve Ruiz` || 'Steve Ruiz'}</title>
+        <title>{title ? `${title} - Steve Ruiz` : 'Steve Ruiz'}</title>
         <meta charSet="utf-8" />
         <meta property="og:title" content="Steve Ruiz" key="title" />
         <meta property="og:type" content="website" />
