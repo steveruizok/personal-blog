@@ -66,21 +66,21 @@ To get this done, I'll create our first styled component, `Button`.
 
 ```jsx
 const Button = styled.button`
-  display: grid;
+  height: 48px;
+  width: 48px;
   position: relative;
-  align-items: center;
-  justify-content: center;
   padding: 0px;
 `
 ```
 
-Next, I'll create a second component, `Icon`, that we'll use to wrap our icons. Here we're using a CSS grid to place all of our children on top of eachother.
+Next, I'll create a second component, `Icon`, that we'll use to wrap our icons.
 
 ```jsx
 const Icon = styled.div`
-  grid-area: 1/1;
-  height: 48px;
-  width: 48px;
+  position: absolute;
+  top: 0px;
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -251,14 +251,14 @@ Now we can modify our `Icon` styled component to use these animations. We'll pas
 
 ```jsx
 const Icon = styled.div`
-  grid-area: 1/1;
-  height: 48px;
-  width: 48px;
+  position: absolute;
+  top: 0px;
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation-fill-mode: 'forwards';
-  animation-duration: '400ms';
+  animation-fill-mode: forwards;
   animation-name: ${(props) => (props.isCurrent ? riseIn : riseOut)};
 `
 ```
@@ -277,10 +277,9 @@ It may still look a little strange, but if we hide the overflow on the button...
 
 ```jsx
 const Button = styled.button`
-  display: grid;
+  height: 48px;
+  width: 48px;
   position: relative;
-  align-items: center;
-  justify-content: center;
   padding: 0px;
   overflow: hidden;
 `
@@ -306,14 +305,12 @@ First, let's style up our button, getting rid of its background and border and g
 
 ```jsx
 const Button = styled.button`
-  color: currentColor;
-  cursor: pointer;
-  display: grid;
+  height: 48px;
+  width: 48px;
   position: relative;
-  align-items: center;
-  justify-content: center;
   padding: 0px;
   overflow: hidden;
+  cursor: pointer;
   outline: none;
   border-radius: 4px;
   background: transparent;
@@ -355,9 +352,10 @@ To make use of this value, we'll give our `Icon` component one more prop, `isIni
 
 ```jsx
 const Icon = styled.div`
-  grid-area: 1/1;
-  height: 48px;
-  width: 48px;
+  position: absolute;
+  top: 0px;
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -2,7 +2,8 @@ import { useState, useRef, useEffect, Children } from 'react'
 import { styled } from '../theme'
 
 export const Button = styled.button({
-  display: 'grid',
+  height: 48,
+  width: 48,
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'center',
@@ -16,7 +17,8 @@ export const Button = styled.button({
 })
 
 export const Button2 = styled.button({
-  display: 'grid',
+  height: 48,
+  width: 48,
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'center',
@@ -33,7 +35,9 @@ export const Button2 = styled.button({
 })
 
 export const Icon = styled.div({
-  gridArea: '1/1',
+  position: 'absolute',
+  top: 0,
+  left: 0,
   height: 48,
   width: 48,
   display: 'flex',
@@ -66,7 +70,7 @@ export function RotatingIconButton({ children }) {
       {Children.map(children, (child, i) => {
         const isCurrent = i === current
 
-        return <Icon>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>
       })}
     </Button>
   )
@@ -76,7 +80,7 @@ export function RotatingIconButtonSimple({ children }) {
   return (
     <Button>
       {Children.map(children, (child, i) => {
-        return <Icon>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>
       })}
     </Button>
   )
@@ -99,17 +103,14 @@ export function RotatingIconButtonWithTransition({ children }) {
     }
   }
 
-  const previous = rPrevious.current
-  const isInitial = current === previous
-
   return (
     <Button onClick={cycleCurrent}>
       {Children.map(children, (child, i) => {
         const isCurrent = i === current
-        const isPrevious = i === previous
 
         return (
           <Icon
+            key={i}
             style={{
               transition: 'all .5s',
               transform: `translateY(${isCurrent ? 0 : -100}%)`,
@@ -141,6 +142,7 @@ export function RotatingIconButtonWithCSSAnimation({ children }) {
 
         return (
           <Icon
+            key={i}
             style={{
               animationFillMode: 'forwards',
               animationDuration: '400ms',
@@ -173,6 +175,7 @@ export function RotatingIconButtonWithCSSAnimationNoOverflow({ children }) {
 
         return (
           <Icon
+            key={i}
             style={{
               animationFillMode: 'forwards',
               animationDuration: '400ms',
@@ -210,6 +213,7 @@ export function RotatingIconButtonWithCSSAnimationInitial({ children }) {
 
         return (
           <Icon
+            key={i}
             style={{
               animationFillMode: 'forwards',
               animationDuration: isInitial ? '0ms' : '400ms',
@@ -247,6 +251,7 @@ export function RotatingIconButtonWithCSSAnimationFinal({ children }) {
 
         return (
           <Icon
+            key={i}
             style={{
               animationFillMode: 'forwards',
               animationDuration: isInitial ? '0ms' : '400ms',
