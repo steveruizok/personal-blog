@@ -1,7 +1,7 @@
-import { styled, Button, Grid, Box, A, Image, Heading1 } from './theme'
-import useTheme from '../components/hooks/useTheme'
+import { styled, Button } from './theme'
+import useTheme, { themes, ThemeName } from '../components/hooks/useTheme'
 import NoSSR from 'react-no-ssr'
-import { Sun, Moon } from 'react-feather'
+import { Sun, Moon, CloudRain } from 'react-feather'
 import RotatingIcon from './rotating-icon'
 
 const IconButton = styled(Button, {
@@ -24,14 +24,14 @@ const IconButton = styled(Button, {
 export default function LightDarkSwitch() {
   const { current, cycleTheme } = useTheme()
 
-  const index = current === 'light' ? 0 : 1
+  const index = Object.keys(themes).indexOf(current)
 
   return (
     <IconButton onClick={cycleTheme}>
       <NoSSR>
         <RotatingIcon
           current={index}
-          states={{ light: <Sun />, dark: <Moon /> }}
+          states={{ light: <Sun />, dim: <CloudRain />, dark: <Moon /> }}
         />
       </NoSSR>
     </IconButton>

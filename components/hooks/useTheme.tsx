@@ -1,13 +1,14 @@
 import { useEffect } from 'react'
-import { lightTheme, darkTheme } from '../theme'
+import { lightTheme, dimTheme, darkTheme } from '../theme'
 import { createState, useStateDesigner } from '@state-designer/react'
 
-type ThemeName = 'light' | 'dark'
-
-const themes: Record<ThemeName, any> = {
+export const themes = {
   light: lightTheme,
+  dim: dimTheme,
   dark: darkTheme,
 }
+
+export type ThemeName = keyof typeof themes
 
 let initial: ThemeName = 'light'
 
@@ -25,7 +26,7 @@ if (process.browser) {
  */
 const state = createState({
   data: {
-    all: ['light', 'dark'] as ThemeName[],
+    all: Object.keys(themes) as ThemeName[],
     current: initial,
   },
   on: {

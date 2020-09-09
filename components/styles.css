@@ -8,3 +8,21 @@
     transform: translateY(3px);
   }
 }
+
+@keyframes rise {
+  from {
+    transform: translateY(48px);
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes set {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-48px);
+  }
+}

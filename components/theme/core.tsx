@@ -28,7 +28,7 @@ const { styled, css } = createStyled({
       $syntaxHeader: '#0000ff',
     },
     lineHeights: {
-      $body: '1.62',
+      $body: '1.7',
       $code: '1.5',
     },
     space: {
@@ -68,6 +68,29 @@ const { styled, css } = createStyled({
 })
 
 const lightTheme = css.theme({})
+
+const dimTheme = css.theme({
+  $background: '#2c2b33',
+  $text: '#f9f9f5',
+  $codeBg: '#141414',
+  $codeText: '#d1d5da',
+  $codeSelectionText: '#eeeeee',
+  $codeSelectionBg: '#363636',
+  $syntaxOperator: '#d1d5da',
+  $syntaxPunctuation: '#79b8ff',
+  $syntaxVariable: '#b392f0',
+  $syntaxAltVariable: '#79b8ff',
+  $syntaxKeyword: '#f97583',
+  $syntaxAtom: '#79b8ff',
+  $syntaxString: '#ffab70',
+  $syntaxQualifier: '#b392f0',
+  $syntaxType: '#f97583',
+  $syntaxComment: '#959da5',
+  $syntaxTag: '#34d058',
+  $syntaxAttribute: '#b392f0',
+  $syntaxLink: '#79b8ff',
+  $syntaxHeader: '#f97583',
+})
 
 const darkTheme = css.theme({
   $background: '#010101',
@@ -149,4 +172,4 @@ css.global({
   },
 })
 
-export { styled, css, lightTheme, darkTheme }
+export { styled, css, lightTheme, dimTheme, darkTheme }

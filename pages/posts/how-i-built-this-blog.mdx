@@ -24,6 +24,8 @@ Here's my stack.
 
 I designed this blog in Figma. I've built the website using the [Next.js](https://nextjs.org/) framework and I've deployed it to [Vercel](https://vercel.com/dashboard). I've written my [React](https://reactjs.org/) components in [TypeScript](https://www.typescriptlang.org/) and I've used [Stitches](https://stitches.dev/) for styling. I write my content in [MDX](https://mdxjs.com/).
 
+If you're after the source code, you can find that [here](https://github.com/steveruizok/personal-blog).
+
 In the sections below, I'll describe how I built this blog. I'll first introduce the "stack" of technologies that I used, then I'll break down each part of this stack and explain how it works with other parts of the stack. Along the way, I'll give some insight into my reasoning behind the choices I've made.
 
 ## Rendering Websites in React and Next.js
@@ -230,7 +232,7 @@ In 2019, [Brent Jackson](https://twitter.com/jxnblk) defined a [theme specificat
 
 When I began this blog, I used theme-ui to define a theme and then built my components using [emotion](https://emotion.sh/), the styling library that powers theme-ui.
 
-Later on, I switched to [Stiches](http://stitches.dev), a newly released library by the team at [Modulz](https://www.modulz.app/).[^4] Like theme-ui, it follows Jackson's theme specification; however, it has its own styling engine.
+Later on, I switched to [Stiches](http://stitches.dev), a newly released library by the team at [Modulz](https://www.modulz.app/).[^4] Like theme-ui, it follows Jackson's theme specification; however, it has its own styling engine that may work better with the project's "static" approach.
 
 My site has a core configuration that defines tokens for colors, sizes, spaces and breakpoints, and two themes that overwrite the configuration's colors tokens. Both the configuration and the themes are pretty basic.
 

@@ -9,6 +9,15 @@ export default function RotatingIcon({
 }) {
   const prev = useRef<number>(current)
 
+  useEffect(() => {
+    prev.current = current
+  }, [current])
+
+  const icons = Object.entries(states)
+
+  const [cName, cIcon] = icons[current]
+  const [pName, pIcon] = icons[prev.current]
+
   return (
     <div
       style={{
@@ -18,35 +27,25 @@ export default function RotatingIcon({
         overflow: 'hidden',
       }}
     >
-      {Object.entries(states).map(([name, child], i) => (
-        <MovingIcon key={name} from={i - prev.current} to={i - current}>
-          {child}
-        </MovingIcon>
-      ))}
+      {icons.map(([name, icon], i) => {
+        return (
+          <MovingIcon key={name} active={i === current}>
+            {icon}
+          </MovingIcon>
+        )
+      })}
     </div>
   )
 }
 
 function MovingIcon({
-  from,
-  to,
+  active,
   children,
 }: {
-  from: number
-  to: number
+  active: boolean
   children: React.ReactNode
 }) {
   const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-
-    el.style.setProperty('transition', `none`)
-    el.style.setProperty('transform', `translateY(${from * 48}px)`)
-    el.style.setProperty('transition', `all .4s`)
-    el.style.setProperty('transform', `translateY(${to * 48}px)`)
-  }, [from, to])
 
   return (
     <div
@@ -57,7 +56,7 @@ function MovingIcon({
         position: 'absolute',
         left: 12,
         top: 12,
-        transform: `translateY(${to * 48}px)`,
+        animation: `forwards .4s ease-in-out ${active ? 'rise' : 'set'}`,
       }}
     >
       {children}
