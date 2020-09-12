@@ -63,7 +63,14 @@ export const Grid = styled("div", {
 
 export const Nav = styled("nav", {})
 
-export const Footer = styled("footer", {})
+export const Footer = styled("footer", {
+  py: 4,
+  flexDirection: "row",
+  textAlign: "center",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+})
 
 export const Divider = styled("hr", {
   my: "$5",
@@ -375,3 +382,25 @@ export function CodeSandbox({
     </CodeBox>
   )
 }
+
+export const IconButton = styled(Button, {
+  p: 0,
+  height: 48,
+  width: 48,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "$text",
+  background: "transparent",
+  border: "none",
+  outline: "none",
+  cursor: "pointer",
+  overflow: "hidden",
+  position: "relative",
+  borderRadius: 4,
+  sm: {
+    "&:hover": {
+      bg: "$hover",
+    },
+  },
+})

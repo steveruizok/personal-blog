@@ -39,7 +39,6 @@ const blogPostsRssXml = (blogPosts: Blog.Post[]) => {
       <item>
         <title>${post.title}</title>
         <link> https://www.steveruiz.me${post.slug}</link>
-
         <pubDate>${new Date(post.date).toLocaleDateString()}</pubDate>
         <description>
         <![CDATA[${post.description}]]>

@@ -1,19 +1,15 @@
-import { styled } from "./theme"
+import { styled, IconButton } from "./theme"
 import { Children, useRef, useEffect } from "react"
-
-const Button = styled.div({
-  height: 48,
-  width: 48,
-  overflow: "hidden",
-  position: "relative",
-  display: "grid",
-})
 
 const Icon = styled.div({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  gridArea: "1/1",
+  position: "absolute",
+  top: 0,
+  left: 0,
+  height: "100%",
+  width: "100%",
   animationFillMode: "forwards",
   animationDuration: "400ms",
 })
@@ -21,10 +17,10 @@ const Icon = styled.div({
 export default function RotatingIcons({
   current,
   children,
+  ...rest
 }: {
   current: number
-  children: React.ReactNode
-}) {
+} & React.HTMLProps<HTMLButtonElement>) {
   const icons = Children.toArray(children)
 
   const rPrevious = useRef(current)
@@ -37,7 +33,7 @@ export default function RotatingIcons({
   const previous = current === 0 ? icons.length - 1 : current - 1
 
   return (
-    <Button>
+    <IconButton {...rest}>
       {icons.map((child, i) => {
         const isCurrent = i === current
         const isPrevious = i === previous
@@ -55,6 +51,6 @@ export default function RotatingIcons({
           </Icon>
         )
       })}
-    </Button>
+    </IconButton>
   )
 }

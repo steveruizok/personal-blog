@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { styled, Button, Grid, Box, A, Image, Heading1 } from "./theme"
+import { styled, Grid, Box, A, Image, Heading1 } from "./theme"
 import LightDarkSwitch from "./light-dark-switch"
 
 const Container = styled(Grid, {
   mt: 0,
   mb: "$5",
-  gridTemplateColumns: "1fr repeat(4, auto)",
+  gridTemplateColumns: "1fr repeat(5, auto)",
   gridGap: 0,
   alignItems: "center",
   justifyContent: "space-between",
