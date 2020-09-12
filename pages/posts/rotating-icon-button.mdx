@@ -1,12 +1,13 @@
 ---
-title: 'Making a Rotating Icon Button in React'
-date: '9/9/2020'
-hero: '/images/anastasia-taioglou-EEDLURXCpqg-unsplash.jpg'
-status: 'published'
+title: "Making a Rotating Icon Button in React"
+date: "9/9/2020"
+hero: "/images/anastasia-taioglou-EEDLURXCpqg-unsplash.jpg"
+status: "published"
+description: "A tutorial on building my theme-switching microinteraction."
 ---
 
-import { Sun, CloudRain, Moon } from 'react-feather'
-import * as Article from '../../components/articles/rotating-icon-button'
+import { Sun, CloudRain, Moon } from "react-feather"
+import * as Article from "../../components/articles/rotating-icon-button"
 
 If you haven't already, try changing the theme on this blog by clicking the button in the top right corner of the webpage. You'll notice a fun detail: as you cycle between the themes, the icons will "rotate" in from bottom to top.
 
@@ -27,9 +28,9 @@ Let's start by creating a new React app and adding our dependencies. For this ar
 We'll also need a component for our button, `RotatingIconButton`. Our app is going to return this button with our three icons as its children.
 
 ```jsx
-import React from 'react'
-import { Sun, CloudRain, Moon } from 'react-feather'
-import styled from 'styled-components'
+import React from "react"
+import { Sun, CloudRain, Moon } from "react-feather"
+import styled from "styled-components"
 
 export default function App() {
   return (
@@ -192,7 +193,7 @@ export function RotatingIconButton({ children }) {
           <Icon
             key={i}
             style={{
-              transition: 'transform .5s',
+              transition: "transform .5s",
               transform: `translateY(${isCurrent ? 0 : -100}%)`,
             }}
           >
@@ -226,7 +227,7 @@ We can use CSS animations instead.
 To use a CSS animation, we'll first need to define the animation as a set of keyframes.[^2] For this animation, we need two sets of keyframes: `riseIn` will move an element from a lower position to its default position; and `riseOut` will move the element from its default position to a higher position.
 
 ```jsx
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes } from "styled-components"
 
 const riseIn = keyframes`
   from {

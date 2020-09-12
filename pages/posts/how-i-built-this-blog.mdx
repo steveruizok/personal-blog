@@ -1,11 +1,12 @@
 ---
-title: 'How I Built This Blog'
-date: '9/6/2020'
-hero: '/images/greyson-joralemon-A1g0oeX29ec-unsplash.jpg'
-status: 'draft'
+title: "How I Built This Blog"
+date: "9/6/2020"
+hero: "/images/greyson-joralemon-A1g0oeX29ec-unsplash.jpg"
+status: "draft"
+description: "A breakdown of the technical stack I used to make this blog."
 ---
 
-import LightDarkSwitch from '../../components/light-dark-switch'
+import LightDarkSwitch from "../../components/light-dark-switch"
 
 As a designer, I've spent my career borrowing development tools to build prototypes that needed a level of interactivity or data that couldn't be done in design tools alone. I was always more of a chainsaw artist than arborist, however, and so I skipped many of the projects that other developers start off with.
 
@@ -40,7 +41,7 @@ In a Next project, your website's pages are defined as individual files, each co
 ```tsx
 // pages/my-page.jsx
 
-import Heading from '../components/heading'
+import Heading from "../components/heading"
 
 function MyPage() {
   return (
@@ -100,7 +101,7 @@ function MyFirstPost() {
       <p>
         My name is <a href="https://twitter.com/steveruizok">Steve</a> and I'm a
         product designer who writes about design, code, and everything in
-        between. I live in London but I'm originally from Chicago. It's been a{' '}
+        between. I live in London but I'm originally from Chicago. It's been a{" "}
         <i>long</i> year, hasn't it?
       </p>
       <p>Anyway, thanks for reading!</p>
@@ -113,9 +114,9 @@ It's not impossible, but I think it's a clunky syntax for blogging. Other people
 
 ```md
 ---
-title: 'My First Blog Post'
-date: '9/1/2020'
-hero: '/images/my-hero-image.jpg'
+title: "My First Blog Post"
+date: "9/1/2020"
+hero: "/images/my-hero-image.jpg"
 ---
 
 Welcome to my blog!
@@ -138,9 +139,9 @@ While Markdown is great for regular written content, it's limited to _just_ writ
 
 <div
   style={{
-    display: 'flex',
-    justifyContent: 'center',
-    animation: '1s ease-in-out 1s infinite alternate bounce',
+    display: "flex",
+    justifyContent: "center",
+    animation: "1s ease-in-out 1s infinite alternate bounce",
   }}
 >
   <LightDarkSwitch />
@@ -207,11 +208,11 @@ There are several different styling libraries, but they all look something like 
 ```jsx
 // post-link.tsx
 
-const HoverLink = styled('a', {
+const HoverLink = styled("a", {
   padding: 24,
   margin: -24,
-  '&:hover': {
-    backgroundColor: '#eaf4fd',
+  "&:hover": {
+    backgroundColor: "#eaf4fd",
   },
 })
 
@@ -242,12 +243,12 @@ const { styled, css } = createStyled({
   tokens: {
     // ...
     fontSizes: {
-      $0: '14px',
-      $1: '16px',
-      $2: '18px',
-      $3: '20px',
-      $4: '24px',
-      $5: '28px',
+      $0: "14px",
+      $1: "16px",
+      $2: "18px",
+      $3: "20px",
+      $4: "24px",
+      $5: "28px",
     },
     fonts: {
       $body: "'Fira Sans', system-ui, sans-serif",
@@ -265,17 +266,17 @@ My components are more complex. They include theme from the theme along with dif
 
 ```ts
 const Container = styled(Grid, {
-  gridTemplateColumns: '1fr repeat(4, auto)',
+  gridTemplateColumns: "1fr repeat(4, auto)",
   gridGap: 0,
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  font: '$ui',
-  mr: '-$0',
+  alignItems: "center",
+  justifyContent: "space-between",
+  font: "$ui",
+  mr: "-$0",
   mt: 0,
-  mb: '$5',
+  mb: "$5",
   sm: {
-    mt: '$2',
-    mr: '-$1',
+    mt: "$2",
+    mr: "-$1",
   },
 })
 ```

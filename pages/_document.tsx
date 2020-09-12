@@ -44,7 +44,14 @@ export default class Document extends NextDocument {
   render() {
     return (
       <html lang="en">
-        <Head></Head>
+        <Head>
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="RSS for blog posts"
+            href="https://www.steveruiz.me/rss"
+          />
+        </Head>
         <body>
           <Main />
           <NextScript />
