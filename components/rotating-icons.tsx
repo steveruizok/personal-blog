@@ -21,7 +21,7 @@ export default function RotatingIcons({
 }: {
   current: number
   children: React.ReactNode
-} & Pick<React.HTMLProps<HTMLButtonElement>, "onClick", "title">) {
+} & Pick<React.HTMLProps<HTMLButtonElement>, "onClick" | "title">) {
   const icons = Children.toArray(children)
 
   const rPrevious = useRef(current)

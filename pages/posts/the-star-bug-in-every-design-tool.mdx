@@ -1,0 +1,59 @@
+---
+title: "Stars are broken in your favorite design tool."
+date: "9/12/2020"
+hero: "/images/star-hero.png"
+status: "draft"
+description: "Every design tool has the same bug with their star shape."
+---
+
+As a designer, I rely on design tools every day in order to do my work. As a designer working on _making_ design tools, I tend to look closely and critically at the tools I use. And it's tempting to ignore the thousands of things that these tools do right and instead become obsessed with the petty or meaningless faults I discover.
+
+This is that kind of article.
+
+Take another look at this article's hero image, a screenshot from Figma showing its default star shape. Notice anything off? Well, if it looks fine to you now, I promise you that by the end of this article you will have joined me in my suffering—or at least feel an educated pity towards my plight.
+
+**Because that star is off-center**.
+
+It's stuck to the top of its bounding box.
+
+And it's not just Figma. It doesn't matter what tool you use. **They're _all_ wrong.**
+
+## The Rogue's Gallery
+
+Here's the default star in Sketch:
+
+![Star shape in Sketch, off center.](/images/star-sketch.png)
+
+Here's the default star in Framer:
+
+![Star shape in Framer, off center](/images/star-framer.png)
+
+Here again is the default star in Figma:
+
+![Star shape in Figma, off center](/images/star-figma.png)
+
+Here's the default star in Proto.io:
+
+![Star shape in Proto.io, off center](/images/star-proto.png)
+
+And finally, while Adobe XD doesn't have a star shape, it does have a Polygon shape that can be used to create stars.
+
+![Star shape in Adobe XD, centered!](/images/star-xd.png)
+
+Alright, so not _every_ design tool has this bug.
+
+For the rest, though, what's the problem?
+
+To find out, we'll need to learn about how these tools draw their stars.
+
+## How to Draw a Star
+
+![Animated star-drawing algorithm.](/images/star-alg.gif)
+
+To draw a star with _n_ points inside of a bounding box:
+
+1. Draw a circle that touches all four corners of the bounding box.
+2. Starting from the top and center, place _n_ points equally-spaced around the circle's circumference.
+3. Draw a second circle inside of the first.
+4. Starting from the bottom and center, place _n_ points equally-spaced around this circle's circumference.
+5. Draw lines that connect the points.
