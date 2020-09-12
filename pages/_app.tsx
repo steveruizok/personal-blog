@@ -1,5 +1,5 @@
-import { MDXProvider } from '@mdx-js/react'
-import Figure from '../components/figure'
+import { MDXProvider } from "@mdx-js/react"
+import Figure from "../components/figure"
 import {
   Container,
   Heading1,
@@ -22,8 +22,8 @@ import {
   CodeSandbox,
   Divider,
   CodeBox,
-} from '../components/theme'
-import '../components/styles.css'
+} from "../components/theme"
+import "../components/styles.css"
 
 function MyApp({ Component, pageProps }) {
   return (

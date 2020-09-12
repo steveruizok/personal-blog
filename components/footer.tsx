@@ -1,18 +1,18 @@
-import { Footer as F, A, Box, Text } from './theme'
+import { Footer as F, A, Box, Text } from "./theme"
 
 export default function Footer() {
   return (
     <F
       css={{
         py: 4,
-        textAlign: 'center',
+        textAlign: "center",
       }}
     >
       <Text variant="detail">
-        Made in London •{' '}
+        Made in London •{" "}
         <A variant="author" href="https://twitter.com/steveruizok">
           Steve Ruiz
-        </A>{' '}
+        </A>{" "}
         • 2020
       </Text>
     </F>

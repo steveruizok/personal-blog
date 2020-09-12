@@ -1,12 +1,12 @@
 // @ts-ignore
-import { frontMatter as posts } from '../pages/posts/*.mdx'
+import { frontMatter as posts } from "../pages/posts/*.mdx"
 
 let allPosts: Blog.Post[] = (posts as Blog.Post[]).sort(
   (a, b) => a.dateTime - b.dateTime
 )
 
-if (process.env.NODE_ENV === 'production') {
-  allPosts = allPosts.filter((post) => post.status === 'published')
+if (process.env.NODE_ENV === "production") {
+  allPosts = allPosts.filter((post) => post.status === "published")
 }
 
 export function getAllPosts() {

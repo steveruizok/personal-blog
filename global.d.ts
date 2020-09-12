@@ -3,7 +3,7 @@ declare namespace Blog {
     title: string
   }
 
-  type Status = 'published' | 'draft'
+  type Status = "published" | "draft"
 
   interface Post {
     author: string

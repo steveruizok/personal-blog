@@ -1,21 +1,21 @@
-import { styled } from './theme'
-import { Children, useRef, useEffect } from 'react'
+import { styled } from "./theme"
+import { Children, useRef, useEffect } from "react"
 
 const Button = styled.div({
   height: 48,
   width: 48,
-  overflow: 'hidden',
-  position: 'relative',
-  display: 'grid',
+  overflow: "hidden",
+  position: "relative",
+  display: "grid",
 })
 
 const Icon = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gridArea: '1/1',
-  animationFillMode: 'forwards',
-  animationDuration: '400ms',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gridArea: "1/1",
+  animationFillMode: "forwards",
+  animationDuration: "400ms",
 })
 
 export default function RotatingIcons({
@@ -47,8 +47,8 @@ export default function RotatingIcons({
           <Icon
             key={i}
             style={{
-              animationDuration: isInstant ? '0ms' : '400ms',
-              animationName: isCurrent ? 'rise' : 'set',
+              animationDuration: isInstant ? "0ms" : "400ms",
+              animationName: isCurrent ? "rise" : "set",
             }}
           >
             {child}

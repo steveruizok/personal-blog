@@ -1,5 +1,5 @@
-import PostLink from './post-link'
-import { getRecentPosts } from '../lib/api'
+import PostLink from "./post-link"
+import { getRecentPosts } from "../lib/api"
 
 export default function PostList({ postCount = 5 }) {
   const posts = getRecentPosts(postCount)

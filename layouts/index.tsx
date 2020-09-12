@@ -1,8 +1,8 @@
-import { Text, Box, Divider, Heading1, A, Image } from '../components/theme'
-import Link from 'next/link'
-import Greeting from '../components/greeting'
-import Layout from '../components/layout'
-import PostNavLinks from '../components/post-nav-links'
+import { Text, Box, Divider, Heading1, A, Image } from "../components/theme"
+import Link from "next/link"
+import Greeting from "../components/greeting"
+import Layout from "../components/layout"
+import PostNavLinks from "../components/post-nav-links"
 
 export default function DefaultLayout({ children, frontMatter }) {
   const {
@@ -26,14 +26,14 @@ export default function DefaultLayout({ children, frontMatter }) {
               <Heading1>{title}</Heading1>
             </A>
           </Link>
-          <Text variant="detail" css={{ mb: '$4' }}>
+          <Text variant="detail" css={{ mb: "$4" }}>
             <A href={`https://twitter.com/${twitter}`} variant="author">
               {author}
-            </A>{' '}
+            </A>{" "}
             • <time dateTime={date}>{date}</time> • {readingTime.text}
           </Text>
           {hero && (
-            <Image src={hero} alt={title} title={title} css={{ mb: '$2' }} />
+            <Image src={hero} alt={title} title={title} css={{ mb: "$2" }} />
           )}
         </header>
         <main>{children}</main>

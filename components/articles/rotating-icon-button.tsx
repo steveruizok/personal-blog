@@ -1,48 +1,48 @@
-import { useState, useRef, useEffect, Children } from 'react'
-import { styled } from '../theme'
+import { useState, useRef, useEffect, Children } from "react"
+import { styled } from "../theme"
 
 export const Button = styled.button({
   height: 48,
   width: 48,
-  position: 'relative',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '$text',
-  backgroundColor: '$surface',
-  borderColor: '$background',
-  borderWidth: '1px',
-  borderRadius: '2px',
-  outline: 'none',
+  position: "relative",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "$text",
+  backgroundColor: "$surface",
+  borderColor: "$background",
+  borderWidth: "1px",
+  borderRadius: "2px",
+  outline: "none",
   padding: 0,
 })
 
 export const Button2 = styled.button({
   height: 48,
   width: 48,
-  position: 'relative',
-  alignItems: 'center',
-  justifyContent: 'center',
+  position: "relative",
+  alignItems: "center",
+  justifyContent: "center",
   padding: 0,
-  color: '$text',
-  background: 'transparent',
-  border: 'none',
-  outline: 'none',
+  color: "$text",
+  background: "transparent",
+  border: "none",
+  outline: "none",
   borderRadius: 4,
-  cursor: 'pointer',
-  '&:hover': {
-    background: 'rgba(144, 144, 144, .1)',
+  cursor: "pointer",
+  "&:hover": {
+    background: "rgba(144, 144, 144, .1)",
   },
 })
 
 export const Icon = styled.div({
-  position: 'absolute',
+  position: "absolute",
   top: 0,
   left: 0,
   height: 48,
   width: 48,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 })
 
 export function RotatingIconButton({ children }) {
@@ -112,7 +112,7 @@ export function RotatingIconButtonWithTransition({ children }) {
           <Icon
             key={i}
             style={{
-              transition: 'all .5s',
+              transition: "all .5s",
               transform: `translateY(${isCurrent ? 0 : -100}%)`,
             }}
           >
@@ -144,9 +144,9 @@ export function RotatingIconButtonWithCSSAnimation({ children }) {
           <Icon
             key={i}
             style={{
-              animationFillMode: 'forwards',
-              animationDuration: '400ms',
-              animationName: isCurrent ? 'rise' : 'set',
+              animationFillMode: "forwards",
+              animationDuration: "400ms",
+              animationName: isCurrent ? "rise" : "set",
             }}
           >
             {child}
@@ -169,7 +169,7 @@ export function RotatingIconButtonWithCSSAnimationNoOverflow({ children }) {
   }
 
   return (
-    <Button onClick={cycleCurrent} style={{ overflow: 'hidden' }}>
+    <Button onClick={cycleCurrent} style={{ overflow: "hidden" }}>
       {Children.map(children, (child, i) => {
         const isCurrent = i === current
 
@@ -177,9 +177,9 @@ export function RotatingIconButtonWithCSSAnimationNoOverflow({ children }) {
           <Icon
             key={i}
             style={{
-              animationFillMode: 'forwards',
-              animationDuration: '400ms',
-              animationName: isCurrent ? 'rise' : 'set',
+              animationFillMode: "forwards",
+              animationDuration: "400ms",
+              animationName: isCurrent ? "rise" : "set",
             }}
           >
             {child}
@@ -207,7 +207,7 @@ export function RotatingIconButtonWithCSSAnimationInitial({ children }) {
   }
 
   return (
-    <Button onClick={cycleCurrent} style={{ overflow: 'hidden' }}>
+    <Button onClick={cycleCurrent} style={{ overflow: "hidden" }}>
       {Children.map(children, (child, i) => {
         const isCurrent = i === current
 
@@ -215,9 +215,9 @@ export function RotatingIconButtonWithCSSAnimationInitial({ children }) {
           <Icon
             key={i}
             style={{
-              animationFillMode: 'forwards',
-              animationDuration: isInitial ? '0ms' : '400ms',
-              animationName: isCurrent ? 'rise' : 'set',
+              animationFillMode: "forwards",
+              animationDuration: isInitial ? "0ms" : "400ms",
+              animationName: isCurrent ? "rise" : "set",
             }}
           >
             {child}
@@ -245,7 +245,7 @@ export function RotatingIconButtonWithCSSAnimationFinal({ children }) {
   }
 
   return (
-    <Button2 onClick={cycleCurrent} style={{ overflow: 'hidden' }}>
+    <Button2 onClick={cycleCurrent} style={{ overflow: "hidden" }}>
       {Children.map(children, (child, i) => {
         const isCurrent = i === current
 
@@ -253,9 +253,9 @@ export function RotatingIconButtonWithCSSAnimationFinal({ children }) {
           <Icon
             key={i}
             style={{
-              animationFillMode: 'forwards',
-              animationDuration: isInitial ? '0ms' : '400ms',
-              animationName: isCurrent ? 'rise' : 'set',
+              animationFillMode: "forwards",
+              animationDuration: isInitial ? "0ms" : "400ms",
+              animationName: isCurrent ? "rise" : "set",
             }}
           >
             {child}

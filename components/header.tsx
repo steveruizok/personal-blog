@@ -1,44 +1,44 @@
-import Link from 'next/link'
-import { styled, Button, Grid, Box, A, Image, Heading1 } from './theme'
-import LightDarkSwitch from './light-dark-switch'
+import Link from "next/link"
+import { styled, Button, Grid, Box, A, Image, Heading1 } from "./theme"
+import LightDarkSwitch from "./light-dark-switch"
 
 const Container = styled(Grid, {
   mt: 0,
-  mb: '$5',
-  gridTemplateColumns: '1fr repeat(4, auto)',
+  mb: "$5",
+  gridTemplateColumns: "1fr repeat(4, auto)",
   gridGap: 0,
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  font: '$ui',
-  mr: '-$0',
+  alignItems: "center",
+  justifyContent: "space-between",
+  font: "$ui",
+  mr: "-$0",
   sm: {
-    mt: '$2',
-    mr: '-$1',
+    mt: "$2",
+    mr: "-$1",
   },
 })
 
 const Icon = styled(Box, {
   height: 32,
   width: 32,
-  my: '$1',
-  backgroundColor: '$text',
-  '&:hover': {
-    animation: 'forwards .2s rotate',
+  my: "$1",
+  backgroundColor: "$text",
+  "&:hover": {
+    animation: "forwards .2s rotate",
   },
 })
 
-const HeaderLink = styled('a', {
-  cursor: 'pointer',
-  fontFamily: '$ui',
-  fontSize: '$ui',
+const HeaderLink = styled("a", {
+  cursor: "pointer",
+  fontFamily: "$ui",
+  fontSize: "$ui",
   borderRadius: 4,
-  textDecoration: 'none',
-  transition: 'background-color .16s',
-  bg: '$background',
-  p: '$1',
+  textDecoration: "none",
+  transition: "background-color .16s",
+  bg: "transparent",
+  p: "$1",
   sm: {
-    '&:hover': {
-      bg: '$hover',
+    "&:hover": {
+      bg: "$hover",
     },
   },
 })
