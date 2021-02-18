@@ -10,7 +10,7 @@ export default function Footer() {
         <A variant="author" href="https://twitter.com/steveruizok">
           Steve Ruiz
         </A>{" "}
-        • 2020
+        • 2021
       </Text>
       <Link href="/rss" title="Rss Feed">
         <IconButton>
