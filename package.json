@@ -25,6 +25,7 @@
     "react-dom": "16.13.1",
     "react-feather": "^2.0.8",
     "react-no-ssr": "^1.1.0",
+    "react-twitter-embed": "^3.0.3",
     "reading-time": "^1.2.0",
     "remark-autolink-headings": "^6.0.1",
     "remark-code-titles": "^0.1.1",

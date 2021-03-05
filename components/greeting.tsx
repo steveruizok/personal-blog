@@ -20,9 +20,8 @@ export default function Greeting() {
     <Container>
       <AuthorAvatar src="/avatars/@steveruizok.jpg" />
       <Text css={{ my: 0 }}>
-        <b>Hi, I’m Steve.</b> I write about design, code, and creative tools. If
-        you’d like to say hello, follow me on{" "}
-        <A href="https://twitter.com/steveruizok">twitter</A> or{" "}
+        <b>Hi, I’m Steve.</b> I write about design, code, and creative tools.
+        Follow me on <A href="https://twitter.com/steveruizok">twitter</A> or{" "}
         <A href="https://github.com/steveruizok">github</A>.
       </Text>
     </Container>
