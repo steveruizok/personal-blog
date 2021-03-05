@@ -2,7 +2,7 @@
 import { frontMatter as posts } from "../pages/posts/*.mdx"
 
 let allPosts: Blog.Post[] = (posts as Blog.Post[]).sort(
-  (a, b) => a.dateTime - b.dateTime
+  (a, b) => b.dateTime - a.dateTime
 )
 
 if (process.env.NODE_ENV === "production") {
