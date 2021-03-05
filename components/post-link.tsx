@@ -11,14 +11,18 @@ const LinkContainer = styled(BoxLink, {
   my: "$2",
   textDecoration: "none",
   sm: {
-    gridTemplateColumns: "128px 1fr",
-    gridTemplateRows: "auto",
+    gridTemplateColumns: "2fr 5fr",
+    gridTemplateRows: "min-content",
     gap: "$2",
     my: 0,
   },
 })
 
-const TitleContainer = styled("div", {})
+const TitleContainer = styled("div", {
+  height: "min-content",
+  display: "grid",
+  gridGap: "$1",
+})
 
 const PostImage = styled("div", {
   width: "100%",
@@ -33,6 +37,7 @@ export default function PostLink({
   title,
   date,
   readingTime,
+  description,
   slug,
   hero,
 }: Blog.Post) {
@@ -47,11 +52,12 @@ export default function PostLink({
           />
           <TitleContainer>
             <header>
-              <Heading2 css={{ mt: 0, mb: "$1" }}>{title}</Heading2>
+              <Heading2 css={{ mt: 0, mb: 0 }}>{title}</Heading2>
             </header>
             <Text variant="detail">
               <time dateTime={date}>{date} </time> • {readingTime.text}
             </Text>
+            <Text variant="detail">{description}</Text>
           </TitleContainer>
         </LinkContainer>
       </Link>
