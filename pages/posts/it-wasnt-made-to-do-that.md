@@ -3,7 +3,7 @@ title: "It Wasn't Made To Do That"
 date: "9/6/2020"
 hero: "/images/figma-input.png"
 status: "published"
-description: "How to deal with bizarre prototypes."
+description: "Figma's Interactive Components and the bizarre prototypes they've inspired."
 ---
 
 import Figure from "../../components/figure"
