@@ -13,7 +13,7 @@ const defaultFrontmatter = {
   keywords: "design",
   date: "1/1/2020",
   location: "London",
-  status: "published",
+  status: "draft",
 }
 
 module.exports = withMdxEnhanced({

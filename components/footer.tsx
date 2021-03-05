@@ -12,11 +12,6 @@ export default function Footer() {
         </A>{" "}
         • 2021
       </Text>
-      <Link href="/rss">
-        <IconButton>
-          <Rss size={20} style={{ marginTop: "-2px" }} />
-        </IconButton>
-      </Link>
     </_Footer>
   )
 }
