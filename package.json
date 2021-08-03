@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development ENV=development next dev",
+    "dev": "yarn refresh && NODE_ENV=development ENV=development next dev",
     "build": "next build",
     "start:development": "NODE_ENV=development ENV=development next start",
     "start:staging": "NODE_ENV=production ENV=production next start",
