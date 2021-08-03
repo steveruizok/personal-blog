@@ -197,7 +197,7 @@ export const Paragraph = styled("p", {
   fontWeight: "normal",
   "& code": {
     font: "$monospace",
-    fontSize: "$2",
+    fontSize: "$1",
     bg: "$codeBg",
     px: 4,
     borderRadius: 4,
