@@ -19,7 +19,7 @@ export default function DefaultLayout({ children, frontMatter }) {
   } = frontMatter
 
   return (
-    <Layout description={description} keywords={keywords}>
+    <Layout description={description} keywords={keywords} hero={hero}>
       <Head>
         <meta property="og:type" content="website" />
         <meta
