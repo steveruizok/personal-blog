@@ -29,9 +29,9 @@ export default function Layout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@steveruizok" />
         <meta name="twitter:creator" content="@steveruizok" />
+        <meta name="twitter:title" content={title} />
         <meta name="twitter:url" content={APP_URL} />
         <meta name="twitter:image" content={APP_URL + hero} />
-        <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:creator" content="@steveruizok" />
         <meta property="og:type" content="website" />
