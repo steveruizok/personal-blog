@@ -1,0 +1,309 @@
+---
+title: "Creating a Zoom UI"
+date: "8/5/2021"
+hero: "/images/brazil-topno-qvLhmpWIA2Y-unsplash.jpg"
+status: "published"
+description: "All the math to control a camera in a zoom-able, pan-able UI."
+keywords:
+  - "infinite"
+  - "zoom"
+  - "pan"
+  - "canvas"
+  - "browser"
+  - "svg"
+---
+
+import Figure from "../../components/figure"
+
+If you've used apps like Photoshop, Figma, or even Google Maps, then you're probably familiar with a "zoom UI". This pattern lets a user explore a "canvas" of content by panning around the canvas or zooming in on a specific point.
+
+In this article, I'll walk through everything involved in implementing the pattern using an infinite canvas. I'll be using TypeScript and React as my example implementations. The concepts are generic and you should be able to apply them to whatever environment, language or framework you like best.
+
+> 👋 Just want to look at some code? [Click here](https://codesandbox.io/s/zoom-ui-example-ep0cf) for the CodeSandbox.
+
+# Core Concepts
+
+Let's start with some core concepts.
+
+<Figure
+  src="/images/zoom-ui/camera-viewport-canvas.jpg"
+  alt="A diagram showing the relationship between the canvas, the camera, and the viewport."
+/>
+
+The first is the **canvas**. You can think of this as a fixed plane of infinite dimensions. In a creative app, the canvas holds the user's artboards, shapes or other content.
+
+Suspended in front of this plane is the **camera**. It points at the canvas.
+
+The **screen** is where we see what the camera sees.
+
+The **viewport** is the part of the canvas that is visible on the screen.
+
+<Figure
+  src="/images/zoom-ui/viewport-screen.jpg"
+  alt="A diagram showing the relationship between the canvas, the camera, and the viewport."
+/>
+
+Note that the viewport is not centered around the camera. Instead, the viewport extends _down
+and right_ from the camera.
+
+The camera can move in three dimensions: the camera's **point** is its position along the horizontal and vertical axes; its **zoom** is its position relative to the canvas. As the camera moves, the viewport will change to reflect the new visible part of the canvas.
+
+## Converting between Screen and Canvas
+
+A zoom ui has two coordinate systems: **screen coordinates** and **canvas coordinates**. A certain point on the screen will always refer to a certain point on the canvas. The actual canvas point will depend on the camera's point and zoom.
+
+If we model a point like this:
+
+```ts
+interface Point {
+  x: number
+  y: number
+}
+```
+
+And our camera like this:
+
+```ts
+interface Camera {
+  x: number
+  y: number
+  z: number
+}
+```
+
+Then we can turn a screen point into a canvas point like this:
+
+```ts
+function screenToCanvas(point: Point, camera: Camera): Point {
+  return {
+    x: point.x / camera.z - camera.x,
+    y: point.y / camera.z - camera.y,
+  }
+}
+```
+
+And likewise, we can turn a screen point into a canvas point:
+
+```ts
+function canvasToScreen(point: Point, camera: Camera): Point {
+  return {
+    x: (point.x - camera.x) * camera.z,
+    y: (point.y - camera.y) * camera.z,
+  }
+}
+```
+
+**Note**: In our model, a zoom of `1` is equal to a 100% zoom.
+
+## Finding the Viewport
+
+The viewport is a box that represents which part of the canvas is visible. Its values refer to canvas points. To find the viewport, we construct a box by converting two screen the upper left and bottom right points of the screen—into their corresponding canvas points.
+
+If we define a box as:
+
+```ts
+interface Box {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+  width: number
+  height: number
+}
+```
+
+Then we can find our viewport box like this:
+
+```ts
+function getViewport(camera: Camera, box: Box): Box {
+  const topLeft = screenToCanvas({ x: box.minX, y: box.minY }, camera)
+  const bottomRight = screenToCanvas({ x: box.maxX, y: box.maxY }, camera)
+
+  return {
+    minX: topLeft.x,
+    minY: topLeft.y,
+    maxX: bottomRight.x,
+    maxY: bottomRight.y,
+    height: bottomRight.x - topLeft.x,
+    width: bottomRight.y - topLeft.y,
+  }
+}
+```
+
+In a full screen browser app, we could find the viewport like this:
+
+```ts
+const viewport = getViewport(camera, {
+  minX: 0,
+  minY: 0,
+  maxX: window.innerWidth,
+  maxY: window.innerHeight,
+  width: window.innerWidth,
+  height: window.innerHeight,
+})
+```
+
+Or, if our canvas was part of a webpage, we could find the viewport using its `DOMRect`. Note that in this case, scrolling would change the "screen box".
+
+```ts
+const rect = document.body.getBoundingClientRect()
+
+const viewport = getViewport(camera, {
+  minX: rect.left,
+  minY: rect.top,
+  maxX: rect.right,
+  maxY: rect.bottom,
+  width: rect.width,
+  height: rect.height,
+})
+```
+
+## Panning and Zooming
+
+When the camera moves along the horizontal or vertical axes, we call this movement a "pan". To model a pan, we adjust the camera's point by the delta in either direction. And to make the pan feel consistent, we divide the deltas by the camera's zoom.
+
+```ts
+function panCamera(camera: Camera, dx: number, dy: number): Camera {
+  return {
+    x: camera.x - dx / camera.z,
+    y: camera.y - dy / camera.z,
+    z: camera.z,
+  }
+}
+```
+
+When the camera moves toward or away from the canvas, we call this movement a "zoom". In our model, we also need to provide a canvas point that the camera is "zooming toward". Again, to make our zoom feel consistent, we adjust the zoom delta based on the current zoom.
+
+```ts
+function zoomCamera(camera: Camera, point: Point, dz: number): Camera {
+  const zoom = camera.z - dz * camera.z
+
+  const p1 = screenToCanvas(point, camera)
+
+  const p2 = screenToCanvas(point, { ...camera, z: zoom })
+
+  return {
+    x: camera.x + (p2.x - p1.x),
+    y: camera.y + (p2.y - p1.y),
+    z: zoom,
+  }
+}
+```
+
+## Capturing Events
+
+In the browser, both zoom and pan events come from wheel events. By convention, we use the control key to identify a zoom. A user's device will sometimes follow this convention automatically: for example, on a MacBook trackpad, pinching will fire a WheelEvent with `ctrlKey: true`.
+
+```ts
+function handleWheel(event: WheelEvent) {
+  event.preventDefault()
+
+  const { clientX: x, clientY: y, deltaX, deltaY, ctrlKey } = event
+
+  if (ctrlKey) {
+    setCamera((camera) => zoomCamera(camera, { x, y }, deltaY / 100))
+  } else {
+    setCamera((camera) => panCamera(camera, deltaX, deltaY))
+  }
+}
+```
+
+Set this event on the `document.body` or the zoom UI's root container.
+
+> In the browser, wheel events often cause other changes such as scrolls or browser-level zooms. Calling `event.preventDefault()` prevents these actions. On mobile devices, you may need to cancel other touch or gesture events to avoid native behaviors.
+
+In a React app, you might use a hook like this. It's important to set the `{ passing: false }` to prevent native browser behavior when pinching or zooming.
+
+```tsx
+React.useEffect(() => {
+  const elm = ref.current
+
+  if (!elm) return
+
+  elm.addEventListener("wheel", handleWheel, { passive: false })
+
+  return () => elm.removeEventListener("wheel", handleWheel)
+}, [ref])
+```
+
+## Sortcuts
+
+Often you'll also want to have shortcuts for zooming in and out toward the center of the viewport.
+
+```ts
+function zoomCameraTo(camera: Camera, point: Point, zoom: number): Camera {
+  const p1 = screenToCanvas(point, camera)
+
+  const p2 = screenToCanvas(point, { ...camera, z: zoom })
+
+  return {
+    x: camera.x + (p2.x - p1.x),
+    y: camera.y + (p2.y - p1.y),
+    z: zoom,
+  }
+}
+```
+
+To zoom in increments of 25%:
+
+```ts
+function zoomIn(camera: Camera): Camera {
+  const i = Math.round(camera.z * 100) / 25
+
+  const nextZoom = (i + 1) * 0.25
+
+  const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+
+  return zoomCameraTo(camera, center, camera.z - nextZoom)
+}
+```
+
+```ts
+function zoomOut(camera: Camera): Camera {
+  const i = Math.round(camera.z * 100) / 25
+
+  const nextZoom = (i - 1) * 0.25
+
+  const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+
+  return zoomCameraTo(camera, center, camera.z - nextZoom)
+}
+```
+
+And to reset the zoom:
+
+```ts
+function resetZoom(camera: Camera): Camera {
+  return zoomCamera(camera, center, camera.z - 1)
+}
+```
+
+## Applying the Camera
+
+In the browser, the best way to apply a zoom is through CSS transforms.
+
+```ts
+const transform = `
+  scale(${camera.z}) 
+  translate(${camera.x}px, ${camera.y}px)
+`
+```
+
+> Remember that _order matters_ when writing a transform. In this case, the order is: first scale, then translate.
+
+If you're using canvas, then you can translate the canvas instead.
+
+```ts
+ctx.scale(camera.z, camera.z)
+ctx.translate(camera.x, camera.y)
+```
+
+## Conclusion
+
+That's the basics of a zoom ui. Many zoom uis will also have the option to zooming to content or to selected content, but those functions will be different depending on how the rest of your app is set up.
+
+Here's a [CodeSandbox](https://codesandbox.io/s/zoom-ui-example-ep0cf) showing an SVG implementation for all of the code in this article.
+
+Here's a [CodeSandbox](https://codesandbox.io/s/zoom-ui-example-canvas-6j3wo) showing the same implementation with HTML canvas.
+
+Enjoy!
