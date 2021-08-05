@@ -21,9 +21,7 @@ export function getPostBySlug(slug: string) {
   return allPosts.find((p) => p.slug === slug)
 }
 
-export function getNeighborPosts(
-  slug: string
-): {
+export function getNeighborPosts(slug: string): {
   prev?: Blog.Post
   next?: Blog.Post
 } {
