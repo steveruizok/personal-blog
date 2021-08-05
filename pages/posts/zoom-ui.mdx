@@ -1,5 +1,5 @@
 ---
-title: "Creating a Zoom UI"
+title: "Creating a zoom UI"
 date: "8/5/2021"
 hero: "/images/brazil-topno-qvLhmpWIA2Y-unsplash.jpg"
 status: "published"
@@ -50,7 +50,7 @@ The camera can move in three dimensions: the camera's **point** is its position 
 
 ## Converting between Screen and Canvas
 
-A zoom ui has two coordinate systems: **screen coordinates** and **canvas coordinates**. A certain point on the screen will always refer to a certain point on the canvas. The actual canvas point will depend on the camera's point and zoom.
+A zoom UI has two coordinate systems: **screen coordinates** and **canvas coordinates**. A certain point on the screen will always refer to a certain point on the canvas. The actual canvas point will depend on the camera's point and zoom.
 
 If we model a point like this:
 
@@ -300,7 +300,7 @@ ctx.translate(camera.x, camera.y)
 
 ## Conclusion
 
-That's the basics of a zoom ui. Many zoom uis will also have the option to zooming to content or to selected content, but those functions will be different depending on how the rest of your app is set up.
+That's the basics of a zoom UI. Many zoom UIs will also have the option to zooming to content or to selected content, but those functions will be different depending on how the rest of your app is set up.
 
 Here's a [CodeSandbox](https://codesandbox.io/s/zoom-ui-example-ep0cf) showing an SVG implementation for all of the code in this article.
 
