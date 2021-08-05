@@ -26,7 +26,9 @@ export default function Layout({
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@steveruizok" />
+        <meta name="twitter:creator" content="@steveruizok" />
         <meta name="twitter:url" content={APP_URL} />
         <meta name="twitter:image" content={APP_URL + hero} />
         <meta name="twitter:title" content={title} />
