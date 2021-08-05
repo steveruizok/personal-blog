@@ -7,7 +7,7 @@ type Props = Pick<Blog.Post, "keywords" | "description" | "title" | "hero"> & {
   children: React.ReactNode
 }
 
-const APP_URL = "https://steveruiz.me"
+const APP_URL = "http://steveruiz.me"
 
 export default function Layout({
   keywords = "",
