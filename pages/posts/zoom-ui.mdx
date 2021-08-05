@@ -90,7 +90,7 @@ function canvasToScreen(point: Point, camera: Camera): Point {
 
 ## Finding the Viewport
 
-The viewport is a box that represents which part of the canvas is visible. Its values refer to canvas points. To find the viewport, we construct a box by converting two screen the upper left and bottom right points of the screen—into their corresponding canvas points.
+The viewport is a box that represents which part of the canvas is shown on the screen. Its values refer to canvas points. To find the viewport, we construct a box by converting the upper left and bottom right points of the screen into their corresponding canvas points.
 
 If we define a box as:
 
@@ -205,7 +205,7 @@ Set this event on the `document.body` or the zoom UI's root container.
 
 > In the browser, wheel events often cause other changes such as scrolls or browser-level zooms. Calling `event.preventDefault()` prevents these actions. On mobile devices, you may need to cancel other touch or gesture events to avoid native behaviors.
 
-In a React app, you might use a hook like this. It's important to set the `{ passing: false }` to prevent native browser behavior when pinching or zooming.
+In a React app, you might use a hook like this. It's important to set the `{ passive: false }` to prevent native browser behavior when pinching or zooming.
 
 ```tsx
 React.useEffect(() => {
@@ -219,7 +219,7 @@ React.useEffect(() => {
 }, [ref])
 ```
 
-## Sortcuts
+## Shortcuts
 
 Often you'll also want to have shortcuts for zooming in and out toward the center of the viewport.
 
