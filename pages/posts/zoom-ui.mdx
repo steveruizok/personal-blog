@@ -80,8 +80,8 @@ And likewise, we can turn a canvas point into a screen point:
 ```ts
 function canvasToScreen(point: Point, camera: Camera): Point {
   return {
-    x: (point.x - camera.x) * camera.z,
-    y: (point.y - camera.y) * camera.z,
+    x: (point.x + camera.x) * camera.z,
+    y: (point.y + camera.y) * camera.z,
   }
 }
 ```
