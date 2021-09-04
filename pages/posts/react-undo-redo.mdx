@@ -1,0 +1,309 @@
+---
+title: "Undo and Redo in React"
+date: "8/21/2021"
+hero: "/images/react-undo-redo/david-clode.jpg"
+status: "draft"
+description: "Implementing a StateManager stack in React with patches."
+---
+
+In this article, I will walk through a pattern that I have been using to manage state in React applications that need to support undo and redo. While we will be using React and TypeScript, the pattern itself is generic and could be done in any language or framework.
+
+## State
+
+We can start with our state object. It is important that this state object is "serializable"; that is, it should contain only arrays, objects, and primitives such as numbers, strings, booleans, or null values. It should not contain classes, Dates, Symbols, Maps, Sets, etc.
+
+For this article's example, we will be making a todo list (sorry). Each todo is an object with an `id`, a `text` string, a boolean `isComplete`, and a `dateCreated` string.
+
+```ts
+interface Todo {
+  id: string
+  text: string
+  isComplete: boolean
+  dateCreated: number
+}
+```
+
+Our state is an object with one object property named `todos` where each of our todos is stored under its `id`.
+
+```ts
+interface State {
+  todos: Record<string, Todo>
+}
+```
+
+Let's define our initial state with two todos:
+
+```ts
+const initialState: State = {
+  todos: {
+    todo0: {
+      id: "todo0",
+      text: "Scrub the dog.",
+      isComplete: false,
+      dateCreated: 1629575640560,
+    },
+    todo1: {
+      id: "todo1",
+      text: "Sharpen the dishes.",
+      isComplete: false,
+      dateCreated: 1629275340560,
+    },
+  },
+}
+```
+
+## Patch
+
+Each change to our state will produce a new state object. To create this new stte object, we will merge the previous state with a "patch", or "deep partial" containing the changes we wish to make.
+
+```ts
+type Patch<T> = Partial<{ [P in keyof T]: Patch<T[P]> }>
+```
+
+For example, if we wanted to change the text of our first todo, we would use a patch that looked like this:
+
+```ts
+const patch: Patch<State> = {
+  todos: {
+    todo0: {
+      text: "Walk the dog.",
+    },
+  },
+}
+```
+
+And here's the function that we'll use to do the merge.
+
+```ts
+function merge<T>(target: T, patch: Patch<T>): T {
+  const result: T = { ...target }
+  const entries = Object.entries(patch) as [keyof T, T[keyof T]][]
+
+  for (const [key, value] of entries) {
+    result[key] =
+      value === Object(value) && !Array.isArray(value)
+        ? merge(result[key], value)
+        : value
+  }
+
+  return result
+}
+```
+
+If we pass both our initial state and our patch together to the `merge` function, we will get back our new state object.
+
+```ts
+const nextState = merge(initialState, patch)
+```
+
+The result will be a new object (`nextState`) with a new `todos` object, a new `todos.todo0` object, and a new `todos.todo0.text` value. The rest of the state's properties will be strictly equal to their values from the `initialState`.
+
+```ts
+let currentState = initialState
+
+currentState = merge(currentState, patch)
+
+initialState.todos.todo0 === currentState.todos.todo0 // false
+initialState.todos.todo1 === currentState.todos.todo1 // true
+```
+
+## Command
+
+A command contains two patches: an "after" patch that makes some change to the state, and a "before" patch that reverses that change. As we'll see, we can use commands to implement undo and redo.
+
+```ts
+interface Command<T extends object> {
+  before: Patch<T>
+  after: Patch<T>
+}
+```
+
+For example, if we wanted our previous change to be "undoable", we would use a command like this:
+
+```ts
+const command: Command<State> = {
+  before: {
+    todos: {
+      todo0: {
+        text: initialState.todos.todo0.text,
+      },
+    },
+  },
+  after: {
+    todos: {
+      todo0: {
+        text: "Walk the dog.",
+      },
+    },
+  },
+}
+```
+
+Assuming that we start from our initial state, then we would "do" the change by merging in the command's `after` patch. To "undo" the change, we would merge in the command's `before` patch. And to "redo" the change, we would again merge in the command's `after` patch.
+
+```ts
+let currentState = initialState
+
+// Do
+currentState = merge(currentState, command.after)
+
+// Undo
+currentState = merge(currentState, command.before)
+
+// Redo
+currentState = merge(currentState, command.after)
+```
+
+In order to make this "command pattern" more usable in an app, we will next need to create a structure to keep track of these changes.
+
+## StateManager
+
+Next, we will create a class named `StateManager` to help us manage our state through commands. It has an array of `Command` objects called a `stack` and a `pointer` that references the index of the current `Command`. The `stack` will begin as an empty array, so the `pointer` will begin at `-1`.
+
+```ts
+export class StateManager<T extends object> {
+  protected state: T
+  protected snapshot: T
+  protected stack: Command<T>[] = []
+  protected pointer: number = -1
+
+  constructor(initialState: T) {
+    this.state = initialState
+    this.snapshot = initialState
+  }
+
+  protected patchState = (patch: Patch<T>) => {
+    this.state = merge(this.state, patch)
+    return this
+  }
+
+  protected setState = (command: Command<T>) => {
+    this.pointer++
+    this.stack = this.stack.slice(0, this.pointer)
+    this.stack.push(command)
+    return this.patchState(command.after)
+  }
+
+  protected undo = () => {
+    if (this.pointer < 0) return this
+    const command = this.stack[this.pointer]
+    this.pointer--
+    return this.patchState(command.before)
+  }
+
+  protected redo = () => {
+    if (this.pointer > this.stack.length - 1) return this
+    this.pointer++
+    const command = this.stack[this.pointer]
+    return this.patchState(command.after)
+  }
+
+  protected setSnapshot = () => {
+    this.snapshot = { ...this.state }
+  }
+}
+```
+
+Our `StateManager` class implements the command pattern through five core methods:
+
+#### `patchState`
+
+The class's `patch` method accepts a `Patch` and produces a new `state` member by merging the patch with the current state.
+
+#### `setState`
+
+Our class's `setState` method is used to "do" a command. When we set the state, we first iterate the pointer, then slice the `stack` up to the current command, and then push the new command to the stack. Note that pushing a new command will immediately remove any "redoable" commands.
+
+#### `undo`
+
+In our `undo` method, we will first apply the current command’s `before` patch, then decrement the pointer. Note that we cannot undo if our stack is empty.
+
+#### `redo`
+
+In our `redo` method, we will increment the `pointer` and then patch in the current command’s `after` patch. Note that we cannot redo if we are already at the end of our stack.
+
+#### `setSnapshot`
+
+Finally, the `setSnapshot` method stores a shallow copy of the current `state` to the class's `snapshot` property. More on this in a bit.
+
+## Using Snapshots
+
+Certain user actions, such as editing the content of a text field or dragging a slider, will produce many changes in rapid succession. When the action is complete, pressing undo should restore the “original” value, and redo should restore the “final” value.
+
+We can use the `StateManager`'s `snapshot` and `setSnapshot` to help implement these sorts of features.
+
+Let's start with our `TodoItem` component.
+
+```tsx
+export function TodoItem({ todo }: { todo: Todo }) {
+  const { toggleTodoComplete, setSnapshot, setTodoText } = todoState
+
+  return (
+    <div>
+      <input
+        type="checkbox"
+        checked={todo.isComplete}
+        onChange={() => toggleTodoComplete(todo.id)}
+      />
+      <input
+        type="text"
+        value={todo.text}
+        onFocus={() => setSnapshot()}
+        onBlur={(e) => setTodoText(todo.id, e.currentTarget.value, true)}
+        onChange={(e) => setTodoText(todo.id, e.currentTarget.value, false)}
+        disabled={todo.isComplete}
+      />
+    </div>
+  )
+}
+```
+
+In our todos example, we would want to call `setSnapshot()` when a user focuses a todo’s text input, saving the todo’s current value.
+
+As the user makes changes to the next, we will call `patchState()` in order to update the todo’s value without changing our StateManager stack.
+
+```ts
+
+```
+
+When the user confirms their entry by blurring the text input, we will call `setState()` and push a command that references the snapshot. (Pressing enter should call `setSnapshot()` again).
+
+```ts
+
+```
+
+And if the user cancels their edit by pressing Escape, we will use the snapshot to patch back in the original value.
+
+```ts
+
+```
+
+This way, a user can select a todo, edit its value through a series of keystrokes, blur the input, and then undo back to the original value.
+
+## Cleanup
+
+Our patch pattern doesn’t let us delete properties from objects. We can only set them to undefined or return the entire parent object without those properties.
+
+For this reason, and for others related to a particular app’s logic, we also pass out patched state through a `cleanup` method.
+
+In our example, such a method would allow us to “delete” todos by patching them to `undefined`; and then, in our `cleanup` method, actually delete these properties from the `todos` object.
+
+```ts
+
+```
+
+Likewise for the `undo` method of a “create todo” command.
+
+## From `StateManager` to `TodoState`
+
+The `StateManager` class is rather generic. To make it specifically useful for an actual app, such as our example todo list, we would want to _extend_ the class, adding new methods that use the `StateManager`'s core methods.
+
+```ts
+class TodoState extends StateManager<State> {
+  constructor(initialState: State) {
+    super(initialState)
+  }
+}
+```
+
+Because we're going to be using this state in a React app, our first step would be to create a way for other React components to select from and subscribe to our state. We can use the `cleanup` method to
