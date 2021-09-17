@@ -1,34 +1,66 @@
 import Link from "next/link"
+import { useRouter } from "next/router"
 import { Image, Span, A } from "./theme"
 
 export default function Figure(props: {
   src: string
   alt: string
   title: "string"
+  isVideo?: boolean
 }) {
+  const router = useRouter()
+
   return (
     <>
-      <Link href={props.src}>
-        <A
-          css={{
-            textAlign: "center",
-            display: "block",
-            mx: "-$1",
-            sm: {
+      {props.isVideo ? (
+        <>
+          <video
+            {...props}
+            autoPlay
+            muted
+            playsInline
+            onClick={(e) => {
+              const elm = e.currentTarget
+              if (elm.paused) {
+                e.currentTarget.play()
+              } else {
+                e.currentTarget.pause()
+              }
+            }}
+            onDoubleClick={() => router.push(props.src)}
+          />
+          <Span variant="caption">
+            {props.title}{" "}
+            <Link href={props.src}>
+              <A>(source)</A>
+            </Link>
+          </Span>
+        </>
+      ) : (
+        <>
+          <Span
+            css={{
+              textAlign: "center",
+              display: "block",
               mx: "-$1",
-            },
-            md: {
-              mx: "-$2",
-            },
-            lg: {
-              mx: "-$2",
-            },
-          }}
-        >
-          <Image {...props} css={{ mt: "$3" }} />
-        </A>
-      </Link>
-      <Span variant="caption">{props.title}</Span>
+              mt: "$3",
+              sm: {
+                mx: "-$1",
+              },
+              md: {
+                mx: "-$2",
+              },
+              lg: {
+                mx: "-$2",
+              },
+            }}
+            onDoubleClick={() => router.push(props.src)}
+          >
+            <Image {...props} />
+          </Span>
+          <Span variant="caption">{props.title}</Span>
+        </>
+      )}
     </>
   )
 }
