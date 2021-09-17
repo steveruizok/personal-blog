@@ -135,6 +135,9 @@ css.global({
     padding: 0,
     margin: 0,
   },
+  video: {
+    maxWidth: "100%",
+  },
   "pre[class*='language-']": {
     fontSize: "$code",
     backgroundColor: "$codeBg",
