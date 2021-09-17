@@ -29,12 +29,7 @@ export default function Figure(props: {
             }}
             onDoubleClick={() => router.push(props.src)}
           />
-          <Span variant="caption">
-            {props.title}{" "}
-            <Link href={props.src}>
-              <A>(source)</A>
-            </Link>
-          </Span>
+          <Span variant="caption">{props.title} </Span>
         </>
       ) : (
         <>
