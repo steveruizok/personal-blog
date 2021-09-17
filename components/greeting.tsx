@@ -22,7 +22,8 @@ export default function Greeting() {
       <Text css={{ my: 0 }}>
         <b>Hi, I’m Steve.</b> I write about design, code, and creative tools.
         Follow me on <A href="https://twitter.com/steveruizok">twitter</A> or{" "}
-        <A href="https://github.com/steveruizok">github</A>.
+        <A href="https://github.com/steveruizok">github</A>. Like what I do?{" "}
+        <A href="https://github.com/sponsors/steveruizok">Become a sponsor!</A>
       </Text>
     </Container>
   )

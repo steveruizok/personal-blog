@@ -278,6 +278,13 @@ export const Image = styled("img", {
   borderRadius: 4,
 })
 
+export const Video = styled("video", {
+  maxWidth: "100%",
+  height: "auto",
+  color: "$text",
+  borderRadius: 4,
+})
+
 /* ------------------- Code Blocks ------------------ */
 
 export const Pre = styled("pre", {
