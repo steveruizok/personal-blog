@@ -1,0 +1,86 @@
+---
+title: "Fixing the Drift in Shape Rotations"
+date: "9/19/2021"
+hero: "/images/rotating-shapes/hero.png"
+status: "published"
+description: "A look at an obscure bug common to drawing programs, where rotations can cause shapes to move to new positions."
+---
+
+import Figure from "../../components/figure"
+import Tweet from "../../components/tweet"
+
+Ever notice in [Figma](https://figma.com) that if you rotate a few shapes and then rotate them back, they'll end up in a different place?
+
+<Figure
+  src="/images/rotating-shapes/figma-drift.mp4"
+  alt="A video recorded from Figmashowing the change in position after rotating four selected shapes and then rotating them back."
+  isVideo
+/>
+
+It's not just Figma! [Excalidraw](https://excalidraw.com) supports this kind of rotation and has the same issue.
+
+<Figure
+  src="/images/rotating-shapes/excalidraw-drift.mp4"
+  alt="A video recorded from Excalidraw showing the change in position after rotating four selected shapes and then rotating them back."
+  isVideo
+/>
+
+...and so does my own project, [tldraw](https://tldraw.com), which is where I ran into the issue.
+
+<Figure
+  src="/images/rotating-shapes/tldraw-drift.mp4"
+  alt="A video recorded from TLDraw showing the change in position after rotating four selected shapes and then rotating them back."
+  isVideo
+/>
+
+Side note: most other design tools don't support this kind of rotation. Shapes either rotate around their own centers or inherit rotation from a group. I wish they would though!
+
+<Figure
+  src="/images/rotating-shapes/pitch-rotation.mp4"
+  alt="A video recorded from Excalidraw showing the change in position after rotating four selected shapes and then rotating them back."
+  isVideo
+/>
+
+Anyway, here's what's happening. When you start rotating a selection, you need to pick a point to rotate around. We're all using the average center of the selected shapes—and we keep using this point until you stop rotating.
+
+<Figure
+  src="/images/rotating-shapes/center-rotate.mp4"
+  alt="A video showing how selected shapes are rotated around their initial common center point."
+  isVideo
+/>
+
+However, the rotated shapes probably have a different average center; which means that your second rotation (ie to rotate things back) is pivoting around a different point. And that's what causes the change of position.
+
+<Figure
+  src="/images/rotating-shapes/new-centers.mp4"
+  alt="A video showing how the selection's common center point changes when shapes are rotated."
+  isVideo
+/>
+
+Honestly, I was extremely glad to find this in Figma and other apps because I was worried it was a bug in my own rotation implementation.
+
+It is even a bug though? It's weird that rotating a group and then rotating it back doesn't put them back in the same place. Let's fix it!
+
+<Figure
+  src="/images/rotating-shapes/tldraw-fixed.mp4"
+  alt="A video from the tldraw app showing how the selection's common center point is preserved while the selection does not change."
+  isVideo
+/>
+
+And here's the fix: once a user starts a rotation, we hold onto the the center point; if the user rotates again, we re-use that same point; and we only give it up once the user makes a new selection.
+
+<Figure
+  src="/images/rotating-shapes/canva-fixed.mp4"
+  alt="A video from the Canva app showing how the selection's common center point is preserved while the selection does not change."
+  isVideo
+/>
+
+To their credit, [canva](https://canva.com) seems to be solving the problem is the same way. The original rotation point is preserved until a user makes a new selection.
+
+Ok, that's it! Hope you enjoyed this extra-obscure edition of design tool micro-UX. If you catch any rotation-related bugs in [tldraw](https://tldraw.com), let me know!
+
+---
+
+Look familiar? This blog post was adapted from my [Twitter thread](https://twitter.com/steveruizok/status/1439581543480152069).
+
+<Tweet id="1439581543480152069" />
