@@ -33,6 +33,7 @@ export default function DefaultLayout({ children, frontMatter }) {
           content={description}
           key="description"
         />
+        <meta name="twitter:site" content="@steveruizok" />
         <meta property="twitter:title" content={title} key="title" />
         <meta property="twitter:image" content={hero} />
         <meta property="twitter:description" content={description} />

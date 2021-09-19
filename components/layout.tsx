@@ -7,8 +7,6 @@ type Props = Pick<Blog.Post, "keywords" | "description" | "title" | "hero"> & {
   children: React.ReactNode
 }
 
-const APP_URL = "http://steveruiz.me"
-
 export default function Layout({
   keywords = "",
   description = "",
@@ -30,16 +28,17 @@ export default function Layout({
         <meta name="twitter:site" content="@steveruizok" />
         <meta name="twitter:creator" content="@steveruizok" />
         <meta name="twitter:title" content={title} />
-        <meta name="twitter:url" content={APP_URL} />
-        <meta name="twitter:image" content={APP_URL + hero} />
+        <meta name="twitter:site" content="@steveruizok" />
+        <meta name="twitter:url" content="https://www.steveruiz.me" />
+        <meta name="twitter:image" content={"http://www.steveruiz.me" + hero} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:creator" content="@steveruizok" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:site_name" content={title} />
-        <meta property="og:url" content={APP_URL} />
-        <meta property="og:image" content={APP_URL + hero} />
+        <meta property="og:url" content="https://www.steveruiz.me" />
+        <meta property="og:image" content={"http://www.steveruiz.me" + hero} />
       </Head>
       <header>
         <Header />
