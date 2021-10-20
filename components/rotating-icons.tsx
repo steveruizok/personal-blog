@@ -1,20 +1,8 @@
-import { styled, IconButton } from "./theme"
 import { Children, useRef, useEffect } from "react"
+import { styled } from "~stitches.config"
+import { IconButton } from "./icon-button"
 
-const Icon = styled.div({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  position: "absolute",
-  top: 0,
-  left: 0,
-  height: "100%",
-  width: "100%",
-  animationFillMode: "forwards",
-  animationDuration: "400ms",
-})
-
-export default function RotatingIcons({
+export function RotatingIcons({
   current,
   children,
   ...rest
@@ -28,7 +16,7 @@ export default function RotatingIcons({
 
   useEffect(() => {
     rPrevious.current = current
-  })
+  }, [current])
 
   const isInitial = current === rPrevious.current
   const previous = current === 0 ? icons.length - 1 : current - 1
@@ -55,3 +43,16 @@ export default function RotatingIcons({
     </IconButton>
   )
 }
+
+const Icon = styled("div", {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  position: "absolute",
+  top: 0,
+  left: 0,
+  height: "100%",
+  width: "100%",
+  animationFillMode: "forwards",
+  animationDuration: "400ms",
+})
