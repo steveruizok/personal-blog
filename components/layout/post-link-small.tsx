@@ -34,10 +34,10 @@ const LinkContainer = styled("article", {
   gridTemplateColumns: "2fr 5fr",
   transition: "all .2s",
   cursor: "pointer",
-  border: "2px solid transparent",
-  "&:hover": {
-    border: "2px solid $codeText",
-  },
+  // border: "2px solid transparent",
+  // "&:hover": {
+  //   border: "2px solid $codeText",
+  // },
 })
 
 const Content = styled("div", {

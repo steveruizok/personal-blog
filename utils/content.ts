@@ -61,8 +61,8 @@ export function getPostList() {
 
 export function getPostLinks(post: Post) {
   const posts = getPosts()
-  const prev = posts.find((p) => p.index === post.index - 1)
-  const next = posts.find((p) => p.index === post.index + 1)
+  const prev = posts[post.index - 1]
+  const next = posts[post.index + 1]
 
   return {
     prev: prev

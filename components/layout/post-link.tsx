@@ -56,8 +56,8 @@ const LinkContainer = styled("a", {
   gap: "$0",
   textDecoration: "none",
   transition: "all .12s",
-  border: "2px solid transparent",
-  "&:hover": {
-    border: "2px solid $codeText",
-  },
+  // border: "2px solid transparent",
+  // "&:hover": {
+  //   border: "2px solid $codeText",
+  // },
 })

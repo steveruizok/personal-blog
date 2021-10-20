@@ -55,6 +55,11 @@ export function generateContent() {
         },
       }
     })
+    .filter((result) =>
+      process.env.NODE_ENV === "development"
+        ? true
+        : result.data.status === "published"
+    )
     .sort((a, b) => b.date - a.date)
     .map((result, i) => ({ ...result, index: i }))
     .forEach((result) => content.posts.push(result))
