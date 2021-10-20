@@ -1,0 +1,87 @@
+---
+title: "Smooth Lines for Pencil Tools"
+date: "9/17/2021"
+hero: "/images/pencil-ux/hero.png"
+status: "published"
+description: "A dive of medium depth into why pencil tools work the way they do—and how they can be improved."
+---
+
+Ever wonder why regular pencil tools wait until after you finish drawing to smooth out your line? It's usually because the app is using a line-simplification algorithm—and these sorts of algorithms aren't "stable" as a line is changing.
+
+<Figure
+  src="/images/pencil-ux/simplify-while-drawing.mp4"
+  alt="A video showing a simplified line moving as a user writes the word hey."
+  isVideo
+/>
+
+Here's the algorithm at work, picking new points on almost every frame. Each solution is "correct" for each set of points but it is overall "incorrect" in the sense that the solutions keep changing! Try it out [here](https://codesandbox.io/s/simplified-too-often-xhpnr?file=/src/index.js).
+
+<Figure
+  src="/images/pencil-ux/simplify-hey-dots.mp4"
+  alt="A video showing the simplified line's points as dots."
+  isVideo
+/>
+
+Why simplify at all? The "raw" input points are often very jerky and noisy.
+
+<Figure
+  src="/images/pencil-ux/rough-hey-dots.mp4"
+  alt="A video showing the drawing's unfiltered input points as dots."
+  isVideo
+/>
+
+They don't make a very good looking line. Try it out [here](https://codesandbox.io/s/unfiltered-dots-kzgo3?file=/src/index.js).
+
+<Figure
+  src="/images/pencil-ux/rough-hey-line.mp4"
+  alt="A video showing the drawing's unfiltered input points as a line."
+  isVideo
+/>
+
+We can improve it a little by applying a low pass filter. (grey dots are the original points)
+
+<Figure
+  src="/images/pencil-ux/low-pass-hey-dots.mp4"
+  alt="A video showing the drawing's input points as dots after a low-pass filter has been applied."
+  isVideo
+/>
+
+The low-pass improves things a bit... (Try it out [here](https://codesandbox.io/s/low-pass-qvun5?file=/src/index.js))
+
+<Figure
+  src="/images/pencil-ux/low-pass-hey.mp4"
+  alt="A video showing the drawing's input points as a line after a low-pass filter has been applied."
+  isVideo
+/>
+
+But it's still a lot of data, especially if you're expecting to edit the points after the fact. So why not just wait until the end to simplify? The line doesn't change while the user draws and we get the result we want at the end, too. Try it out [here](https://codesandbox.io/s/agitated-knuth-k1dwm?file=/src/index.js).
+
+<Figure
+  src="/images/pencil-ux/rough-then-smooth.mp4"
+  alt="A video showing the drawing's input points as a line during the drawing, then applying a simplify filter when it is completed."
+  isVideo
+/>
+
+If you're in a design tool, then waiting until the end is probably fine—but it's not a great experience for drawing or writing. So one of the big challenges in [perfect-freehand](https://github.com/steveruizok/perfect-freehand) was coming up with a "stable" way to simplify lines.
+
+<Figure
+  src="/images/pencil-ux/freehand-final.mp4"
+  alt="A video showing the drawing's as a polygon rendered with perfect-freehand."
+  isVideo
+/>
+
+You can see it at work on the corners of this curve—first with the smoothing at minimum, and then with it turned up. (Try it [here](https://codesandbox.io/s/freehand-y1ihm?file=/src/index.js))
+
+<Figure
+  src="/images/pencil-ux/freehand-curves.mp4"
+  alt="A video showing the perfect-freehand drawing simplifying points along a curve."
+  isVideo
+/>
+
+This is still something I'm working on in the perfect-freehand algorithm. If you have any ideas, let me know. Or [dive into the code](https://github.com/steveruizok/perfect-freehand)!
+
+---
+
+Look familiar? This blog post was adapted from my [Twitter thread](https://twitter.com/steveruizok/status/1438847842261549061).
+
+<Tweet id="1438847842261549061" />

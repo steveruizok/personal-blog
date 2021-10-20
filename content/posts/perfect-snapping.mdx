@@ -1,0 +1,298 @@
+---
+title: "Perfect Snapping"
+date: "10/19/2021"
+hero: "/images/snapping/snapping_1.png"
+status: "draft"
+description: "How to make shapes snap and align."
+---
+
+In this post, I'm going to walk through how you might implement one of my favorite features in design apps: snapping.
+
+In a design app, snapping happens when you're dragging or resizing some selected on the canvas. If the app detects that your selection _almost_ aligns with some other shape, then it will adjust your selection so that it _does_ align.
+
+If we want to implement snapping in our own app, then **what we're after is this offset**—the distance to move the selection so that it snaps to the right place.
+
+We can find that offset by comparing the bounding box of our _selected_ shapes against the bounding boxes of other shapes on the page.
+
+## Get your Bounding Boxes
+
+As a quick refresher: a bounding box is the smallest possible box that we could draw around a shape. Our bounding boxes will be "axis-aligned", meaning they'll never be rotated—even if the shape itself is rotated.
+
+<img src="/images/snapping/snapping_3.png" />
+
+Though we could define a box using only four numbers (its `x`, `y`, `width`, and `height`), we'll want to compute some more information to save time later.
+
+We'll define a bounding box like this:
+
+```ts
+interface AABB {
+  minX: number
+  midX: number
+  maxX: number
+  minY: number
+  midY: number
+  maxY: number
+  width: number
+  height: number
+}
+```
+
+This will give us enough information to compute nine points on the shape: the min, mid, and max in both dimensions.
+
+<img src="/images/snapping/snapping_2.png" />
+
+Which bounding boxes do we need to find? That's in part up to you. You can start with every shape on the canvas, then filter out the shapes that the user has selected or the shapes that are outside of the viewport.
+
+So if our shapes look like this:
+
+```ts
+interface Shape {
+  id: string
+  point: number[]
+  size: number[]
+}
+```
+
+Then we could find a bounding box like this:
+
+```ts
+function getAABB({ point: [x, y], size: [w, h] }: Shape) {
+  return {
+    minX: x,
+    midX: x + w / 2,
+    maxX: x + w,
+    minY: y,
+    midY: y + h / 2,
+    maxY: y + h,
+    width: w,
+    height: h,
+  }
+}
+```
+
+And if our app state looks like this:
+
+```ts
+interface State {
+  shapes: Shape[]
+  selection: Shape[]
+  viewport: AABB
+}
+```
+
+Then with a few helper functions...
+
+```ts
+const boundsContain = (a: AABB, b: AABB) =>
+  a.minX < b.minX && a.minY < b.minY && a.maxY > b.maxY && a.maxX > b.maxX
+
+const boundsCollide = (a: AABB, b: AABB) =>
+  !(a.maxX < b.minX || a.minX > b.maxX || a.maxY < b.minY || a.minY > b.maxY)
+```
+
+We could find the "snappable" bounding boxes like this:
+
+```ts
+function getSnappableAABBs(
+  shapes: Shape[],
+  selection: Shape[],
+  viewport: AABB
+) {
+  return shapes
+    .filter((shape) => !selection.includes(shape))
+    .map(getAABB)
+    .filter(
+      (bounds) =>
+        boundsContain(viewport, bounds) || boundsCollide(viewport, bounds)
+    )
+}
+```
+
+We now have all the _other_ bounding boxes that our selection might snap to.
+
+Next, let's find the bounding box for our selected shapes.
+
+Here we'll need one more helper function:
+
+```ts
+const expandBounds = (a: AABB, b: AABB) => {
+  const minX = Math.min(a.minX, b.minX)
+  const maxX = Math.max(a.maxX, b.maxX)
+  const minY = Math.min(a.minY, b.minY)
+  const maxY = Math.max(a.maxY, b.maxY)
+
+  return {
+    minX,
+    midX: (minX + maxX) / 2,
+    maxX,
+    minY,
+    midY: (minY + maxY) / 2,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+  }
+}
+```
+
+And we can use it like so:
+
+```ts
+function getCommonAABB(shapes: Shape[]) {
+  return shapes.map(getAABB).reduce((a, b, i) => {
+    if (i === 0) return b
+    return expandBounds(a, b)
+  }, {} as AABB)
+}
+```
+
+Ok! We now have all of the information we need to find our snap offset.
+
+## Finding the Snaps
+
+As we said in the introduction, a snap happens when the selected bounding box _almost_ aligns with another shape's bounding box. Let's break that down a bit.
+
+First, let's say that the length of "almost" is 5.
+
+```ts
+const isCloseEnough = (distance: number) => Math.abs(distance) < 5
+```
+
+Our selection can have at most two snaps: one for its `x` axis and one for its `y` axis. The selection can snap to different shapes on either axis.
+
+<img src="/images/snapping/snapping_4.png" />
+
+For _either_ axis, the selection can snap at either its `mid`, `min`, or `max`—and it can snap to the other shape's `mid`, `min`, or `max`, too. This gives us nine potential snaps for each direction, or eighteen total.
+
+<img src="/images/snapping/snapping_5.png" />
+
+In our code, we can define a snap like this:
+
+```ts
+interface SnapX {
+  target: AABB
+  from: "midX" | "minX" | "maxX"
+  to: "midX" | "minX" | "maxX"
+}
+
+interface SnapY {
+  target: AABB
+  from: "midY" | "minY" | "maxY"
+  to: "midY" | "minY" | "maxY"
+}
+```
+
+Not all snaps are equal. We want to preference snaps in this order:
+
+1. from the middle of the selection to the middle of the shape
+2. from the middle of the selection to the min or max of the shape
+3. from the min or max of the selection to the middle of the shape
+4. from the min or max of the selection to the min or max of the shape
+
+If we define these as constants, starting with the mids:
+
+```ts
+const xs = ["midX", "minX", "maxX"] as const
+const ys = ["midY", "minY", "maxY"] as const
+```
+
+Then we can find our snap points like this:
+
+```ts
+function findSnaps(bounds: AABB, others: AABB[]) {
+  let snapX: SnapX
+  let snapY: SnapY
+
+  others.forEach((target) => {
+    xs.forEach((from) =>
+      xs.forEach((to) => {
+        if (snapX || !isCloseEnough(bounds[from] - others[to])) return
+        snapX = { target, from, to }
+      })
+    )
+
+    ys.forEach((from) =>
+      ys.forEach((to) => {
+        if (snapY || !isCloseEnough(bounds[from] - others[to])) return
+        snapY = { target, from, to }
+      })
+    )
+  })
+
+  return { snapX, snapY }
+}
+```
+
+In the code above, we're iterating through the other shapes' bounds and, for each shape, checking all nine of our possible snaps for each axis. Once we've found a snap on an axis, we stop checking on that axis, which ensures that our middle-snaps take priority over our min or max snaps.
+
+## Finding the Offset
+
+Now that we have the snap points, we can figure out the offset. The offset is a vector: how far we'll need to move the selection bounds on each axis in order for it to align with the snapped edges.
+
+<img src="/images/snapping/snapping_6.png" />
+
+To find the offset, we can subtract the edges that snapped together. If we didn't have a snap on an axis, then that part of the offset will be zero.
+
+```ts
+function getOffsetFromSnaps(bounds: AABB, snapX: SnapX, snapY: SnapY) {
+  return [
+    snapX ? bounds[snapX.from] - snapX.target[snapX.to] : 0,
+    snapY ? bounds[snapY.from] - snapX.target[snapY.to] : 0,
+  ]
+}
+```
+
+## Using the Offset
+
+In order to make use of our offset, we'll need to add it to the position of our dragging selection. In order for this to work correctly, it's important that we do our dragging the [right way](/posts/perfect-dragging).
+
+## Snap Lines
+
+Finding the snap offset is probably not enough, however. Snapping is a change to a user's choice, and polite software development demands that we never make this kind of change without giving a hint as to why we're doing it.
+
+In other words, we want to _show_ the snap to the user, too.
+
+For our example, we'll generate a series of sorted points. We can then use these to make the sort of "snap lines" you're used to from tools like Figma and Sketch—but you can render them however you like.
+
+<img src="/images/snapping/snapping_6.png" />
+
+We can get those points like this:
+
+```ts
+function getSnapLines(bounds: AABB, snapX?: SnapX, snapY?: SnapY) {
+  const pointsX: number[][] = []
+  const pointsY: number[][] = []
+
+  if (snapX) {
+    const x = bounds[snapX.from]
+    pointsX.push([x, snapX.target.minY], [x, snapX.target.maxY])
+
+    if (snapX.from === "midX") {
+      pointsX.push([x, bounds.midY])
+    } else {
+      pointsX.push([x, bounds.minY], [x, bounds.maxY])
+    }
+
+    pointsX.sort((a, b) => a[1] - b[1])
+  }
+
+  if (snapY) {
+    const y = bounds[snapY.from]
+    pointsY.push([snapY.target.minX, y], [snapY.target.maxX, y])
+
+    if (snapY.from === "midY") {
+      pointsY.push([bounds.midY, y])
+    } else {
+      pointsY.push([bounds.minY, y], [bounds.maxY, y])
+    }
+
+    pointsY.sort((a, b) => a[0] - b[0])
+  }
+
+  return {
+    pointsX,
+    pointsY,
+  }
+}
+```
+
+Again, we're doing something very similar for both the x and y axes. Our only exception is that, when

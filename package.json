@@ -1,47 +1,37 @@
 {
-  "name": "blog",
+  "name": "personal-blog",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn refresh && NODE_ENV=development ENV=development next dev",
-    "build": "yarn refresh && NODE_ENV=development ENV=development next build",
-    "start:development": "NODE_ENV=development ENV=development next start",
-    "start:staging": "NODE_ENV=production ENV=production next start",
-    "start:production": "NODE_ENV=production ENV=production next start",
-    "refresh": "rm -rf .next/cache/next-babel-loader"
+    "dev": "next-remote-watch ./content",
+    "build": "yarn content && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "content": "ts-node --project tsconfig.scripts.json ./scripts/generate-content.ts"
   },
   "dependencies": {
-    "@mapbox/rehype-prism": "^0.5.0",
-    "@ngsctt/remark-smartypants": "^0.2.0",
-    "@state-designer/react": "^1.2.26",
-    "@stitches/react": "^0.0.1",
-    "babel-plugin-import-glob-array": "^0.2.0",
-    "immer": "^9.0.6",
-    "next": "9.5.2",
-    "next-compose-plugins": "^2.2.0",
-    "next-mdx-enhanced": "^4.0.0",
-    "next-optimized-images": "^2.6.2",
-    "next-seo": "^4.7.3",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-feather": "^2.0.8",
-    "react-no-ssr": "^1.1.0",
-    "react-twitter-embed": "^3.0.3",
-    "reading-time": "^1.2.0",
-    "remark-autolink-headings": "^6.0.1",
-    "remark-code-titles": "^0.1.1",
-    "remark-sectionize": "^1.1.1",
-    "remark-slug": "^6.0.0",
-    "unist-util-visit": "^2.0.3"
+    "@mapbox/rehype-prism": "^0.8.0",
+    "@mdx-js/loader": "^1.6.22",
+    "@mdx-js/react": "^1.6.22",
+    "@next/mdx": "^11.1.2",
+    "@stitches/react": "^1.2.5",
+    "next": "11.1.2",
+    "next-mdx-remote": "3.0.5",
+    "next-themes": "^0.0.15",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-feather": "^2.0.9",
+    "react-is": "^17.0.2",
+    "react-tweet-embed": "^1.3.1"
   },
   "devDependencies": {
-    "@types/node": "^14.6.2",
-    "@types/react": "^16.9.48",
-    "typescript": "^4.0.2",
-    "webp-loader": "^0.6.0"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": false
+    "@types/react": "17.0.30",
+    "esbuild": "^0.13.8",
+    "eslint": "^8.0.1",
+    "eslint-config-next": "11.1.2",
+    "gray-matter": "^4.0.3",
+    "next-remote-watch": "^1.0.0",
+    "ts-node": "^10.3.0",
+    "typescript": "4.4.4"
   }
 }
