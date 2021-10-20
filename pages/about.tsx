@@ -4,7 +4,6 @@ import { getMdxSource, getPage, getPostList } from "../utils/content"
 import { Page, PostListItem } from "../types"
 import { PageLayout } from "../components/layout/page-layout"
 import { Mdx } from "../components/layout/mdx"
-import { PostListSmall } from "~components/layout/post-list-small"
 
 interface Props extends Page {
   mdxSource: MDXRemoteSerializeResult
