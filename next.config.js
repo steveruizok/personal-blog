@@ -48,4 +48,10 @@ module.exports = withMdxEnhanced({
     },
     phase: "both",
   },
-})(withPlugins([[optimizedImages, {}]]))
+})(
+  withPlugins([[optimizedImages]], {
+    experimental: {
+      scrollRestoration: true,
+    },
+  })
+)

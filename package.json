@@ -16,6 +16,7 @@
     "@state-designer/react": "^1.2.26",
     "@stitches/react": "^0.0.1",
     "babel-plugin-import-glob-array": "^0.2.0",
+    "immer": "^9.0.6",
     "next": "9.5.2",
     "next-compose-plugins": "^2.2.0",
     "next-mdx-enhanced": "^4.0.0",
