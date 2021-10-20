@@ -1,0 +1,29 @@
+---
+title: "Perfect Freehand"
+date: "3/5/2021"
+hero: "/images/figma-input.png"
+status: "draft"
+description: "How to draw perfect, pressure-sensitive freehand lines."
+---
+
+- Input points (raw input points)
+
+  - x
+  - y
+  - pressure?
+
+- StrokePoints (adjusted points)
+
+  - Linked list
+  - Distance (streamline)
+  - Pressure (simulated or real)
+
+    - Rate of pressure change
+
+  - Radius (how "big" the point is)
+
+    - Easing (how pressure relates to pressure)
+    - Thinning (how pressure relates to size)
+
+  - Vertices (left and right projected points)
+    - Linked list
