@@ -3,7 +3,7 @@ import { useTheme } from "next-themes"
 import { Sun, Moon, CloudRain } from "react-feather"
 import { RotatingIcons } from "./rotating-icons"
 
-const themes = ["light", "dark", "dim"]
+const themes = ["light", "dim", "dark"]
 
 export function ThemeSwitch() {
   const { theme = "light", setTheme } = useTheme()

@@ -36,14 +36,13 @@ const Container = styled("header", {
   mx: "-$0",
   h1: {
     margin: 0,
-    fontSize: "$3",
+    fontSize: "$2",
     fontWeight: "bold",
   },
   a: {
     textDecoration: "none",
     cursor: "pointer",
-    fontFamily: "$ui",
-    fontSize: "$ui",
+    fontSize: "$1",
     borderRadius: 4,
     transition: "background-color .16s",
     bg: "transparent",

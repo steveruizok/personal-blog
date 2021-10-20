@@ -28,7 +28,7 @@ const Container = styled("div", {
 
 const SmallIcon = styled("div", {
   alignSelf: "center",
-  backgroundColor: "black",
+  backgroundColor: "$text",
   height: 16,
   width: 16,
 })
