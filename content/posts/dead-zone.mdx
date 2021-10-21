@@ -1,0 +1,101 @@
+---
+title: "Dragging Dead Zone"
+date: "10/21/2021"
+hero: "/images/dead-zone/dead_zone_3.png"
+status: "published"
+description: "Improve dragging experience by adding a spooky dead zone, or a minimum distance before a shape will begin to drag."
+---
+
+This is another post about improving user experience in applications that involve dragging shapes around on a canvas, or in a [zoom-ui](/posts/zoom-ui). This post will cover implementing a "dead zone": a minimum distance needed before a shape will begin to drag.
+
+A dead zone is very useful to prevent "accidental drags" during clicks. Without a dead zone, a pixel or two of movement can result in a change to a shape's position. This especially common on touch devices or when using a stylus, and it can be very frustrating for users.
+
+But have no fear—a dead zone can fix it.
+
+> 👋 Just want to look at some code? [Click here](https://codesandbox.io/s/dead-zone-example-1zkw9) for the CodeSandbox.
+
+## Get Your Dragging Right First
+
+This post is a follow-up to my [post](/posts/perfect-dragging) about the correct way to calculate where a dragging shape should be, by comparing the user's current pointer location with its location when the drag began.
+
+<Figure
+  src="/images/dead-zone/dead_zone_1.png"
+  alt="A diagram showing how a shape's point is calculated."
+  title="To find the shape's current point, subtract the pointer's current point and its original point and add the result to the shape's original point."
+/>
+
+In that post, I mentioned that such a technique could be useful for features such as implementing a dead zone; and as we'll see, it fixes plenty of issues with dead zones.
+
+## The Dead Zone FSM
+
+We can implement a dead zone using a finite state machine with three states: `idle`, `pointing`, and `dragging`.
+
+<Figure
+  src="/images/dead-zone/dead_zone_4.png"
+  alt="A diagram showing how the relationships between three finite states: idle, pointing, and dragging."
+  title="The dead zone finite state machine."
+/>
+
+The state machine works like this: A user starts out in the `idle` state. When a user starts pointing a shape, we transition to the `pointing` state.
+
+In the `pointing` state, a user can either stop pointing and return to the `idle` state, or they can move their pointer. While in the `pointing` state, moving the pointer has no effect on the shape's position. If the user moves their pointer far enough from that it leaves the dead zone, then we transition to the `dragging` state.
+
+When we enter the `dragging` state, we update the shape's position and keep updating it whenever the user moves their pointer. From this state, a user can return to the `idle` state by ending their drag.
+
+## Getting it Right
+
+While a good drag zone is useful, it's important to implement it correctly. You'll know that an implementation is correct if the user's pointer location in the `dragging` state is the same, relative to the shape, as when the user started pointing the shape.
+
+<Figure
+  src="/images/dead-zone/dead_zone_5.png"
+  alt="A diagram showing how the position of the pointer after leaving the dead zone."
+  title="On the left, the pointer is now further up into the upper-right corner; on the right, the pointer is centered in the shape."
+/>
+
+And here's where our dragging strategy matters.
+
+If we we only using the difference between the pointer's location and its previous location, then our "dead zone" would be the distance of that move; allowing a slow-moving pointer to remain in that dead zone forever.
+
+<Figure
+  src="/images/dead-zone/dead_zone_8.mp4"
+  alt="A video showing shapes being moved around."
+  title="Using the pointer event's distance to trigger the dead zone won't work with slow-moving pointers. Bad!"
+  isVideo
+/>
+
+Further, once we left the dead zone, we would have no way of putting the shape back where it should be. If we only began offsetting based on pointer movement, the shape will have lagged behind.
+
+<Figure
+  src="/images/dead-zone/dead_zone_7.mp4"
+  alt="A video showing shapes being moved around."
+  title="Using the pointer's movement means a shape will lag behind the pointer once it starts dragging. Bad!"
+  isVideo
+/>
+
+However, if we're comparing against the pointer's original location, then the shape will be in the right place no matter where the pointer is when it leaves the dead zone; and we'll always leave the dead zone once it's reached the minimum distance.
+
+<Figure
+  src="/images/dead-zone/dead_zone_9.mp4"
+  alt="A video showing shapes being moved around."
+  title="The shape is always placed correctly under the pointer. Good!"
+  isVideo
+/>
+
+## Why is this better?
+
+As I wrote at the start of this post, a well-implemented dead zone can prevent accidental drags during clicks, which are especially common on touch devices or when the user is pointing with a stylus. Done right, a dead zone can make an app feel more intentional while being almost impossible to notice.
+
+<Figure
+  src="/images/dead-zone/dead_zone_6.mp4"
+  alt="A video showing shapes being moved around."
+  title="Dead zones are hard to spot unless you're dragging very slowly."
+  isVideo
+/>
+
+In the example aboves, we've used a generous dead zone distance in order to show the feature in action. In a real app, you might set your dead zone as low as two or three pixels: low enough that it will only last a frame or two, but high enough to catch accidental drags.
+
+## Example
+
+Want to see this in practice? Here's an [example]([https://codesandbox.io/s/dead-zone-example-1zkw9]) in React.
+
+<CodeSandbox url="dead-zone-example-1zkw9" />
