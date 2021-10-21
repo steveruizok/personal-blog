@@ -7,7 +7,7 @@ import { Text } from "~components/text"
 interface FigureProps {
   src: string
   alt: string
-  title: "string"
+  title: string
   isVideo?: boolean
 }
 
@@ -56,24 +56,20 @@ export function Figure({ src, alt, title, isVideo }: FigureProps) {
           objectFit="contain"
         />
       </ImageWrapper>
-      <Text variant="caption">{title}</Text>
+      <Text variant="caption" css={{ mb: "$5", textAlign: "center" }}>
+        {title}
+      </Text>
     </>
   )
 }
 
-const ImageWrapper = styled("span", {
+const ImageWrapper = styled("div", {
+  position: "relative",
   textAlign: "center",
-  display: "block",
   width: "100%",
-  mx: "-$1",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   mt: "$3",
-  sm: {
-    mx: "-$1",
-  },
-  md: {
-    mx: "-$2",
-  },
-  lg: {
-    mx: "-$2",
-  },
+  backgroundColor: "#F8FAFA",
 })

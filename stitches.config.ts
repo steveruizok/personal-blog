@@ -213,12 +213,6 @@ export const globalStyles = globalCss({
     fontSize: "$body",
     fontFamily: "$body",
   },
-  img: {
-    maxWidth: "100%",
-    height: "auto",
-    color: "$text",
-    borderRadius: 4,
-  },
   video: {
     maxWidth: "100%",
     height: "auto",
