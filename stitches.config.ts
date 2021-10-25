@@ -266,8 +266,6 @@ export const globalStyles = globalCss({
   ol: {
     fontFamily: "$body",
     fontSize: "$2",
-    display: "grid",
-    gap: "$1",
     "& code": {
       fontFamily: "$monospace",
       fontSize: "$2",
@@ -277,8 +275,6 @@ export const globalStyles = globalCss({
   ul: {
     fontFamily: "$body",
     fontSize: "$2",
-    display: "grid",
-    gap: "$1",
   },
   li: {
     lineHeight: "$body",

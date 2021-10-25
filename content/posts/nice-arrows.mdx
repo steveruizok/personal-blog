@@ -1,0 +1,296 @@
+---
+title: "Nice Arrows"
+date: "10/24/2021"
+hero: "/images/nice-arrows/nice_arrows_1.png"
+status: "draft"
+description: "Crunching the numbers behind a very handsome arrow."
+---
+
+If you're like me, then you must love drawing arrows so much that you've released a library called [perfect-arrows](https://github.com/steveruizok/perfect-arrows) that is all about figuring out a good-looking arrow between two arbitrary points or rectangles.
+
+<Figure src="/images/nice-arrows/nice_arrows_pa.mp4" isVideo />
+
+This project was great for charts, maps, annotations, or other statically-generated content. It was not so great for applications where a user might want to adjust the arrow themselves: in my own experiments, I could only support interactions like flipping the direction or facing of the arrow.
+[Try it yourself](https://codesandbox.io/s/hopeful-currying-rc9q6).
+
+<Figure src="/images/nice-arrows/nice_arrows_16.mp4" isVideo />
+
+So I started searching for other ways to draw arrows. There turned out to be _lots_ of ways to draw an arrow, many of them related to graph theory and involving complex routing algorithms, which were all a little more than I was looking for.
+
+I eventually found inspiration in an old Evan Wallace mini-project named [Finite State Machine Designer](http://madebyevan.com/fsm/), where a user could draw arrows between circles and adjust their arc.
+
+<Figure src="/images/nice-arrows/nice_arrows_3.mp4" isVideo />
+
+There were a few things I liked about the project:
+
+- Arrows looked good no matter what
+- Arrows always pointed at the shape's center
+- The user had some control over the appearance
+
+Sounds good, but how do they work?
+
+## Circle From Three Points
+
+Evan's arrows worked on the basis of simple fact of highschool geometry (though one that I somehow missed) which is that you can create a circle from any three points.
+
+<Figure src="/images/nice-arrows/nice_arrows_4.png" />
+
+Here's the code to do it:
+
+```ts
+export function getCircleFromThreePoints(
+  A: number[],
+  B: number[],
+  C: number[]
+): number[] {
+  const a =
+    (A[0] * (B[1] - C[1]) - A[1] * (B[0] - C[0]) + B[0] * C[1] - C[0] * B[1]) *
+    -2
+
+  const x =
+    ((A[0] * A[0] + A[1] * A[1]) * (C[1] - B[1]) +
+      (B[0] * B[0] + B[1] * B[1]) * (A[1] - C[1]) +
+      (C[0] * C[0] + C[1] * C[1]) * (B[1] - A[1])) /
+    a
+
+  const y =
+    ((A[0] * A[0] + A[1] * A[1]) * (B[0] - C[0]) +
+      (B[0] * B[0] + B[1] * B[1]) * (C[0] - A[0]) +
+      (C[0] * C[0] + C[1] * C[1]) * (A[0] - B[0])) /
+    a
+
+  return {
+    center: [x, y],
+    radius: Math.hypot(x - A[0], y - A[1]),
+  }
+}
+```
+
+Looks kind of cursed, right?
+
+You can treat many functions like these as [black boxes](https://en.wikipedia.org/wiki/Black_box), trusting that they work without needing to understanding how they work. However, since we'll be working quite a bit with vectors in this article, let's bring in a library to help carve code like this up into recognizable operations.
+
+> 👉 In this post, I'll be using the vector helpers from my [`@tldraw/vec`](https://www.npmjs.com/package/@tldraw/vec) library, which I use in my project [tldraw](https://tldraw.com).
+
+Let's look at that code again:
+
+```ts
+import { Vec } from "@tldraw/vec"
+
+export function getCircleFromThreePoints(
+  A: number[],
+  B: number[],
+  C: number[]
+): number[] {
+  const Al = Vec.len2(A)
+  const Bl = Vec.len2(B)
+  const Cl = Vec.len2(C)
+
+  const a = (Vec.cpr(A, Vec.sub(B, C)) + Vec.cpr(B, C)) * -2
+  const b = Al * (C[1] - B[1]) + Bl * (A[1] - C[1]) + Cl * (B[1] - A[1])
+  const c = Al * (B[0] - C[0]) + Bl * (C[0] - A[0]) + Cl * (A[0] - B[0])
+
+  const center = [b / a, c / a]
+
+  return {
+    center,
+    radius: Vec.dist(center, A),
+  }
+}
+```
+
+Still pretty dense, for sure—and I won't pretend to understand exactly why it works—but we can at least see more of what's going on. We'll use some of these helpers again later in this post.
+
+## Drawing the Arrow
+
+In our arrow, our three points are the two shape centers (A and C) and a handle (B). If we find a circle that passes through those points, then we can draw our arrow as arc of that circle beginning at A and ending at point C. This arc should pass through point B along the way.
+
+<Figure src="/images/nice-arrows/nice_arrows_5.5.png" />
+
+If we wanted to render this to SVG [path data](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#arcs), here's what it would look like:
+
+```
+ M x1 y1 A rx ry rotation-x large-arc-flag sweep-flag x2 y2
+```
+
+Some of this information we know already: our point A will provide `x1` and `y1`, our circle's radius will provide `rx` and `ry`, and our point C will provide `x2` and `y2`. We can leave the `rotation-x` as `0`.
+
+This leaves us with two missing pieces: `large-arc-flag` and `sweep-flag`. What are these? Well, whenever we draw an arc between two points, we need to answer two very important questions.
+
+First, _which_ circle do we want to trace? There are two!
+
+<Figure src="/images/nice-arrows/nice_arrows_21.png" />
+
+And second, should we trace the arc on the _small_ side of the circle or the _large_ side?
+
+<Figure src="/images/nice-arrows/nice_arrows_19.png" />
+
+This gives us four potential arcs for any two points.
+
+<Figure src="/images/nice-arrows/nice_arrows_22.png" />
+
+In the case below, we would want to trace the small arc of the bottom circle. So `0` for the `large-arc-flag` and `1` for the `sweep-flag`.
+
+<Figure src="/images/nice-arrows/nice_arrows_23.png" />
+
+Let's see how we can figure that out programatically.
+
+To find out the sweep (i.e. which circle to trace), we'll need to look at the angle CAB. If this angle is positive, then our sweep flag will be zero, indicating that we want to trace our arc along the circle that's to the right of the line AC. If it's negative, then we'll trace along the left one.
+
+<Figure src="/images/nice-arrows/nice_arrows_24.png" />
+
+That code will look will this:
+
+```ts
+function getSweepFlag(A: number[], B: number[], C: number[]) {
+  const angleAC = Vec.angle(A, C)
+  const angleAB = Vec.angle(A, B)
+  const angleCAB = ((angleAB - angleAC + 3 * Math.PI) % (2 * Math.PI)) - Math.PI
+
+  return angleCAB > 0 ? 0 : 1
+}
+```
+
+For whether to draw the large or small arc, we'll look at the angle ABC. If this angle is acute (i.e. more narrow than a right angle) then we'll draw our arc along the large arc of the circle; otherwise, we'll draw along the small one.
+
+<Figure src="/images/nice-arrows/nice_arrows_25.png" />
+
+And here's that code:
+
+```ts
+function getLargeArcFlag(A: number[], C: number[], B: number[]) {
+  const angleBA = Vec.angle(B, A)
+  const angleBC = Vec.angle(B, C)
+  const angleABC = ((angleBC - angleBA + 3 * Math.PI) % (2 * Math.PI)) - Math.PI
+
+  return Math.abs(angleABC) > Math.PI / 2 ? 0 : 1
+}
+```
+
+With our `large-arc-flag` and `sweep-flag` worked out, we can now get our SVG path data like this:
+
+```ts
+function getSvgPathForArrow(A: number[], B: number[], C: number[]) {
+  const { center, r } = getCircleFromThreePoints(A, B, C)
+  const sweepFlag = getSweepFlag(A, B, C)
+  const largeArcFlag = getLargeArcFlag(A, B, C)
+
+  return `M ${A} A ${r} ${r} 0 ${largeArcFlag} ${sweepFlag} ${C}`
+}
+```
+
+Ok, we can now draw the correct arc to connect any three points!
+
+Well, almost any.
+
+## Straight Lines and Handles
+
+The only place where our circle from three points strategy will fail is if the three points form a line, in which case the circle that connects them becomes infinitely large.
+
+<Figure src="/images/nice-arrows/nice_arrows_5.png" />
+
+Luckily for us, that won't be a problem.
+
+In our arrow, the three points are the two shape centers (A and C) and a handle (B). If the points are nearly in line, we can safely bet that the user actually _wants_ a straight line and just draw that instead.
+
+<Figure src="/images/nice-arrows/nice_arrows_6.png" />
+
+What about the interactions? A and C are easy: because those points are the centers of the two shapes, the user can move either point A or C by moving that shape.
+
+But the middle handle B is more complex.
+
+## Where Should B Be?
+
+We could let a user drag the B handle anywhere they want. As long as it's not exactly in line with A and C, then it will still make a circle. There are two downsides to this freedom: a user can create some pretty strange-looking arrows; and the handle can end up in unexpected places.
+
+<Figure src="/images/nice-arrows/nice_arrows_8.png" />
+
+Evan's project solved this in a clever way. First, it _did_ allow for some strange-looking arrows if desired. And second, it solved the handle-placement issue by not having a handle at all. Instead, the entire arrow was the handle; or rather, the point B would be measured from wherever you clicked or dragged along the arrow.
+
+<Figure src="/images/nice-arrows/nice_arrows_9.mp4" isVideo />
+
+When I first [started experimenting](https://twitter.com/steveruizok/status/1333158736131710976) with this type of arrows, I originally lifted this same interaction pattern. You can try that [here](https://codesandbox.io/s/arrows-sandbox-xj1du).
+
+<Figure src="/images/nice-arrows/nice_arrows_17.mp4" isVideo />
+
+Six months later, when I was creating arrows for [tldraw](https://tldraw.com), I needed the arrows themselves to be separately selectable, so I couldn't make the entire arrow a handle. I needed a real handle—a handle handle—but that introduced some new problems.
+
+## A Clamped Handle
+
+Having a point-based handle introduced a new challenge, which was the risk of losing the handle. In the end, I decided that the handle should only move along a cross axis—a line perpendicular to the line between the two points.
+
+<Figure src="/images/nice-arrows/nice_arrows_7.png" />
+
+The handle will follow it until either end, at which point the bend will form a half-circle. This prevents arrows from bending too far: another artificial limitation, this time aesthetic.
+
+<Figure src="/images/nice-arrows/nice_arrows_10.mp4" isVideo />
+
+We'll come back to this later in this post when we talk about how to respond when a user drags the handle. For now, let's look at how to draw the arrow.
+
+## Moving The Middle Handle
+
+As mentioned previously, our middle handle will always need to exist somewhere along a line segment perpendicular to the line AC.
+
+To implement this, we'll need to rely on another vector classic: finding the nearest point from point B on a line that passes through A and B.
+
+<Figure src="/images/nice-arrows/nice_arrows_11.png" />
+
+And here's the code, again relying on our vector helpers:
+
+```ts
+function nearestPointOnLine(A: number[], B: number[], P: number[]): number[] {
+  const uAB = Vec.uni(Vec.sub(B, A))
+  const distAP = Vec.pry(Vec.sub(P, A), uAB)
+  return Vec.add(A, Vec.mul(uAB, distAP))
+}
+```
+
+While this will give us the point on the line, that line is infinite; and so we'll need to make sure that the point doesn't end up somewhere outside of our line segment.
+
+<Figure src="/images/nice-arrows/nice_arrows_12.png" />
+
+We can clamp the point (let's call it Q) to the line segment by comparing it with a box created by A and B. If Q falls outside of that box, then we can move to the point on the corresponding side.
+
+<Figure src="/images/nice-arrows/nice_arrows_13.png" />
+
+```ts
+export function clampPointToLine(
+  A: number[],
+  B: number[],
+  P: number[]
+): number[] {
+  if (P[0] < Math.min(A[0], B[0])) return A[0] < B[0] ? A : B
+  if (P[0] > Math.max(A[0], B[0])) return A[0] > B[0] ? A : B
+  if (P[1] < Math.min(A[1], B[1])) return A[1] < B[1] ? A : B
+  if (P[1] > Math.max(A[1], B[1])) return A[1] > B[1] ? A : B
+  return P
+}
+```
+
+In this case, Q is both above and right of the box, so we should definitely move it to B.
+
+<Figure src="/images/nice-arrows/nice_arrows_18.png" />
+
+## Is The Line Straight?
+
+As mentioned before, straight lines and almost-straight lines will cause any circle-from-three-points code to produce strange or incorrect results. In order to prevent this, I needed to make sure that an almost-straight line would end up perfectly straight.
+
+To find this out, we could compare the position of B with the midpoint of the line between A and B. If it were close enough, we'd move the handle to B.
+
+```ts
+function isArrowStraight(A: number[], B: number[], C: number[]) {
+  return Vec.dist(Vec.med(A, C), B) < MIN_DISTANCE
+}
+```
+
+As long as we're [dragging correctly](/posts/perfect-dragging), then we can safely adjust the position of the handle when we draw the arrow so that it "snaps" to the right place.
+
+## Handling Movement
+
+Now that we have our three points, how should we
+
+## Which Arc To Draw?
+
+---
+
+There's more to say about these arrows, in particular about the intersections with the two shapes and the way that arrowheads are calculated, but I'll leave it here for this post.
