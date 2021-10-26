@@ -1,0 +1,77 @@
+---
+title: "Filtering a Union in TypeScript"
+date: "8/3/2021"
+hero: "/images/filtering/filtering_1.jpg"
+status: "published"
+description: "How to filter properties from an object."
+---
+
+Here's a pattern I find myself using all the time.
+
+```ts
+export type U =
+  | { name: "first"; arg: number }
+  | { name: "second"; arg: string }
+  | { name: "third"; arg: string[] }
+
+type T = {
+  [K in U["name"]]: (args: Extract<Armor, { name: K }>["arg"]) => void
+}
+```
+
+First, an enumerated list of values:
+
+```ts
+enum BodyParts {
+  Head = 'head'
+  Chest = 'chest'
+  Legs = 'legs',
+}
+```
+
+And then a union of types that each use the enum for one property.
+
+```ts
+export type Armor =
+  | { id: number; part: BodyParts.Head; name: "helmet" }
+  | { id: number; part: BodyParts.Chest; name: "cuirass" }
+  | { id: number; part: BodyParts.Legs; name: "greaves" }
+```
+
+This makes narrowing easy. We only have to match one unique key in order for TypeScript to exclude the types that don't have that key:
+
+```ts
+function equipArmor(armor: Armor) {
+  if (armor.part === BodyParts.Head) {
+    // TypeScript now knows that armor.part is "helmet", too.
+  }
+}
+```
+
+It gets tricky when we want to do this type of narrowing using generics.
+
+For example, what if I wanted to create a list like this:
+
+```ts
+const equippers: Equippers = {
+  [BodyParts.Head]: (armor, player) => {
+    // armor should have `part: BodyParts.Head`
+  },
+  [BodyParts.Chest]: (armor, player) => {
+    // ...
+  },
+  [BodyParts.legs]: (armor, player) => {
+    // ...
+  },
+}
+```
+
+In this case, we would want `equippers` to have cover all of the values in our `Armor` enum, and for TypeScript to tell us if any were missing. And we would also want to ensure that the `armor` parameter of each function contained only an `Armor` that was compatible with that body part.
+
+What should that `Equippers` type be?
+
+```ts
+type Equippers = {
+  [K in Armor["part"]]: (armor: Extract<Armor, { part: K }>)
+}
+```
