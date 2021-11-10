@@ -1,0 +1,73 @@
+---
+title: "Erasers are Hard"
+date: "10/21/2021"
+hero: "/images/dead-zone/dead_zone_3.png"
+status: "published"
+description: "Thoughts on eraser tools in design and whiteboarding apps."
+---
+
+One of the most common requests related to my digital ink library [perfect-freehand](https://github.com/steveruizok/perfect-freehand), as well as its various integrations in [TLDraw](https://tldraw.com) and [Excalidraw](https://excalidraw.com) is for some kind of **eraser tool**.
+
+In this post, I'll share some thoughts on eraser tools: how they work, how they should work, and why implementing an eraser tool in a design app is so tricky.
+
+## Painting Pixels vs. Making Boxes
+
+There are many kinds of drawing tools and many different ways of making a drawing tool. At the risk of over-simplifying, allow me to over-simplify. All drawing tools are implemeted in one of two ways: you're either **painting pixels** or you're **making boxes**.
+
+<Figure
+  src="/images/erasers-are-hard/erasers_0.png"
+  alt="A diagram showing the word Hey in a box, once labeled painting pixels and again, this time with boxes around each shape, labeled making boxes."
+/>
+
+In either case, the app's job will be to give the browser something that it can use to show the user a picture of their drawing. This "something" can be an image, or it can be HTML and CSS that the browser can use to create an image itself.
+
+## Erasers in a World of Painted Pixels
+
+Let's say you're using the pencil tool in a drawing app.
+
+If the app is of the "painting pixels" kind, then it will have a "canvas", or image made up of pixels that can be modified through code.
+
+Each time you draw with your the cursor, the app only needs to change the color of the pixels beneath your cursor. If it's a smart app, it might also change the color of the pixels _behind_ your cursor, in order to fill in any gaps between its current and previous positions.
+
+This type of technology is often called a "brush engine". While brush engines can become very complex, each essentially works by "stamping" or "painting" one image—the brush—onto the canvas.
+
+In a pixel-painting app, an eraser works exacly like a pen except that as you draw the application will _remove_ the color from pixels beneath your cursor. This is done either by setting each effected pixel to the color of the background, or to a transparent version of that pixel's current color.
+
+A drawing made of pixels has advantages and disadvantages. Certain things are very easy: you can blur, blend, smear, shade, or warp your image in a thousands ways. Other things are very difficult: you cannot, for example, easily easily a single line and move it, or change its appearance, or bring it from the back of the drawing to the front.
+
+This is because those shapes no longer exist; the only data we have to work with is the image itself. Like a collection of fingerprints, this image only preserves the effect that each shape had when it was made; it does not preserve the shape itself.
+
+## Erasers in a World of Making Boxes
+
+If instead the application is of the "making boxes" kind, then the process is very different.
+
+In this approach, each new shape is stored with the information needed to _create_ an image of that shape. As you draw, the application will re-paint the canvas. First, it will erase the canvas or paint over it with the background color, and then proceed through its list of shapes in order, creating an image for each one and then painting this image onto the background.
+
+The final result may look the same, but a "making boxes" app effectively flips the advantages and disadvantages of a "painting pixels" image.
+
+You can, for example, select a line and move it, rotate it, or send it to the front or back of the painting order. Because the canvas image is being constantly recreated, these changes will effect how the next image.
+
+You cannot, however, easily blur, blend, smear, shade, or warp your image, because shapes aren't aware of any other shape. If you blurred two shapes together, then dragged the second shape to a different part of the screen, how would this effect the first?
+
+You also can't easily erase. But we'll come back to that in a moment.
+
+In effect, the a "making boxes" approach gives you the freedom to change each shape independently, but at the cost of changing the image as a whole. This makes it perfect for design apps but bad for sketching or digital painting apps.
+
+But what about whiteboarding apps?
+
+## Erasing Whiteboards
+
+A "whiteboarding" app is something relatively new. Seeking to recreate the experience of drawing on a whiteboard, these types of apps borrow conventions from both drawing and design tools. The result is something less precise and more constrained than either a painting or design app, but easier to use and just as expressive.
+
+Their confused place _between_ design and drawing is most visible with the eraser tool. While all whiteboarding apps use the "making boxes" approach, each also demands an eraser.
+
+And erasers are hard.
+
+If I've drawn a circle and drag an eraser through the middle of it, what should the result be? I can't just add a new shape for the erased mark, or else that mark could be moved away or deleted. Should I erase the whole shape? Or should I now have two new shapes, each an arc, that can be independently selected?
+
+<Figure
+  src="/images/erasers-are-hard/erasers_2.png"
+  alt="A diagram showing the a circle and then an erased circle made up of two arcs, with one arc selected."
+/>
+
+What if, instead of erasing a circle, I was erasing text? Should the app delete the whole text shape? Or remove just the erased characters? Or split the text into multiple new shapes?
