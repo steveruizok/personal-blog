@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next-remote-watch ./content",
+    "dev": "./bin/next-remote-watch ./content",
     "build": "yarn content && next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +15,7 @@
     "@stitches/react": "^1.2.5",
     "gtag": "^1.0.1",
     "next": "11.1.2",
-    "next-mdx-remote": "3.0.5",
+    "next-mdx-remote": "^3.0.8",
     "next-themes": "^0.0.15",
     "react": "17.0.2",
     "react-dom": "17.0.2",

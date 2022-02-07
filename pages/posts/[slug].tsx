@@ -1,5 +1,5 @@
-import React from "react"
-import { GetStaticPaths, GetStaticProps } from "next"
+import React, { useEffect } from "react"
+import { GetStaticPaths, GetServerSideProps, GetStaticProps } from "next"
 import { MDXRemoteSerializeResult } from "next-mdx-remote"
 import {
   getMdxSource,
@@ -18,6 +18,12 @@ interface Props extends Post {
 }
 
 export default function MdxPost({ mdxSource, ...rest }: Props) {
+  useEffect(() => {
+    setTimeout(() => {
+      console.log("Hello")
+      window.scrollTo(0, document.body.scrollHeight)
+    }, 1000)
+  }, [])
   return (
     <PostLayout {...rest}>
       <Mdx mdxSource={mdxSource} />

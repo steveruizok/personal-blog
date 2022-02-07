@@ -1,0 +1,247 @@
+---
+title: "Undo Redo in MobX"
+date: "2/7/2022"
+hero: "/images/dragging/dragging_1.png"
+status: "draft"
+description: "Creating an automatic undo/redo manager in MobX."
+---
+
+Hey, let's build an undo redo manager for MobX.
+
+[MobX](https://mobx.js.org/README.html) is a state management library for JavaScript. Powered by observers and proxies, MobX makes it (comparitively) easy to react to changes in data, handle side effects and preserve cached data when that data's dependencies have not changed.
+
+The most important factor here is that this work is done _automatically_. Provided we configure out state correctly, we should be able to trust that changing a value will cause all of the necessary derived values (including values in the UI) to change along with it.
+
+In theory, we should also be able to use mobx to create an automatic undo/redo manager—a personal holy grail, having implemented undo/redo [the hard way](https://github.com/steveruizok/rko) a number of times. While its sister project [mobx-state-tree](https://mobx-state-tree.js.org/intro/welcome) supports undo/redo, that library forces a number of constraints onto your state.
+
+However, after a few weeks of poking around, I think I've got my answer for creating a robust undo/redo manager in vanilla mobx.
+
+> Note: This article assumes some basic knowledge of mobx.
+
+## Getting Started
+
+Here's our example project.
+
+First, our mobx store:
+
+```ts
+import { makeAutoObservable } from "mobx"
+
+interface DiceState {
+  a: number
+  b: number
+}
+
+class Store {
+  constructor() {
+    makeAutoObservable(this)
+  }
+
+  dice: DiceState = {
+    a: 6,
+    b: 6,
+  }
+
+  roll = () => {
+    const { dice } = this
+    dice.a = Math.ceil(Math.random() * 6)
+    dice.b = Math.ceil(Math.random() * 6)
+  }
+
+  undo = () => {
+    // todo
+  }
+
+  redo = () => {
+    // redo
+  }
+}
+
+export const store = new Store()
+```
+
+As you can see, it's a simple dice roller. Calling `roll` will generate new values for `dice.a` and `dice.b`. We've stubbed out `undo` and `redo` and we'll come back to them in a moment.
+
+Let's also look at our UI, built with React and [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite).
+
+```tsx
+import { observer } from "mobx-react-lite"
+import { store } from "./store"
+
+export default observer(function App() {
+  const { dice } = store
+
+  return (
+    <div className="App">
+      <h3>
+        You rolled: {dice.a} {dice.b}
+      </h3>
+      <button onClick={store.roll}>Roll Dice</button>
+      <button onClick={store.undo}>Undo</button>
+      <button onClick={store.redo}>Redo</button>
+    </div>
+  )
+})
+```
+
+Again, pretty straightforward. We can click on the **Roll Dice** button to `roll` new values, or on the **Undo** and **Redo** buttons to call the store's `undo` and `redo` methods. Because we've made our state observable (via `createAutoObservable`) and because we've made our `App` component an observer (via `observer`), changing the `dice` values will cause our UI to update, too.
+
+Now let's move on to those `undo` and `redo` methods!
+
+## Using `deepObserve`
+
+Our first step is to add `mobx-utils` to the project as a dependency. We'll need its `deepObserve` function to watch for changes in the `dice` object.
+
+We'll call this in our store's `construtor`, just after `makeAutoObservable`.
+
+```ts
+import { makeAutoObservable } from "mobx"
+import { deepObserve } from "mobx-utils"
+
+class Store {
+  constructor() {
+    makeAutoObservable(this)
+
+    deepObserve(this.dice, (change, path) => {
+      // todo
+    })
+  }
+}
+```
+
+When the observer's listener fires, it will share information about what has changed in the observable. In our case, that will be the `dice` object. If we click the **Roll Dice** button and log out the change, we'll see something like this:
+
+```json
+{
+  "type": "update",
+  "observableKind": "object",
+  "debugObjectName": "Store@3.dice",
+  "object": {
+    "a": 5,
+    "b": 5
+  },
+  "oldValue": 6,
+  "name": "b",
+  "newValue": 5
+}
+```
+
+Here we're changing the `dice.b` from `6` to `5`. This gives us everything we need to create our undo and redo. To undo the change, we would change `dice.b` from `5` to `6`; and to redo it, we would again change `dice.b` from `6` to `5`.
+
+For our undo and redo, we'll want to capture this change in a way that allows us to "play back" the difference. We could do this in several different ways, but let's use "JSON patches" and bring in another dependency, `fast-json-patch`.
+
+```ts
+yarn add fast-json-patch
+```
+
+We'll turn our change information into two `Operation`s, one that describes how we would _undo_ the change, and another that describes how we would _redo_ the change.
+
+```ts
+import { Operation } from "fast-json-patch"
+
+interface UndoRedo {
+  undo: Operation[]
+  redo: Operation[]
+}
+
+class Store {
+  constructor() {
+    makeAutoObservable(this)
+
+    deepObserve(this.dice, (change, path) => {
+      if (change.type === "update" && change.observableKind === "object") {
+        const undoRedo = {
+          undo: [{ op: "replace", path, value: oldValue }],
+          redo: [{ op: "replace", path, value: newValue }],
+        }
+        // Do something with undoRedo
+      }
+    })
+  }
+}
+```
+
+## Capturing the Whole Change
+
+But wait, calling `roll` should modify _two_ properties of `dice`: `a` and `b`.
+
+We should have _two_ patches for the undo and another two for the redo!
+
+To make matters a little more complicated, `deepObserve` calls its listener on every _individual_ change that we make to `dice`. For example, when we call `roll`, the listener will be called once for the change to `dice.a` and a second time for the change to `dice.b`.
+
+In our case, we want both of those changes to be "batched" into a single action that we can undo or redo. While `mobx` allows certain actions to be "batched" using transactions, `deepObserve` doesn't play by those rules.
+
+So we'll have to be a little clever here.
+
+```ts
+class Store {
+  constructor() {
+    makeAutoObservable(this)
+
+    let pending: UndoRedo = {
+      undo: [],
+      redo: [],
+    }
+
+    deepObserve(this.dice, (change, path) => {
+      if (change.type === "update" && change.observableKind === "object") {
+        pending.undo.push({ op: "replace", path, value: change.oldValue })
+        pending.redo.push({ op: "replace", path, value: change.newValue })
+      }
+    })
+
+    const completePending = () => {
+      pending.undo.reverse()
+      // Do something with undo
+      pending = {
+        undo: [],
+        redo: [],
+      }
+    }
+
+    configure({
+      reactionScheduler: (f): void => {
+        f()
+        completePending()
+      },
+    })
+  }
+}
+```
+
+We'll keep an `UndoRedo` named `pending` around and push changes into its `undo` and `redo` arrays. When MobX lets us know that the current "batch" of changes is complete, we'll reverse `pending`'s' `undo` array, do something with it it as a single change, and then reset the `pending` to a new object for next time.
+
+## Doing Something with the `UndoRedo`
+
+We'll also need to put these `UndoRedo`s somewhere, so we'll create an array (our "stack") and an integer (our "stack pointer") that indicates our current position in that stack.
+
+```ts
+class Store {
+  constructor() {
+    makeAutoObservable(this)
+
+    // snip
+
+    const completePending = () => {
+      pending.undo.reverse()
+
+      this.stack.push(undoRedo)
+      this.pointer++
+
+      pending = {
+        undo: [],
+        redo: [],
+      }
+    }
+
+    // snip
+  }
+
+  stack: UndoRedo[] = []
+  pointer = -1
+}
+```
+
+Now we're ready to implement the `undo` and `redo`.
+
+## Coalescing Changes

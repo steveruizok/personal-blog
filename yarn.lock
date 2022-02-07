@@ -3767,10 +3767,10 @@ negotiator@0.6.2:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
-next-mdx-remote@3.0.5:
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/next-mdx-remote/-/next-mdx-remote-3.0.5.tgz#57b3ea156d20e622b51becbacedc995233cac236"
-  integrity sha512-m9OD2GBuqvz/IeM/h4kufQ7GEdaCaZ4owqkCQ+yoxzCIM7jVQYK9JWXNVcyPP/Y6FBS00fLH03Hn5VFdvkFf0A==
+next-mdx-remote@^3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/next-mdx-remote/-/next-mdx-remote-3.0.8.tgz#ea2e7f9f3c99a0ce8167976c547e621d5930e1e0"
+  integrity sha512-WFSxt0crxG5PN/0WvaunzxzqV3wh3dPBZyhkclxwyQfLSRKzsNSArzot/4gYTOOZ/GtyRfNjbI/HtDsW2S4fqQ==
   dependencies:
     "@mdx-js/mdx" "^1.6.22"
     "@mdx-js/react" "^1.6.22"
