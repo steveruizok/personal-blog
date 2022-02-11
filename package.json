@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next-remote-watch ./content",
+    "dev": "next-remote-watch ./content --command 'ts-node --project tsconfig.scripts.json ./scripts/generate-content.ts'",
     "build": "yarn content && next build",
     "start": "next start",
     "lint": "next lint",
