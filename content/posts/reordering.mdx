@@ -56,7 +56,7 @@ This works for single items as well as for multiple items:
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendToBack("c") // c, a, b, d
+items = sendToBack(items, ["c"]) // c, a, b, d
 ```
 
 <Figure
@@ -66,7 +66,7 @@ items = sendToBack("c") // c, a, b, d
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendToBack("b", "d") // b, d, a, c
+items = sendToBack(items, ["b", "d"]) // b, d, a, c
 ```
 
 <Figure
@@ -93,7 +93,7 @@ For `bringToFront`, we perform the same work as `sendToBack`, except this time a
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringToFront("b") // a, c, d, b
+items = bringToFront(items, ["b"]) // a, c, d, b
 ```
 
 <Figure
@@ -103,7 +103,7 @@ items = bringToFront("b") // a, c, d, b
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringToFront("a", "c") // b, d, a, c
+items = bringToFront(items, ["a", "c"]) // b, d, a, c
 ```
 
 <Figure
@@ -139,7 +139,7 @@ Sending an item backward is a little more complex. Here we want to iterate throu
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendBackward("c") // a, c, b, d
+items = sendBackward(items, ["c"]) // a, c, b, d
 ```
 
 <Figure
@@ -149,7 +149,7 @@ items = sendBackward("c") // a, c, b, d
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendBackward("b", "c") // b, c, a, c
+items = sendBackward(items, ["b", "c"]) // b, c, a, c
 ```
 
 <Figure
@@ -185,7 +185,7 @@ The `bringForward` method is implemented in a similar way, but reversing the ind
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringForward("b") // a, c, b, d
+items = bringForward(items, ["b"]) // a, c, b, d
 ```
 
 <Figure
@@ -195,7 +195,7 @@ items = bringForward("b") // a, c, b, d
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringForward("b", "c") // b, a, d, c
+items = bringForward(items, ["b", "c"]) // b, a, d, c
 ```
 
 <Figure
