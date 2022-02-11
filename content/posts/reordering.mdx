@@ -1,0 +1,256 @@
+---
+title: "Reordering Part 1: Arrays"
+date: "02/11/2022"
+hero: "/images/reordering/send_to_back_2.png"
+status: "published"
+description: "Implementing ordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) in an array of items."
+---
+
+In an app that uses a zoom UI, canvas, or really any paradigm where things are "stacked" in order from back to front, the user interface will usually provide some commands that let a user move items in the stack:
+
+1. **Send to Back**
+2. **Send Backward**
+3. **Bring Forward**
+4. **Bring to Front**
+
+Implementing these commands will depend on how your application structures its items. Are they in an array? Are they in a table? Is this a multiplayer application?
+
+In this article, I'll cover the most straightforward implementation in an app that structures its items in an array. In a future post, I'll cover a more complex method in an application where items are stored in a hash table.
+
+## Mise en place
+
+Let's say we have an application where we're storing our items in an array:
+
+```ts
+type Item = { id: string }
+
+type Items = Item[]
+
+const itemsExample: Items = [{ id: "a" }, { id: "b" }, { id: "c" }]
+```
+
+In this structure, each item's "order" is represented by that item's index in the array. In the example above, the item `{ id: "a" }` has the index of `0`, the item `{ id: "b" }` has the index of `1`, etc.
+
+Now that we have our data worked out, let's look at how we would implement our four reordering commands.
+
+> 🚀 You can view the code and tests for this post at this [CodeSandbox](https://codesandbox.io/s/silly-proskuriakova-clnlk?file=/src/array-ordering.test.ts).
+
+### Send to Back
+
+```ts
+function sendToBack(items: Item[], ids: string[]) {
+  const movingIds = new Set(ids)
+  const moving: Item[] = []
+  const notMoving: Item[] = []
+  for (const item of items) {
+    const arr = movingIds.has(item.id) ? moving : notMoving
+    arr.push(item)
+  }
+  return moving.concat(notMoving)
+}
+```
+
+For `sendToBack`, we would want the new `items` array to be all of the moving items, sorted by their prior order within the `items` array, followed by all of the static items sorted by their prior order in the `items` array.
+
+This works for single items as well as for multiple items:
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = sendToBack("c") // c, a, b, d
+```
+
+<Figure
+  src="/images/reordering/send_to_back_1.png"
+  alt="A diagram showing the result of moving c to back in items a, b, c, d."
+/>
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = sendToBack("b", "d") // b, d, a, c
+```
+
+<Figure
+  src="/images/reordering/send_to_back_2.png"
+  alt="A diagram showing the result of moving b and d to back in items a, b, c, d."
+/>
+
+### Bring to Front
+
+```ts
+function bringToFront(items: Item[], ids: string[]) {
+  const movingIds = new Set(ids)
+  const moving: Item[] = []
+  const notMoving: Item[] = []
+  for (const item of items) {
+    const arr = movingIds.has(item.id) ? moving : notMoving
+    arr.push(item)
+  }
+  return notMoving.concat(moving)
+}
+```
+
+For `bringToFront`, we perform the same work as `sendToBack`, except this time adding the moving items to the end of the static items array. Again, both arrays preserve their items' order from the input array.
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = bringToFront("b") // a, c, d, b
+```
+
+<Figure
+  src="/images/reordering/bring_to_front.png"
+  alt="A diagram showing the result of moving c to front in items a, b, c, d."
+/>
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = bringToFront("a", "c") // b, d, a, c
+```
+
+<Figure
+  src="/images/reordering/bring_to_front_2.png"
+  alt="A diagram showing the result of moving a and c to front in items a, b, c, d."
+/>
+
+### Send Backward
+
+```ts
+function sendBackward(items: Item[], ids: string[]) {
+  const movingIds = new Set(ids)
+  const indices: number[] = []
+  items.forEach((item, i) => {
+    if (movingIds.has(item.id)) {
+      indices.push(i)
+    }
+  })
+  const result = items.slice()
+  indices.forEach((index) => {
+    const movingItem = result[index]
+    const neighborBelow = result[index - 1]
+    if (neighborBelow && !movingIds.has(neighborBelow.id)) {
+      result[index] = neighborBelow
+      result[index - 1] = movingItem
+    }
+  })
+  return result
+}
+```
+
+Sending an item backward is a little more complex. Here we want to iterate through each moving item's original index and try to swap the item we find at that index in the results array with its neighbor at the index below. If there is no neighbor item, then this means we're trying to move the first item in the list; and if the neighbor is also moving, then this means we haven't yet been able to move any items down.
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = sendBackward("c") // a, c, b, d
+```
+
+<Figure
+  src="/images/reordering/send_backward_1.png"
+  alt="A diagram showing the result of moving c backward in items a, b, c, d."
+/>
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = sendBackward("b", "c") // b, c, a, c
+```
+
+<Figure
+  src="/images/reordering/send_backward_4.png"
+  alt="A diagram showing the result of moving b and c backward in items a, b, c, d."
+/>
+
+### Bring Forward
+
+```ts
+function bringForward(items: Item[], ids: string[]) {
+  const movingIds = new Set(ids)
+  const indices: number[] = []
+  items.forEach((item, i) => {
+    if (movingIds.has(item.id)) {
+      indices.push(i)
+    }
+  })
+  const result = items.slice()
+  indices.reverse().forEach((index) => {
+    const movingItem = result[index]
+    const neighborAbove = result[index + 1]
+    if (neighborAbove && !movingIds.has(neighborAbove.id)) {
+      result[index] = neighborAbove
+      result[index + 1] = movingItem
+    }
+  })
+  return result
+}
+```
+
+The `bringForward` method is implemented in a similar way, but reversing the indices array so that we iterate down from the highest index to the lowest, and swapping each item with the item above it in the results array.
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = bringForward("b") // a, c, b, d
+```
+
+<Figure
+  src="/images/reordering/bring_forward_1.png"
+  alt="A diagram showing the result of moving b forward in items a, b, c, d."
+/>
+
+```ts
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
+items = bringForward("b", "c") // b, a, d, c
+```
+
+<Figure
+  src="/images/reordering/bring_forward_2.png"
+  alt="A diagram showing the result of moving b and c forward in items a, b, c, d."
+/>
+
+## Wrapup
+
+Moving items in an array has some upsides and some downsides. An advantage is that items may be placed in the document or painted in the correct order without any further sorting or manipulation.
+
+```tsx
+for (const item of items) {
+  canvas.paintItem(item)
+}
+```
+
+```tsx
+<div>
+  {items.map((item) => (
+    <Item key={item.id} item={item} />
+  ))}
+</div>
+```
+
+The main disadvantage comes from the difficulty of accessing a particular item within the array, which requires a search through the array.
+
+```ts
+const items = [{ id: "a" }, { id: "b" }, { id: "c" }]
+
+function getItem(id: string) {
+  return items.find((item) => item.id === id)
+}
+```
+
+This can be impractical for apps that need to store many items, or that require a more efficient way of accessing items. This is usually done with a hash table (such as a `Map`, or plain object) or another from of associative structure.
+
+```ts
+const items = {
+  a: { id: "a", index: 1 },
+  b: { id: "b", index: 2 },
+  c: { id: "c", index: 3 },
+}
+
+function getItem(id: string) {
+  return items[id]
+}
+```
+
+However, while hash tables make for fast lookup, they can't make guarantees about ordering in the same way that arrays do; and so we would be forced to keep track of indices ourselves.
+
+This adds some new trickiness and I'll cover that in the next post.
+
+> 🚀 You can view the code and tests from this post at this [CodeSandbox](https://codesandbox.io/s/silly-proskuriakova-clnlk?file=/src/array-ordering.test.ts).
+
+---
+
+Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).
