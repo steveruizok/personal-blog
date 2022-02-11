@@ -6,40 +6,32 @@ status: "published"
 description: "Implementing ordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) in an array of items."
 ---
 
-# Reordering Part 1: Arrays
-
-In an app that uses a zoom UI, canvas, or really any paradigm where things are "stacked" in order from back to front, the user interface will usually provide some commands that let a user move items in the stack.
-
-These commands are usually:
+In an app that uses a zoom UI, canvas, or really any paradigm where things are "stacked" in order from back to front, the user interface will usually provide some commands that let a user move items in the stack:
 
 1. **Send to Back**
 2. **Send Backward**
 3. **Bring Forward**
 4. **Bring to Front**
 
-There are several ways of implementing these four commands, and these can vary greatly depending on how an application structures its items.
+Implementing these commands will depend on how your application structures its items. Are they in an array? Are they in a table? Is this a multiplayer application?
 
-In this article, we'll cover implementations in an app that uses an array to structure its items. In the a future post, we'll cover a more complex method for an application where items are stored in a hash table.
+In this article, I'll cover the most straightforward implementation in an app that structures its items in an array. In a future post, I'll cover a more complex method in an application where items are stored in a hash table.
 
-## Reordering Arrays
+## Mise en place
 
-Let's say we have a collection of items that look like this:
+Let's say we have an application where we're storing our items in an array:
 
 ```ts
 type Item = { id: string }
-```
 
-...and we're storing them in an array:
-
-```ts
 type Items = Item[]
 
-const itemsExample = [{ id: "a" }, { id: "b" }, { id: "c" }]
+const itemsExample: Items = [{ id: "a" }, { id: "b" }, { id: "c" }]
 ```
 
-Here an item's "order" is represented by the item's index in the array. In the example above, the item `{ id: "a" }` has the index of `0`, the item `{ id: "b" }` has the index of `1`, etc.
+In this structure, each item's "order" is represented by that item's index in the array. In the example above, the item `{ id: "a" }` has the index of `0`, the item `{ id: "b" }` has the index of `1`, etc.
 
-With this as our data, let's look at how we would implement our four reordering commands.
+Now that we have our data worked out, let's look at how we would implement our four reordering commands.
 
 > 🚀 You can view the code and tests for this post at this [CodeSandbox](https://codesandbox.io/s/silly-proskuriakova-clnlk?file=/src/array-ordering.test.ts).
 
