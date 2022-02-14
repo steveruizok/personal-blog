@@ -63,7 +63,7 @@ sendBackwards(
 
 The problem with this approach is that making a change to _one_ item's order might mean making a change to _all_ items in the stack. This strategy could lead to excessive writes to a database, or larger packets being sent to ensure consistency between users in a multiplayer session, and even unnecessary renders depending on how changes are observed.
 
-What we really want is a method that ensures that only the _moving_ items will require new `index` values. Luckily for us, we do have such a method: _fractional indexing_.
+What we really want is a method that ensures that only the _moving_ items will require new `index` values. Luckily for us, we do have such a method!
 
 ### Fractional Indexing
 
@@ -103,7 +103,7 @@ Now that we have our stategy understood, let's look at implementations.
 
 ## Getting Indices Between
 
-In our case, we'll be representing our fractional indices by numbers. We'll use the following function to get the indices between two other `index` values:
+In our reordering functions, we'll use the following function to get the indices between two other `index` values:
 
 ```ts
 function getIndicesBetween(
@@ -132,7 +132,7 @@ function getIndicesBetween(
 }
 ```
 
-If we're putting items at the "bottom" of the list, our `above` value will be lowest `index` among our items. In that case, we'll create new fractions based on that `index`.
+If we're putting items at the "bottom" of the list, our `below` value will be `undefined` and our `above` value will be lowest `index` among our items. In that case, we'll create new fractions based on that `index`.
 
 ```ts
 getIndicesBetween(undefined, 1, 1) // [0.5]
@@ -165,7 +165,7 @@ sendToBack(
 // }
 ```
 
-If we're putting items at the "top" of the list, then our `below` value will be the highest `index` among our items. Here we can simply iterate by incrementing the that `index`.
+If we're putting items at the "top" of the list, then our `above` value will be `undefined§ and our `below`value will be the highest`index`among our items. Here we can simply iterate by incrementing the that`index`.
 
 ```ts
 getIndicesBetween(5, undefined, 1) // [6]
