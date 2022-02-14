@@ -357,10 +357,10 @@ export const globalStyles = globalCss({
   ".token.attr-name,.attribute": {
     color: "$syntaxAttribute",
   },
-  ".token.attr-value,.pseudo-element,.pseudo-class,.string": {
+  ".token.attr-value,.pseudo-element,.pseudo-class,.string,.constant": {
     color: "$syntaxString",
   },
-  ".token.atrule,.boolean,.constant,.hexcode,.id,.important,.keyword,.symbol": {
+  ".token.atrule,.boolean,.hexcode,.id,.important,.keyword,.symbol": {
     color: "$syntaxKeyword",
   },
   ".token.hexcode,.unit,.cdata,.class,.inserted,.interpolation-punctuation": {

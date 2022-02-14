@@ -1,23 +1,25 @@
 ---
-title: "Reordering Part 2: Fractional Indexing"
-date: "02/11/2022"
-hero: "/images/reordering-2/send_to_back_2.png"
+title: "Reordering Part 2: Tables and Fractional Indexing"
+date: "02/14/2022"
+hero: "/images/reordering-2/bring_forward_1.png"
 status: "published"
-description: "Implementing reordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) in a hash table of items."
+description: "Implementing reordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) in using fractional indexing."
 ---
 
-In a previous blog post, we looked at implementations of common reordering-2 commands in a zoom UI or canvas app. Those commands are:
+In a [previous blog post](https://www.steveruiz.me/posts/reordering), we looked at implementating four common reordering commands in a zoom UI or canvas app. Those commands are:
 
 1. **Send to Back**
 2. **Send Backward**
 3. **Bring Forward**
 4. **Bring to Front**
 
-While the last post showed implementations in an app where items are stored in an array, this post will focus on the more complex implementation for apps where items are stored in hash tables.
+While the last post showed how we might implement these commands when our items were stored in an array, this post will focus on the more complex implementation for cases where items are stored in hash tables.
+
+> 🚀 You can view the code and tests for this post at this [CodeSandbox](https://codesandbox.io/s/table-items-examples-xro3n). A separate implementation using string indices is available [here](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg).
 
 ## Mise en place
 
-Let's say we have an application where we're storing items in a hash table. Because tables (unlike arrays) have no "position" or index for items in the table, we'll need to keep track of that information ourselves.
+Let's say we have an application where we're storing items in a hash table—in JavaScript, a regular object. Because tables (unlike arrays) have no "position" or index for items in the table, we'll need to keep track of that information ourselves.
 
 ```ts
 type Item = { id: string; index: number }
@@ -31,15 +33,16 @@ const itemsExample: Items = {
 }
 ```
 
-In this structure, each item's `index` is stored on the object itself. In the example above, the item `{ id: "a", index: 1}` has the index of `1`, the item `{ id: "b", index: 2 }` has the index of `2`, etc. Note that the lowest index is `1`, and not `0`. This is a deliberate choice and we'll come back to it in a moment.
-
-Now that we have our data worked out, let's look at how we would implement our four reordering-2 commands.
-
-> 🚀 You can view the code and tests for this post at this [CodeSandbox](https://codesandbox.io/s/table-items-examples-xro3n). A separate implementation using string indices is available [here](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg).
+In this structure, each item's `index` is stored as a property. In the example above, the item `{ id: "a", index: 1}` has the index of `1`, the item `{ id: "b", index: 2 }` has the index of `2`, etc. Note that the lowest index is `1`, and not `0`. This is a deliberate choice and we'll come back to it in a moment.
 
 ### Naive Implementation
 
 How should we implement changes to our `index` properties? A simple approach could reproduce the same index logic as in an array, re-assigning each item's index whenever a reorder occurs.
+
+<Figure
+  src="/images/reordering-2/naive_1.png"
+  alt="A diagram showing the result of moving c backward in items a, b, c."
+/>
 
 ```ts
 sendBackwards(
@@ -58,15 +61,22 @@ sendBackwards(
 // }
 ```
 
-The problem with this approach is that making a change to one item's order might mean making a change to _all_ items in the stack. This strategy could lead to excessive writes to a database, or larger packets being sent to ensure consistency between users in a multiplayer session, and even unnecessary renders depending on how changes are observed.
+The problem with this approach is that making a change to _one_ item's order might mean making a change to _all_ items in the stack. This strategy could lead to excessive writes to a database, or larger packets being sent to ensure consistency between users in a multiplayer session, and even unnecessary renders depending on how changes are observed.
 
-Luckily, there is a better way to represent reordering that ensures that only the _moving_ items will require new `index` values.
+What we really want is a method that ensures that only the _moving_ items will require new `index` values. Luckily for us, we do have such a method: _fractional indexing_.
 
 ### Fractional Indexing
 
-The strategy we'll be using is called "fractional indexing", introduced to me by [Figma](https://www.figma.com/blog/realtime-editing-of-ordered-sequences/#fractional-indexing). In this strategy, an `index` only needs to ensure that, when our items are sorted by their `index`, the items end up in the right order. The `index` values themselves do not have to be integers or evenly distributed—all that matters is that they let us produce the correct sort.
+The strategy we'll be using is called "fractional indexing", common in databases but introduced to me by [Figma's article](https://www.figma.com/blog/realtime-editing-of-ordered-sequences/#fractional-indexing) on the topic.
+
+In this strategy, an `index` only needs to ensure that, when our items are sorted by their `index`, the items end up in the right order. The `index` values themselves do not have to be integers or evenly distributed—all that matters is that they let us produce the correct sort.
 
 This opens the option of putting items _between_ other items.
+
+<Figure
+  src="/images/reordering-2/fractional_indexing.png"
+  alt="A diagram showing the result of moving c backward in items a, b, c using fractional indexing."
+/>
 
 ```ts
 sendBackward(
@@ -86,6 +96,8 @@ sendBackward(
 ```
 
 In the example above, we've changed the order without changing items `a` or `b`, simply by changing the item `c` to sort after `a` and before `b`. While `c`'s index of `1.5` happens to be exactly between the `index` values of `a` and `b`, this isn't actually necessary—again, all that matters is that the `index` values let us produce the correct sort.
+
+> As we'll see at the end of this post, our indexes don't even need to be numbers!
 
 Now that we have our stategy understood, let's look at implementations.
 
@@ -127,7 +139,14 @@ getIndicesBetween(undefined, 1, 1) // [0.5]
 getIndicesBetween(undefined, 1, 3) // [0.25, 0.5, 0.75]
 ```
 
-We'll see this in use when we implement `sendToBack` and `sendBackward`
+This is also the reason why we've started our indices from `1` rather than from `0`. We can't cut zero into fractions!
+
+We'll see this pattern in use when we implement `sendToBack` and `sendBackward`.
+
+<Figure
+  src="/images/reordering-2/index_at_start.png"
+  alt="A diagram showing the result of moving c to back in items a, b, c."
+/>
 
 ```ts
 sendToBack(
@@ -155,6 +174,11 @@ getIndicesBetween(5, undefined, 3) // [6, 7, 8]
 
 We'll see this in use when we implement `bringToFront` and `bringForward`.
 
+<Figure
+  src="/images/reordering-2/index_at_end.png"
+  alt="A diagram showing the result of moving a to front in items a, b, c."
+/>
+
 ```ts
 bringToFront(
   {
@@ -179,7 +203,12 @@ getIndicesBetween(2, 3, 1) // [2.5]
 getIndicesBetween(2, 3, 3) // [2.25, 2.5, 2.75]
 ```
 
-We might see this with any of our methods.
+We might see this pattern with any of our methods.
+
+<Figure
+  src="/images/reordering-2/index_between.png"
+  alt="A diagram showing the result of moving a forward in items a, b, c."
+/>
 
 ```ts
 bringForward(
@@ -188,7 +217,7 @@ bringForward(
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
   },
-  ["c"]
+  ["a"]
 )
 
 // {
@@ -200,13 +229,18 @@ bringForward(
 
 As in our last blog post, the tricky parts will be when moving multiple items that may each appear at the front, back, or middle, and that may be adjacent to one another.
 
+<Figure
+  src="/images/reordering-2/complex_move.png"
+  alt="A diagram showing the result of moving a, b, and d forward in items a, b, c, d."
+/>
+
 ```ts
 bringForward(
   {
     a: { id: "a", index: 1 },
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
-    c: { id: "d", index: 3 },
+    d: { id: "d", index: 4 },
   },
   ["a", "b", "d"]
 )
@@ -219,7 +253,9 @@ bringForward(
 // }
 ```
 
-One last note: in addition to our `getIndicesBetween` method, we'll also be using the following `sortByIndex` method:
+### Sorting by Index
+
+One last note: in addition to our `getIndicesBetween` method, we'll also be using the following `sortByIndex` method throughout our four method implementations:
 
 ```ts
 function sortByIndex(a: Item, b: Item) {
@@ -455,7 +491,7 @@ items = bringForward(items, ["a", "c"]) // b, a, d, c, e
 
 ## Wrapup
 
-Fractional indexing makes reordering operations much cheaper in terms of writes to the document or database, as only the mutations necessary are those for the items that need to move.
+Fractional indexing makes reordering operations much cheaper in terms of writes to the document or database, as we only need to mutate the items that have actually moved.
 
 There is one issue, however, and you may have spotted it already: how many times can you divide a number before the difference is less than your program's floating point precision?
 
@@ -467,7 +503,9 @@ let above = 2
 for (let i = 0; i < 53; i++) {
   above = below + (above - below) / 2
 }
-console.log(below, above, below < above) // 1, 1.0000000000000002, true
+below // 1
+above // 1.0000000000000002
+below < above // true
 ```
 
 ```ts
@@ -476,7 +514,9 @@ let above = 2
 for (let i = 0; i < 53; i++) {
   above = below + (above - below) / 2
 }
-console.log(below, above, below < above) // 1, 1, false
+below // 1
+above // 1
+below < above // false
 ```
 
 In JavaScript at least, you can split a number 52 times before the number loses precision and returns to an integer. In our case, this means that there is a certain limit to the number of times we could put items between other items.
@@ -486,33 +526,39 @@ for (let i = 0; i < 53; i++) {
   const sorted = Object.values(items).sort((a, b) => a.index - b.index)
   items = sendBackward(items, [sorted[2].id])
 }
-console.log(Object.values(items).map((item) => item.index))
-// 1, 1.0000000000000002, 1, 4, 5, 6, 7
+// Indexes are: 1, 1.0000000000000002, 1, 4, 5, 6, 7
 ```
 
-In the example above, we're moving the third item from the start backward 53 times. After the 52th time, that item's index loses its precision. (On the next iteration, the item in position 1 would lose its precision as well.)
+In the example above, we're moving the third item from the start backward 53 times. After the 52nd iteration, that item's index loses its precision. On the next iteration, the item in position 1 would lose its precision as well.
 
-The solution to this is to use a more accurate index. Remember that the `index` value only matters insofar as it will produce the correct order when sorted. At the moment our sort compares the two numbers, however we can also sort _alphabetically_.
+### Better Indexing!
+
+The solution to this is to use a more accurate index.
+
+Remember that the `index` value only matters insofar as it will produce the correct order when sorted. At the moment we're sorting based on the greater of two numbers; however, we can also sort _alphabetically_.
 
 ```ts
-type Item = { id: string; order: string }
+bringForward(
+  {
+    a: { id: "a", index: "a0" },
+    b: { id: "b", index: "a1" },
+    c: { id: "c", index: "a2" },
+    d: { id: "d", index: "a3" },
+  },
+  ["b"]
+)
 
-type Items = Record<string, Item>
-
-const itemExample: Item = { id: "a", order: "a0" }
-
-const itemsExample: Items = {
-  a: { id: "a", order: "a0" },
-  b: { id: "b", order: "a1" },
-  c: { id: "c", order: "a2" },
-}
+// {
+//   a: { id: "a", index: "a0"},
+//   b: { id: "b", index: "a2a"},
+//   c: { id: "c", index: "a2" },
+//   d: { id: "d", index: "a3" },
+// }
 ```
 
-This method for representing indices is described in detail in [an article](https://observablehq.com/@dgreensp/implementing-fractional-indexing) by David Greenspan. It works nearly indefinitely.
+This method for representing indices is described in detail in [an article](https://observablehq.com/@dgreensp/implementing-fractional-indexing) by David Greenspan. It lets us split indices pretty much indefinitely.
 
-While I won't reproduce the code here, the good news is that the method is entirely compatible with the code in this article: all we need to do is replace our `index` as a string instead of a number, replace our `sortByIndex` to sort alphabetically instead, and make our `getIndicesBetween` method generate indices via David's method.
-
-I've created a [separate CodeSandbox](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg) with this implementation. The methods behave in the same was as described in this article—the only difference is how indices are represented and generated.
+While I won't reproduce the code here, I have reproduced it in a [separate CodeSandbox](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg). The methods operate in the same was as described in this article and the code is virtually identical: the only difference is how indices are represented and how our `getIndicesBetween` method generates indices.
 
 And with that, I believe we've covered everything there is to know about implementing our four reordering methods.
 
@@ -521,7 +567,3 @@ And with that, I believe we've covered everything there is to know about impleme
 ---
 
 Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).
-
-```
-
-```
