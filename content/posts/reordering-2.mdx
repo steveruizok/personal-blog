@@ -1,0 +1,565 @@
+---
+title: "Reordering Part 2: Tables and Fractional Indexing"
+date: "02/14/2022"
+hero: "/images/reordering-2/bring_forward_1.png"
+status: "published"
+description: "Implementing reordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) in using fractional indexing."
+---
+
+In a [previous blog post](https://www.steveruiz.me/posts/reordering), we looked at implementating four common reordering commands in a zoom UI or canvas app. Those commands are:
+
+1. **Send to Back**
+2. **Send Backward**
+3. **Bring Forward**
+4. **Bring to Front**
+
+While the last post showed how we might implement these commands when our items were stored in an array, this post will focus on the more complex implementation for cases where items are stored in hash tables.
+
+> 🚀 You can view the code and tests for this post at this [CodeSandbox](https://codesandbox.io/s/table-items-examples-xro3n). A separate implementation using string indices is available [here](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg).
+
+## Mise en place
+
+Let's say we have an application where we're storing items in a hash table—in JavaScript, a regular object. Because tables (unlike arrays) have no "position" or index for items in the table, we'll need to keep track of that information ourselves.
+
+```ts
+type Item = { id: string; index: number }
+
+type Items = Record<string, Item>
+
+const itemsExample: Items = {
+  a: { id: "a", index: 1 },
+  b: { id: "b", index: 2 },
+  c: { id: "c", index: 3 },
+}
+```
+
+In this structure, each item's `index` is stored as a property. In the example above, the item `{ id: "a", index: 1}` has the index of `1`, the item `{ id: "b", index: 2 }` has the index of `2`, etc. Note that the lowest index is `1`, and not `0`. This is a deliberate choice and we'll come back to it in a moment.
+
+### Naive Implementation
+
+How should we implement changes to our `index` properties? A simple approach could reproduce the same index logic as in an array, re-assigning each item's index whenever a reorder occurs.
+
+<Figure
+  src="/images/reordering-2/naive_1.png"
+  alt="A diagram showing the result of moving c backward in items a, b, c."
+/>
+
+```ts
+sendBackwards(
+  {
+    a: { id: "a", index: 1 },
+    b: { id: "b", index: 2 },
+    c: { id: "c", index: 3 },
+  },
+  ["c"]
+)
+
+// {
+//   a: { id: "a", index: 1 },
+//   b: { id: "b", index: 3 },
+//   c: { id: "c", index: 2 },
+// }
+```
+
+The problem with this approach is that making a change to _one_ item's order might mean making a change to _all_ items in the stack. This strategy could lead to excessive writes to a database, or larger packets being sent to ensure consistency between users in a multiplayer session, and even unnecessary renders depending on how changes are observed.
+
+What we really want is a method that ensures that only the _moving_ items will require new `index` values. Luckily for us, we do have such a method!
+
+### Fractional Indexing
+
+The strategy we'll be using is called "fractional indexing", common in databases but introduced to me by [Figma's article](https://www.figma.com/blog/realtime-editing-of-ordered-sequences/#fractional-indexing) on the topic.
+
+In this strategy, an `index` only needs to ensure that, when our items are sorted by their `index`, the items end up in the right order. The `index` values themselves do not have to be integers or evenly distributed—all that matters is that they let us produce the correct sort.
+
+This opens the option of putting items _between_ other items.
+
+<Figure
+  src="/images/reordering-2/fractional_indexing.png"
+  alt="A diagram showing the result of moving c backward in items a, b, c using fractional indexing."
+/>
+
+```ts
+sendBackward(
+  {
+    a: { id: "a", index: 1 },
+    b: { id: "b", index: 2 },
+    c: { id: "c", index: 3 },
+  },
+  ["c"]
+)
+
+// {
+//   a: { id: "a", index: 1 },
+//   b: { id: "b", index: 2 },
+//   c: { id: "c", index: 1.5 },
+// }
+```
+
+In the example above, we've changed the order without changing items `a` or `b`, simply by changing the item `c` to sort after `a` and before `b`. While `c`'s index of `1.5` happens to be exactly between the `index` values of `a` and `b`, this isn't actually necessary—again, all that matters is that the `index` values let us produce the correct sort.
+
+> As we'll see at the end of this post, our indexes don't even need to be numbers!
+
+Now that we have our stategy understood, let's look at implementations.
+
+## Getting Indices Between
+
+In our reordering functions, we'll use the following function to get the indices between two other `index` values:
+
+```ts
+function getIndicesBetween(
+  below: number | undefined,
+  above: number | undefined,
+  n: number
+) {
+  let start: number
+  let step: number
+  if (below !== undefined && above !== undefined) {
+    // Put items between
+    step = (above - below) / (n + 1)
+    start = below + step
+  } else if (below === undefined && above !== undefined) {
+    // Put items below (bottom of the list)
+    step = above / (n + 1)
+    start = step
+  } else if (below !== undefined && above === undefined) {
+    // Put items above (top of the list)
+    start = below + 1
+    step = 1
+  } else {
+    throw Error("Must have either a below or an above.")
+  }
+  return Array.from(Array(n)).map((_, i) => start + i * step)
+}
+```
+
+If we're putting items at the "bottom" of the list, our `below` value will be `undefined` and our `above` value will be lowest `index` among our items. In that case, we'll create new fractions based on that `index`.
+
+```ts
+getIndicesBetween(undefined, 1, 1) // [0.5]
+getIndicesBetween(undefined, 1, 3) // [0.25, 0.5, 0.75]
+```
+
+This is also the reason why we've started our indices from `1` rather than from `0`. We can't cut zero into fractions!
+
+We'll see this pattern in use when we implement `sendToBack` and `sendBackward`.
+
+<Figure
+  src="/images/reordering-2/index_at_start.png"
+  alt="A diagram showing the result of moving c to back in items a, b, c."
+/>
+
+```ts
+sendToBack(
+  {
+    a: { id: "a", index: 1 },
+    b: { id: "b", index: 2 },
+    c: { id: "c", index: 3 },
+  },
+  ["c"]
+)
+
+// {
+//   a: { id: "a", index: 1 },
+//   b: { id: "b", index: 2 },
+//   c: { id: "c", index: 0.5 },
+// }
+```
+
+If we're putting items at the "top" of the list, then our `above` value will be `undefined§ and our `below`value will be the highest`index`among our items. Here we can simply iterate by incrementing the that`index`.
+
+```ts
+getIndicesBetween(5, undefined, 1) // [6]
+getIndicesBetween(5, undefined, 3) // [6, 7, 8]
+```
+
+We'll see this in use when we implement `bringToFront` and `bringForward`.
+
+<Figure
+  src="/images/reordering-2/index_at_end.png"
+  alt="A diagram showing the result of moving a to front in items a, b, c."
+/>
+
+```ts
+bringToFront(
+  {
+    a: { id: "a", index: 1 },
+    b: { id: "b", index: 2 },
+    c: { id: "c", index: 3 },
+  },
+  ["a", "b"]
+)
+
+// {
+//   a: { id: "a", index: 4 },
+//   b: { id: "b", index: 5 },
+//   c: { id: "c", index: 3 },
+// }
+```
+
+If we are moving items _between_ two other items, then the `below` and `above` will be the lower and higher `index` values of the two. Here we'll create fractions based on the difference of the two `index` values.
+
+```ts
+getIndicesBetween(2, 3, 1) // [2.5]
+getIndicesBetween(2, 3, 3) // [2.25, 2.5, 2.75]
+```
+
+We might see this pattern with any of our methods.
+
+<Figure
+  src="/images/reordering-2/index_between.png"
+  alt="A diagram showing the result of moving a forward in items a, b, c."
+/>
+
+```ts
+bringForward(
+  {
+    a: { id: "a", index: 1 },
+    b: { id: "b", index: 2 },
+    c: { id: "c", index: 3 },
+  },
+  ["a"]
+)
+
+// {
+//   a: { id: "a", index: 1.5 },
+//   b: { id: "b", index: 2 },
+//   c: { id: "c", index: 3 },
+// }
+```
+
+As in our last blog post, the tricky parts will be when moving multiple items that may each appear at the front, back, or middle, and that may be adjacent to one another.
+
+<Figure
+  src="/images/reordering-2/complex_move.png"
+  alt="A diagram showing the result of moving a, b, and d forward in items a, b, c, d."
+/>
+
+```ts
+bringForward(
+  {
+    a: { id: "a", index: 1 },
+    b: { id: "b", index: 2 },
+    c: { id: "c", index: 3 },
+    d: { id: "d", index: 4 },
+  },
+  ["a", "b", "d"]
+)
+
+// {
+//   a: { id: "a", index: 3.33 },
+//   b: { id: "b", index: 3.67 },
+//   c: { id: "c", index: 3 },
+//   d: { id: "d", index: 4 },
+// }
+```
+
+### Sorting by Index
+
+One last note: in addition to our `getIndicesBetween` method, we'll also be using the following `sortByIndex` method throughout our four method implementations:
+
+```ts
+function sortByIndex(a: Item, b: Item) {
+  return a.index - b.index
+}
+```
+
+## Reordering with Fractional Indexing
+
+### Send to Back
+
+```ts
+function sendToBack(items: Items, ids: string[]): Items {
+  const itemsArray = Object.values(items).sort(sortByIndex)
+  const len = itemsArray.length
+  if (ids.length === len) return items
+  const movingSet = new Set(ids.map((id) => items[id]))
+  let below: number | undefined
+  let above: number | undefined
+  for (const item of itemsArray) {
+    if (!movingSet.has(item)) {
+      above = item.index
+      break
+    }
+    movingSet.delete(item)
+    below = item.index
+  }
+  if (movingSet.size === 0) return items
+  const nextItems = { ...items }
+  const indices = getIndicesBetween(below, above, movingSet.size)
+  Array.from(movingSet.values())
+    .sort(sortByIndex)
+    .forEach((item, i) => (nextItems[item.id].index = indices[i]))
+  return nextItems
+}
+```
+
+For `sendToBack`, we want to move items with the provided `ids` to the bottom of the stack, or to the front of the list when it is ordered by each item's `index`.
+
+We start by turning our items object into an array, sorted by each item's `index`. If it turns out that we're trying to move _all_ of our items to the back, then we can bail as this would produce no change.
+
+Next, we need to find the indices `below` and `above` our insertion range. Working from the bottom of the list, we iterate until we find a shape that is not among our set of moving items. We set this item's `index` as our `above`.
+
+<Figure
+  src="/images/reordering-2/send_to_back_1.png"
+  alt="A diagram showing the result of moving d to back in items a, b, c, d, e."
+/>
+
+If during this iteration we first encounter an item that _is_ among our set of moving items, then this means that the item is already at the bottom of the list. We remove the item from the set and mark the `below` as this item's index. We repeat this for any other moving item we encounter before reaching an item that is not in our moving set.
+
+<Figure
+  src="/images/reordering-2/send_to_back_2.png"
+  alt="A diagram showing the result of moving a, b, and d to back in items a, b, c, d, e."
+/>
+
+If we don't find any moving items before we find non-moving items, then the `below` value will remain `undefined`. That's okay—our `getIndicesBetween` function knows how to handle that.
+
+Either way, we have our `below`, `above`, and a set containing all of the remaining items to move. We use `getIndicesBetween` to generate new `index` values and assign them to the items in our `movingSet`.
+
+```ts
+items = sendToBack(items, ["c"]) // c, a, b, d, e
+```
+
+```ts
+items = sendToBack(items, ["b", "d"]) // b, d, a, c, e
+```
+
+### Bring to Front
+
+```ts
+function bringToFront(items: Items, ids: string[]): Items {
+  const itemsArray = Object.values(items).sort(sortByIndex)
+  const len = itemsArray.length
+  if (ids.length === len) return items
+  let below: number | undefined
+  let above: number | undefined
+  const movingSet = new Set(ids.map((id) => items[id]))
+  for (let i = len - 1; i > -1; i--) {
+    const item = itemsArray[i]
+    if (!movingSet.has(item)) {
+      below = item.index
+      break
+    }
+    movingSet.delete(item)
+    above = item.index
+  }
+  if (movingSet.size === 0) return items
+  const nextItems = { ...items }
+  const indices = getIndicesBetween(below, above, movingSet.size)
+  Array.from(movingSet.values())
+    .sort(sortByIndex)
+    .forEach((item, i) => (nextItems[item.id].index = indices[i]))
+  return nextItems
+}
+```
+
+For `bringToFront`, we perform the same work as `sendToBack`, except this time iterating down from the top of the sorted items array.
+
+<Figure
+  src="/images/reordering-2/bring_to_front_1.png"
+  alt="A diagram showing the result of moving b to front in items a, b, c, d, e."
+/>
+
+Again, if we encounter moving items before we encounter a non-moving item, we remove that item from the moving set but here mark its `index` as the `above`. Once we find an item that is not among the moving set, we mark its `index` as the `below`.
+
+<Figure
+  src="/images/reordering-2/bring_to_front_2.png"
+  alt="A diagram showing the result of moving b, d, and e to front in items a, b, c, d, e."
+/>
+
+```ts
+items = bringToFront(items, ["b"]) // a, c, d, e, b
+```
+
+```ts
+items = bringToFront(items, ["a", "c"]) // b, d, e, a, c
+```
+
+### Send Backward
+
+```ts
+function sendBackward(items: Items, ids: string[]): Items {
+  const itemsArray = Object.values(items).sort(sortByIndex)
+  const len = itemsArray.length
+  if (ids.length === len) return items
+  const movingIndices = new Set(ids.map((id) => itemsArray.indexOf(items[id])))
+  let selectIndex = -1
+  let isSelecting = false
+  let count: number
+  let below: number | undefined
+  let above: number | undefined
+  const nextItems = { ...items }
+  for (let i = len - 1; i > -1; i--) {
+    const isMoving = movingIndices.has(i)
+    if (!isSelecting && isMoving) {
+      isSelecting = true
+      selectIndex = i
+    } else if (isSelecting && !isMoving) {
+      isSelecting = false
+      count = selectIndex - i
+      above = itemsArray[i].index
+      below itemsArray[i - 1]?.index
+      const indices = getIndicesBetween(below, above, count)
+      for (let k = 0; k < count; k++) {
+        const item = itemsArray[i + k + 1]
+        items[item.id].index = indices[k]
+      }
+    }
+  }
+  return nextItems
+}
+```
+
+Sending an item backward is complex. Here we want to iterate from the top of the stack until we find an item that is moving. Once we've found a moving item, we'll begin "selecting" and continue iterating down until we find an item that is _not_ moving. Here we'll stop selecting and assign indexes such that our "selected" items are placed below this item.
+
+<Figure
+  src="/images/reordering-2/send_backward_2.png"
+  alt="A diagram showing the result of moving d and c backward in items a, b, c, d, e."
+/>
+
+Then we'll continue iterating until we again reach a selected item, or we reach the front of the list. If we end with items selected, this means that those items are at the back of the list and require no change.
+
+```ts
+items = sendBackward(items, ["c"]) // a, c, b, d, e
+```
+
+```ts
+items = sendBackward(items, ["b", "c"]) // b, c, a, d, e
+```
+
+```ts
+items = sendBackward(items, ["c", "e"]) // a, c, b, e, d
+```
+
+### Bring Forward
+
+```ts
+function bringForward(items: Items, ids: string[]): Items {
+  const itemsArray = Object.values(items).sort(sortByIndex)
+  const len = itemsArray.length
+  if (ids.length === len) return items
+  const movingIndices = new Set(ids.map((id) => itemsArray.indexOf(items[id])))
+  let selectIndex = -1
+  let isSelecting = false
+  let below: number | undefined
+  let above: number | undefined
+  let count: number
+  const nextItems = { ...items }
+  for (let i = 0; i < len; i++) {
+    const isMoving = movingIndices.has(i)
+    if (!isSelecting && isMoving) {
+      isSelecting = true
+      selectIndex = i
+      above = undefined
+    } else if (isSelecting && !isMoving) {
+      isSelecting = false
+      count = i - selectIndex
+      below = itemsArray[i].index
+      above = itemsArray[i + 1]?.index
+      const indices = getIndicesBetween(below, above, count)
+      for (let k = 0; k < count; k++) {
+        const item = itemsArray[selectIndex + k]
+        items[item.id].index = indices[k]
+      }
+    }
+  }
+  return nextItems
+}
+```
+
+The `bringForward` method is implemented in a similar way, but here we iterate from bottom to top. Again, if we encounter a moving item then we begin selecting. If we encounter a non-moving item while selecting then we stop selecting and insert our selected items above this item. If we end with a selection, then we know that those items were already at the top of the list.
+
+<Figure
+  src="/images/reordering-2/bring_forward_1.png"
+  alt="A diagram showing the result of moving b and c forward in items a, b, c, d, e."
+/>
+
+```ts
+items = bringForward(items, ["b"]) // a, c, b, d, e
+```
+
+```ts
+items = bringForward(items, ["b", "c"]) // a, d, b, c, e
+```
+
+```ts
+items = bringForward(items, ["a", "c"]) // b, a, d, c, e
+```
+
+## Wrapup
+
+Fractional indexing makes reordering operations much cheaper in terms of writes to the document or database, as we only need to mutate the items that have actually moved.
+
+There is one issue, however, and you may have spotted it already: how many times can you divide a number before the difference is less than your program's floating point precision?
+
+With the implementation shown here, that number is 52.
+
+```ts
+let below = 1
+let above = 2
+for (let i = 0; i < 53; i++) {
+  above = below + (above - below) / 2
+}
+below // 1
+above // 1.0000000000000002
+below < above // true
+```
+
+```ts
+let below = 1
+let above = 2
+for (let i = 0; i < 53; i++) {
+  above = below + (above - below) / 2
+}
+below // 1
+above // 1
+below < above // false
+```
+
+In JavaScript at least, you can split a number 52 times before the number loses precision and returns to an integer. In our case, this means that there is a certain limit to the number of times we could put items between other items.
+
+```ts
+for (let i = 0; i < 53; i++) {
+  const sorted = Object.values(items).sort((a, b) => a.index - b.index)
+  items = sendBackward(items, [sorted[2].id])
+}
+// Indexes are: 1, 1.0000000000000002, 1, 4, 5, 6, 7
+```
+
+In the example above, we're moving the third item from the start backward 53 times. After the 52nd iteration, that item's index loses its precision. On the next iteration, the item in position 1 would lose its precision as well.
+
+### Better Indexing!
+
+The solution to this is to use a more accurate index.
+
+Remember that the `index` value only matters insofar as it will produce the correct order when sorted. At the moment we're sorting based on the greater of two numbers; however, we can also sort _alphabetically_.
+
+```ts
+bringForward(
+  {
+    a: { id: "a", index: "a0" },
+    b: { id: "b", index: "a1" },
+    c: { id: "c", index: "a2" },
+    d: { id: "d", index: "a3" },
+  },
+  ["b"]
+)
+
+// {
+//   a: { id: "a", index: "a0"},
+//   b: { id: "b", index: "a2a"},
+//   c: { id: "c", index: "a2" },
+//   d: { id: "d", index: "a3" },
+// }
+```
+
+This method for representing indices is described in detail in [an article](https://observablehq.com/@dgreensp/implementing-fractional-indexing) by David Greenspan. It lets us split indices pretty much indefinitely.
+
+While I won't reproduce the code here, I have reproduced it in a [separate CodeSandbox](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg). The methods operate in the same was as described in this article and the code is virtually identical: the only difference is how indices are represented and how our `getIndicesBetween` method generates indices.
+
+And with that, I believe we've covered everything there is to know about implementing our four reordering methods.
+
+> 🚀 You can view the code and tests from this post at this [CodeSandbox](https://codesandbox.io/s/table-items-examples-xro3n). A separate implementation using string indices is available [here](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg).
+
+---
+
+Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).
