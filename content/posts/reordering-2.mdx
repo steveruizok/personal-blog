@@ -397,11 +397,7 @@ function sendBackward(items: Items, ids: string[]): Items {
       isSelecting = false
       count = selectIndex - i
       above = itemsArray[i].index
-      if (i === 0) {
-        below = undefined
-      } else {
-        below = itemsArray[i - 1].index
-      }
+      below itemsArray[i - 1]?.index
       const indices = getIndicesBetween(below, above, count)
       for (let k = 0; k < count; k++) {
         const item = itemsArray[i + k + 1]
