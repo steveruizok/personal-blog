@@ -28,15 +28,14 @@ To make this feature work, I first needed to create an API endpoint on tldraw.co
 
 > 🚀 Remember, tldraw is open source! You can find the finished endpoint [here](https://github.com/tldraw/tldraw/blob/main/apps/www/pages/api/create.ts).
 
-Being a [Next.js](https://nextjs.org/) project, creating the endpoint was no problem. I made a new file at `/pages/api/create.ts` that expected to receive data from the application in the request body. In my case, the body is going to contain the user's tldraw document and their current `pageId`.
+Being a [Next.js](https://nextjs.org/) project, creating the endpoint was no problem. I made a new file at `/pages/api/create.ts` that expected to receive data from the application in the request body. In my case, the body is going to contain the user's tldraw `document` and their current `pageId`.
 
 ```ts
 // pages/api/create.ts
 
-import type { NextApiRequest, NextApiResponse } from "next"
+import { NextApiRequest, NextApiResponse } from "next"
 
 type storageJson = {
-  roomId: string
   pageId: string
   document: TDDocument
 }
@@ -46,8 +45,8 @@ export default async function CreateMultiplayerRoom(
   res: NextApiResponse
 ) {
   try {
-    // 1. Create the Liveblocks storage JSON
-    // 2. Get an authentication token from Liveblocks
+    // 1. Get an authentication token from Liveblocks
+    // 2. Create the Liveblocks storage JSON
     // 3. Post the JSON and token to Liveblocks
   } catch (e) {
     res.send({ status: "error", message: e.message })
@@ -77,7 +76,7 @@ LIVEBLOCKS_SECRET_KEY = sk_live_whatever
 Ok, back to my `pages/api/creates.ts` endpoint. With my keys in the environment, I next needed to get my authentication token from Liveblocks via their [authorize endpoint](https://liveblocks.io/docs/api-reference/rest-api-endpoints#Authentication).
 
 ```ts
-const auth = await fetch("https://liveblocks.io/api/authorize", {
+const { token } = await fetch("https://liveblocks.io/api/authorize", {
   headers: {
     Authorization: `Bearer ${process.env.LIVEBLOCKS_SECRET_KEY}`,
     "Content-Type": "application/json",
@@ -85,7 +84,7 @@ const auth = await fetch("https://liveblocks.io/api/authorize", {
 }).then((d) => d.json())
 ```
 
-This would give me an object with a `token`, the web token I'd need to communicate with Liveblocks' storage API.
+The authorize endpoint responds with the web token I'd need to communicate with Liveblocks' storage API.
 
 ### Creating the Storage JSON
 
@@ -113,8 +112,10 @@ const storageJson = {
   },
 }
 
-storageJson.data.shapes.data = document.pages[pageId].shapes ?? {}
-storageJson.data.bindings.data = document.pages[pageId].bindings ?? {}
+const page = document.pages[pageId]
+
+storageJson.data.shapes.data = page.shapes ?? {}
+storageJson.data.bindings.data = page.bindings ?? {}
 storageJson.data.assets.data = document.assets ?? {}
 ```
 
@@ -140,17 +141,18 @@ const result = await fetch(
 )
 ```
 
-If all went well, my API endpoint would reply to the tldraw client application with the new room's URL.
+If all went well, my API endpoint would reply to the original tldraw client application's request with a response that contained the new room's URL.
 
 ```ts
 if (result.status === 200) {
+  // If success, send back the url for the new room
   res.send({
     status: "success",
     message: result.statusText,
     url: "/r/" + roomId,
   })
 } else {
-  res.send({ status: "error", message: result.statusText })
+  throw Error(result.statusText)
 }
 ```
 
