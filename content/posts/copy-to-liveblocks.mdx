@@ -1,12 +1,12 @@
 ---
-title: "Copy to Multiplayer Room"
+title: "Copy to Multiplayer Project"
 date: "05/19/2022"
-hero: "/images/copy-to-liveblocks/ricky-kharawala-adK3Vu70DEQ-unsplash.jpg"
+hero: "/images/copy-to-liveblocks/copy-to-liveblocks.png"
 status: "published"
 description: "How I used Liveblock's Storage APIs to create a new feature."
 ---
 
-I recently implemented a feature in [tldraw](https://tldraw.com "tldraw") that lets a user copy the contents of their current page into a new multiplayer room. There are still some issues around images and videos (as these need to be converted and uploaded separately) but it should be a pretty handy feature if you want to share a project or collaborate on something. Just send the link!
+I recently implemented a feature in [tldraw](https://tldraw.com "tldraw") that lets a user copy the contents of their current page into a new multiplayer project. There are still some issues around images and videos (as these need to be converted and uploaded separately) but it should be a pretty handy feature if you want to share a project or collaborate on something. Just send the link!
 
 In this post, I'll walk through how it works.
 
@@ -18,7 +18,7 @@ A few weeks ago, Liveblocks updated their [REST API](https://liveblocks.io/docs/
 
 ## Our own API Endpoint
 
-To make this feature work, I first needed to create an API endpoint on tldraw.com that could act as an intermediary between the tldraw client application and the Liveblocks API. The tldraw app would send data to the tldraw.com API endpoint, where the site's server would authenticate with Liveblocks and then send the data to Liveblocks. If all went well, my endpoint would then send back the new multiplayer room's URL and the app would navigate to that URL.
+To make this feature work, I first needed to create an API endpoint on tldraw.com that could act as an intermediary between the tldraw client application and the Liveblocks API. The tldraw app would send data to the tldraw.com API endpoint, where the site's server would authenticate with Liveblocks and then send the data to Liveblocks. If all went well, my endpoint would then send back the new multiplayer project's URL and the app would navigate to that URL.
 
 <Figure
   src="/images/copy-to-liveblocks/plan.jpeg"
@@ -141,11 +141,11 @@ const result = await fetch(
 )
 ```
 
-If all went well, my API endpoint would reply to the original tldraw client application's request with a response that contained the new room's URL.
+If all went well, my API endpoint would reply to the original tldraw client application's request with a response that contained the new project's URL, based on the `roomId`.
 
 ```ts
 if (result.status === 200) {
-  // If success, send back the url for the new room
+  // If success, send back the url for the new multiplayer project
   res.send({
     status: "success",
     message: result.statusText,
