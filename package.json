@@ -10,6 +10,9 @@
     "lint": "next lint",
     "content": "ts-node --project tsconfig.scripts.json ./scripts/generate-content.ts"
   },
+  "engines": {
+    "node": ">= 14"
+  },
   "dependencies": {
     "@mapbox/rehype-prism": "^0.8.0",
     "@next/mdx": "^12.0.10",
