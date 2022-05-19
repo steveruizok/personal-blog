@@ -1,0 +1,187 @@
+---
+title: "Copy to Multiplayer Room"
+date: "05/19/2022"
+hero: "/images/copy-to-liveblocks/ricky-kharawala-adK3Vu70DEQ-unsplash.jpg"
+status: "published"
+description: "How I used Liveblock's Storage APIs to create a new feature."
+---
+
+I recently implemented a feature in [tldraw](https://tldraw.com "tldraw") that lets a user copy the contents of their current page into a new multiplayer room. There are still some issues around images and videos (as these need to be converted and uploaded separately) but it should be a pretty handy feature if you want to share a project or collaborate on something. Just send the link!
+
+In this post, I'll walk through how it works.
+
+## Liveblocks Storage
+
+tldraw's multiplayer implementation is powered by [Liveblocks](https://liveblocks.io/ "Liveblocks"), a product that offers real time collaboration as a service. We use their presence API for cursor locations and selection, as well as their storage API for synchronizing the document. While there's plenty of client-side conflict resolution to make it all work, it's been a great "drop-in" solution for avoiding conflicts in a project's source of truth.
+
+A few weeks ago, Liveblocks updated their [REST API](https://liveblocks.io/docs/api-reference/rest-api-endpoints) to include endpoints for reading and writing directly to a room's storage, which is what let me write the new feature.
+
+## Our own API Endpoint
+
+To make this feature work, I first needed to create an API endpoint on tldraw.com that could act as an intermediary between the tldraw client application and the Liveblocks API. The tldraw app would send data to the tldraw.com API endpoint, where the site's server would authenticate with Liveblocks and then send the data to Liveblocks. If all went well, my endpoint would then send back the new multiplayer room's URL and the app would navigate to that URL.
+
+<Figure
+  src="/images/copy-to-liveblocks/plan.jpeg"
+  alt="A diagram showing which requests will be made between the app, the endpoint, and the Liveblocks API."
+  title="We'll need to communicate between the tldraw client application, an API endpoint in tldraw.com, and the Liveblocks API endpoints."
+/>
+
+> 🚀 Remember, tldraw is open source! You can find the finished endpoint [here](https://github.com/tldraw/tldraw/blob/main/apps/www/pages/api/create.ts).
+
+Being a [Next.js](https://nextjs.org/) project, creating the endpoint was no problem. I made a new file at `/pages/api/create.ts` that expected to receive data from the application in the request body. In my case, the body is going to contain the user's tldraw document and their current `pageId`.
+
+```ts
+// pages/api/create.ts
+
+import type { NextApiRequest, NextApiResponse } from "next"
+
+type storageJson = {
+  roomId: string
+  pageId: string
+  document: TDDocument
+}
+
+export default async function CreateMultiplayerRoom(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  try {
+    // 1. Create the Liveblocks storage JSON
+    // 2. Get an authentication token from Liveblocks
+    // 3. Post the JSON and token to Liveblocks
+  } catch (e) {
+    res.send({ status: "error", message: e.message })
+  }
+}
+```
+
+The endpoint would need to do three things:
+
+1. Get an authentication token from Liveblocks
+2. Create the Liveblocks storage JSON
+3. Post the JSON and token to Liveblocks
+
+### Getting the Authentication Token
+
+Authenticating with Liveblocks requires a private key. Because I have been using Liveblocks for the site's multiplayer service, I already had my keys in an `.env` file. And, because tldraw is deployed on [Vercel](https://vercel.com/), I had these in my project's [environment variables](https://vercel.com/docs/concepts/projects/environment-variables) as well.
+
+Here's what they look like in my `.env` file:
+
+```ts
+// .env
+
+NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_API_KEY = pk_live_whatever
+LIVEBLOCKS_SECRET_KEY = sk_live_whatever
+```
+
+Ok, back to my `pages/api/creates.ts` endpoint. With my keys in the environment, I next needed to get my authentication token from Liveblocks via their [authorize endpoint](https://liveblocks.io/docs/api-reference/rest-api-endpoints#Authentication).
+
+```ts
+const auth = await fetch("https://liveblocks.io/api/authorize", {
+  headers: {
+    Authorization: `Bearer ${process.env.LIVEBLOCKS_SECRET_KEY}`,
+    "Content-Type": "application/json",
+  },
+}).then((d) => d.json())
+```
+
+This would give me an object with a `token`, the web token I'd need to communicate with Liveblocks' storage API.
+
+### Creating the Storage JSON
+
+Before I could `POST` my data to the Liveblocks storage API endpoint, however, I first needed to turn my tldraw document object into the JSON format that Liveblocks expects to receive.
+
+```ts
+const { pageId, document } = JSON.parse(req.body) as RequestBody
+
+const storageJson = {
+  liveblocksType: "LiveObject",
+  data: {
+    version: 2.1,
+    shapes: {
+      liveblocksType: "LiveMap",
+      data: {},
+    },
+    bindings: {
+      liveblocksType: "LiveMap",
+      data: {},
+    },
+    assets: {
+      liveblocksType: "LiveMap",
+      data: {},
+    },
+  },
+}
+
+storageJson.data.shapes.data = document.pages[pageId].shapes ?? {}
+storageJson.data.bindings.data = document.pages[pageId].bindings ?? {}
+storageJson.data.assets.data = document.assets ?? {}
+```
+
+Luckily our models are fairly similar (tables of objects keyed under their `id`) so this wasn't much work.
+
+### Sending the Storage JSON to Liveblocks
+
+Finally, with my authentication token and my storage JSON ready, I could create a unique ID for the `roomId`, stringify my `storageJson`, and post it to the Liveblocks API endpoint.
+
+```ts
+const roomId = Utils.uniqueId()
+
+const result = await fetch(
+  `https://liveblocks.net/api/v1/room/${roomId}/storage`,
+  {
+    method: "POST",
+    body: JSON.stringify(storageJson),
+    headers: {
+      Authorization: `Bearer ${auth.token}`,
+      "Content-Type": "application/json",
+    },
+  }
+)
+```
+
+If all went well, my API endpoint would reply to the tldraw client application with the new room's URL.
+
+```ts
+if (result.status === 200) {
+  res.send({
+    status: "success",
+    message: result.statusText,
+    url: "/r/" + roomId,
+  })
+} else {
+  res.send({ status: "error", message: result.statusText })
+}
+```
+
+The client would then navigate to the URL—and the user would see their same page content ready for them in the multiplayer editor.
+
+> 🔗 You can see the application code for this feature [here](https://github.com/tldraw/tldraw/blob/main/packages/tldraw/src/components/TopPanel/MultiplayerMenu/MultiplayerMenu.tsx).
+
+## Other APIs
+
+As a final note, there are a few other Liveblocks APIs related to storage that I may use in the future. In addition to creating storage for a room via a `POST`, I could also `GET` the storage for room or `DELETE` its data instead. Eventually, I may use the other two in order to avoid situations where a user tries to copy to a `roomId` that already exists.
+
+For completeness sake, here's the code I'd use for `GET` and `DELETE`:
+
+```ts
+fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
+  method: "GET",
+  headers: {
+    Authorization: `Bearer ${auth.token}`,
+    "Content-Type": "application/json",
+  },
+})
+```
+
+```ts
+fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${auth.token}`,
+    "Content-Type": "application/json",
+  },
+})
+```
+
+Thanks for reading!
