@@ -1,0 +1,102 @@
+---
+title: "Increment a Name in TypeScript"
+date: "6/30/2022"
+hero: "/images/incrementing-name/incrementing-0.png"
+status: "published"
+description: "How to increment a name to avoid duplicates."
+---
+
+Here's a fun problem that I ran into while working on [tldraw](https://tldraw.com)'s page menu: how do I increment a name to avoid duplication?
+
+## The Problem
+
+In tldraw, when you create a new page, and if there's already a page with that name, then we want the second page's name to end with an incremented value, e.g. `"Blog Post (1)"`.
+
+```ts
+const existing = ["Blog Post"]
+
+function getName("Blog Post", existing) {
+  return "Blog Post (1)"  // 0 -> 1
+}
+```
+
+And if you create a new page _again_ without changing that first page's name? Then we'd want the third page's name to be "Blog Post (2)"
+
+```ts
+const existing = ["Blog Post", "Blog Post (1)"]
+
+function getName("Blog Post", existing) {
+  return "Blog Post (2)" // 1 -> 2
+}
+```
+
+We only want to match against the part of the name that exludes the incremented value. So adding `"Blog Post!"` should not get incremented, even if `"Blog Post"` exists already:
+
+```ts
+const existing = ["Blog Post"]
+
+function getName("Blog Post!", existing) {
+  return "Blog Post!" // no change
+}
+```
+
+...and "Blog Post (1)!" should not prevent us from making a `"Blog Post (1)"`
+
+```ts
+const existing = ["Blog Post", "Blog Post (1)!"]
+
+function getName("Blog Post", existing) {
+  return "Blog Post (1)" // Ignores Blog Post (1)!
+}
+```
+
+How to do it?
+
+## The Answer
+
+Here's the solution:
+
+```ts
+// Will return "(1)" from "Blog Post (1)"
+const INCREMENT = new RegExp(/\s\((\d+)\)$/)
+
+// Will return "1" from "(1)"
+const INCREMENT_INT = new RegExp(/\d+(?=\)$)/)
+
+/**
+ * Get an incremented name (e.g. New page (2)) from a name (e.g. New page), based on an array of
+ * existing names.
+ *
+ * @param name The name to increment.
+ * @param others The array of existing names.
+ */
+export function getName(name: string, others: string[]) {
+  let result = name
+
+  while (others.includes(result)) {
+    result = INCREMENT.exec(result)?.[1]
+      ? result.replace(INCREMENT_INT, (m) => (+m + 1).toString())
+      : `${result} (1)`
+  }
+
+  return result
+}
+```
+
+How does it work?
+
+We call the `getName` function with the input name(`name`) and an array of exising names (`others`) that may or may not contain matches.
+
+In a while loop, we check if the `others` includes the current `result`.
+
+If the `others` array includes the `name`, then we mutate the `result`: either by adding a `" (1)"` if the name isn't already incremented, or else, if the name is already incremented, by incrementing the number between the parentheses.
+
+Then our `while` loop checks again. This allows for higher increments: we may have we've just turned `"Blog Post"` into `"Blog Post (1)"`, but the array might include _that_ name, too; and so we need to keep going until we can't find a match.
+
+Once we have a unique name, we can return the result.
+
+### Take a shot!
+
+Think you can improve the code? Here's a [CodeSandbox](https://codesandbox.io/s/withered-grass-99701y?file=/src/index.ts) where you can take a shot.
+
+[Let me know](https://twitter.com/steveruizok) if you come up with a better way!
