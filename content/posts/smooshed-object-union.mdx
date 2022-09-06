@@ -1,0 +1,203 @@
+---
+title: 'The Smooshed Object Union type in TypeScript'
+date: '9/6/2022'
+hero: '/images/smooshed-object-union/smooshed-object-union.png'
+status: 'published'
+description: 'A utility type for creating keyable union of object types.'
+---
+
+I ran into a little TypeScript situation earlier this week. I'm sure I'll run into it again, so I thought I'd share it here.
+
+> 👋 Just want to look at some code? [Click here](https://www.typescriptlang.org/play?#code/C4TwDgpgBAQg9gDygXigbwFBW1UkBcUA5AEaJFY5gBOcYAzoZji1AMZwA2c1h9w1AJYA7AOaVWUABYRBoqcELCArgFsSEahNYB3QQBNgUpWo1aWAXwxWMeaAAUuIUXGEp02u4SJgnL4RQsNHSMHpLYHNy8UPxCYtosMnIKJuqaCTh6hsZQKmnm4fQGEKF5ZtpWNnZQjpwgADIi0KjMOF7EvnWcTYFUtAxMGRFcPHwCIuLhUL4iwKWmmgDaALoV1hi24NAAyqpwcPQy+gDyJABWEGzAAKrCgq4APAAqAHzurdiLANJQIlBPUAgCGAEGE+nov2EADNNDUoAB+KAAawgIDgULhSggADdNMtCACgSCwRCRDDqDVtIifkTQeDkaj0ZSWIj7N9ViwsbiCtguekqlsoNspABDSAQ1DwJAAHxqflcUFltQaTQ21QAgpxOPZ+ppgIISu5dvtDhATudLjc7o9hWKSosfP16ERli8NhxhPxprrqPqSoRNdqfX6JWEcJFRsQSJwRWwkUQADTaJLyRRQACMACYkywskZCFmczgivp-VAACxF7AzYRzQgrJM2KHKYRXe5uegQYA6ujPQHAukQlFojGBnuQX0G+gvAAU2mCYAJVag2JFnGUEADWvHeqniyeqwAlGHq8G9wvlu5V+uIOsMJ3u-0Z0QI9RE1GY3GiIf713x8+UwUd8AGZM0PIA) for the TypeScript Playground.
+
+## The Setup
+
+I'd been working with different shapes for [tldraw](https://tldraw.com). Each shape had different properties stored in a `props` object. Some properties were shared between shape types, such as `color`, or some unique to a particular shape type (e.g. `sides` for a polygon).
+
+```ts
+type Box = {
+	type: 'box'
+	props: {
+		color: string
+		height: number
+		width: number
+	}
+}
+
+type Polygon = {
+	type: 'polygon'
+	props: {
+		color: string
+		height: number
+		width: number
+		sides: number
+	}
+}
+
+type PolyLine = {
+	type: 'polyline'
+	props: {
+		color: string
+		points: number[]
+	}
+}
+```
+
+Each of these properties (except for `type`) could be set via properties panel. The properties panel only showed the properties for the current tool (e.g. `sides` only when the Polygon tool was active), or else for the current selected shapes if no tool was active (e.g. both `sides` and `points` if a user had selected both a polyline and polygon).
+
+I wanted to store the user's most recent choices from those panels in the application's state, so that their choices would be "sticky" to the panel. That meant creating an object that had all of the properties and all of the values from all of the shapes:
+
+```ts
+type Properties = {
+	color: string
+	height: number
+	width: number
+	sides: number
+	points: number[]
+}
+```
+
+To create that type, I first tried creating a union of the shapes:
+
+```ts
+type Shapes = Box | Polygon | PolyLine
+
+const properties: Shapes['props'] = {
+	color: 'black',
+	height: 12,
+	width: 12,
+	sides: 4,
+	points: [],
+}
+```
+
+This worked!
+
+## The Problem
+
+But then I needed a method to update this object when the user picked a property from the properties panel.
+
+```ts
+function setProp<T extends keyof Shapes['props']>(
+	prop: T,
+	value: Shapes['props'][T]
+) {
+	properties[prop] = value
+}
+```
+
+And here's where I ran into trouble.
+
+```ts
+setProp('color', 'black')
+setProp('height', 32)
+// ^ Error!
+//   Argument of type '"height"' is not assignable
+//   to parameter of type '"color"'.ts(2345)
+```
+
+Because `keyof Shapes["props"]` is `color`.
+
+When getting the keys of a union, only the "common" properties are present—meaning the properties that are found in each of the union's members. In our case, only `color` is found in all three.
+
+So I was left with the problem: how do you get all of the keys in a union of objects, _including_ the ones that aren't common to all members of the union?
+
+## The Solution
+
+Here's what I came up with:
+
+```ts
+type SmooshedObjectUnion<T> = {
+	[K in T extends infer P ? keyof P : never]: T extends infer P
+		? K extends keyof P
+			? P[K]
+			: never
+		: never
+}
+```
+
+Rather than typing `properties` as `Shapes['props']`, I instead typed it as a smooshed object union of `Shapes['props']`.
+
+```ts
+type AllProperties = SmooshedObjectUnion<Shapes['props']>
+
+const properties: AllProperties = {
+	color: 'black',
+	height: 12,
+	width: 12,
+	sides: 4,
+	points: [],
+}
+```
+
+Because this smooshed object union is keyable, I could then type my function correctly.
+
+```ts
+function setProp<T extends keyof AllProperties>(
+	prop: T,
+	value: AllProperties[T]
+) {
+	properties[prop] = value
+}
+
+setProp('color', 'black')
+setProp('height', 32)
+```
+
+Problem solved!
+
+## Breakdown
+
+The `SmooshedObjectUnion`, cursed though it looks, is really a combination of several smaller and slightly less ugly utility types.
+
+The first is a helper that returns the value of a property that may or may not exist in an object.
+
+```ts
+type MaybeValue<T, K> = K extends keyof T ? T[K] : never
+
+type X = MaybeValue<{ sides: number }, 'sides'> // number
+type Y = MaybeValue<{ sides: number }, 'color'> // never
+```
+
+The second uses `MaybeValue` to collect all of the values in a union under a certain key.
+
+```ts
+type ValueInUnion<T, K> = T extends infer P ? MaybeValue<P, K> : never
+```
+
+And the third is a utility that gives all of the keys in a union, including those not common to all members:
+
+```ts
+type KeysOfUnion<T> = T extends infer P ? keyof P : never
+
+type X = KeysOfUnion<Shapes['props']>
+// 'color' | 'height' | 'width' | 'sides' | 'points'
+```
+
+And then `SmooshedObjectUnion` would combine these three:
+
+```ts
+type SmooshedObjectUnion<T> = {
+	[K in KeysOfUnion<T>]: ValueInUnion<T, K>
+}
+```
+
+## Bonus Alternative Implementation
+
+Here's a second implementation by [Devansh Jethmalani](https://twitter.com/devanshj__).
+
+```ts
+type DistributedIdentity<T> = {
+	[K in T extends unknown ? keyof T : never]: T extends { [_ in K]: infer V }
+		? V
+		: never
+}
+```
+
+He calls it `DistributedIdentity`—but I'll let you decide whether that's more or less accurate than `SmooshedObjectUnion`.
+
+---
+
+Here's [that link again](https://www.typescriptlang.org/play?#code/C4TwDgpgBAQg9gDygXigbwFBW1UkBcUA5AEaJFY5gBOcYAzoZji1AMZwA2c1h9w1AJYA7AOaVWUABYRBoqcELCArgFsSEahNYB3QQBNgUpWo1aWAXwxWMeaAAUuIUXGEp02u4SJgnL4RQsNHSMHpLYHNy8UPxCYtosMnIKJuqaCTh6hsZQKmnm4fQGEKF5ZtpWNnZQjpwgADIi0KjMOF7EvnWcTYFUtAxMGRFcPHwCIuLhUL4iwKWmmgDaALoV1hi24NAAyqpwcPQy+gDyJABWEGzAAKrCgq4APAAqAHzurdiLANJQIlBPUAgCGAEGE+nov2EADNNDUoAB+KAAawgIDgULhSggADdNMtCACgSCwRCRDDqDVtIifkTQeDkaj0ZSWIj7N9ViwsbiCtguekqlsoNspABDSAQ1DwJAAHxqflcUFltQaTQ21QAgpxOPZ+ppgIISu5dvtDhATudLjc7o9hWKSosfP16ERli8NhxhPxprrqPqSoRNdqfX6JWEcJFRsQSJwRWwkUQADTaJLyRRQACMACYkywskZCFmczgivp-VAACxF7AzYRzQgrJM2KHKYRXe5uegQYA6ujPQHAukQlFojGBnuQX0G+gvAAU2mCYAJVag2JFnGUEADWvHeqniyeqwAlGHq8G9wvlu5V+uIOsMJ3u-0Z0QI9RE1GY3GiIf713x8+UwUd8AGZM0PIA) for the TypeScript Playground.
+
+Enjoy!
