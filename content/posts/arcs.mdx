@@ -1,0 +1,220 @@
+---
+title: 'All About Arcs'
+date: '05/19/2022'
+hero: '/images/copy-to-liveblocks/copy-to-liveblocks.png'
+status: 'published'
+description: 'Hard-won helpers for working with arcs.'
+---
+
+An arc is a section of a circle.
+
+It has quite a lot of information:
+
+- the **center** of the circle of which the arc is a part
+- the **radius** of the circle in distance units
+- a **start point** on the circle where the arc begins
+- an **end point** on the circle where the arc end
+- a **start angle** between the center and start point
+- an **end angle** between the center and end point
+- the **size** of the arc in radians
+- the **length** of the arc in distance units
+- a **large arc flag** that specifies whether the arc takes up the big or small part of the circle
+- a **sweep flag** that specifices whether the arc goes in the clockwise or counterclockwise direction
+
+Depending on how you're working with your arc, you may start off knowing some of this information and just need to find the rest. For example, you may know the center, radius, and start and angle angles, but need to find the size or length of the arc.
+
+When working with arrows, I often need to find an arc based on three points: the start, end, and some middle point. This article contains lots of math for working with arcs, most of which comes from that "three points" use-case.
+
+I hope you find it helpful!
+
+## A Circle from Three Points
+
+Our first step is to find a circle that passes through the three points.
+
+```ts
+function getCircleFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
+	const u = -2 * (a.x * (b.y - c.y) - a.y * (b.x - c.x) + b.x * c.y - c.x * b.y)
+
+	const center = {
+		x:
+			((a.x * a.x + a.y * a.y) * (c.y - b.y) +
+				(b.x * b.x + b.y * b.y) * (a.y - c.y) +
+				(c.x * c.x + c.y * c.y) * (b.y - a.y)) /
+			u,
+		y:
+			((a.x * a.x + a.y * a.y) * (b.x - c.x) +
+				(b.x * b.x + b.y * b.y) * (c.x - a.x) +
+				(c.x * c.x + c.y * c.y) * (a.x - b.x)) /
+			u,
+	}
+
+	const radius = Math.hypot(center.y - a.y, center.x - a.x)
+
+	return { center, radius }
+}
+```
+
+## Theta
+
+Next we need to find an angle for the arc: how much of the circle is taken up by the arc. Bigger arcs will have bigger thetas, smaller arcs will have smaller thetas.
+
+```ts
+function getThetaFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
+	const ab = Math.hypot(a.y - b.y, a.x - b.x)
+	const bc = Math.hypot(b.y - c.y, b.x - c.x)
+	const ca = Math.hypot(c.y - a.y, c.x - a.x)
+
+	return Math.acos((bc * bc + ca * ca - ab * ab) / (2 * bc * ca)) * 2
+}
+```
+
+## Large Arc Flag
+
+```ts
+function largeArcFlag(theta: number) {
+	return +(Math.PI > theta)
+}
+```
+
+## Sweep Flag
+
+The sweep flag determines whether the arc goes in the clockwise or counterclockwise direction. Because we are working from three points, we just need to find out whether those points are in a clockwise or counter clockwise order. We express this as `1` for `true` or `0` for `false`.
+
+```ts
+/**
+ * Get the sweep flag for an arc from three points.
+ *
+ * @param a The first point
+ * @param b The second point
+ * @param c The third point
+ */
+function getSweepFlagFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
+	return = +((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0)
+}
+```
+
+## Size
+
+Finally we can find the size of our part of the arc in radians. Our sweep flag will determine whether it is positive or negative.
+
+```ts
+/**
+ * Get the angle of an arc.
+ *
+ * @param angle The angle of the arc.
+ * @param radius The radius of the arc in distance units.
+ */
+function getSize(angle: number, sweepFlag: number) {
+	return (Math.PI * 2 - angle) * (sweepFlag ? 1 : -1)
+}
+```
+
+## Arc Length
+
+And the size of the arc allows us to find its length. The arc is a section of a circle. Once we have the radius, we can find the circumference of that circle. Once we have the theta—which is the amount of that circle taken up by the arc—we can figure out the length of that arc.
+
+```ts
+/**
+ * Get the length of an arc in distance units.
+ *
+ * @param theta The angle of the arc.
+ * @param radius The radius of the arc in distance units.
+ */
+function getArcLength(theta: number, radius: number) {
+	return theta * radius
+}
+```
+
+## SVG Path for an Arc
+
+We can turn our arc data into an SVG path like this:
+
+```ts
+/**
+ * Get an SVG path for an arc.
+ *
+ * @param start - The start point of the arc.
+ * @param end - The end point of the arc.
+ * @param largeArcFlag - Whether the arc is a large arc.
+ * @param smallArcFlag - Whether the arc is a clockwise arc.
+ */
+function getArcPath(
+	start: VecLike,
+	end: VecLike,
+	radius: number,
+	largeArcFlag: number,
+	smallArcFlag: number
+) {
+	return `M${start.x},${start.y}A${radius} ${radius} 0 ${largeArcFlag} ${smallArcFlag} ${end.x},${end.y}`
+}
+```
+
+## Point on an Arc
+
+We can get a point on an arc by starting at the start angle and moving along the size by `t`, where `t=0` would give us the arc's start point and `t=1` would give us its end point.
+
+```ts
+/**
+ * Get a point along an arc.
+ *
+ * @param center - The arc's center.
+ * @param radius - The arc's radius.
+ * @param startAngle - The start point of the arc.
+ * @param size - The size of the arc.
+ * @param t - The point along the arc to get.
+ */
+export function getPointOnArc(
+	center: VecLike,
+	radius: number,
+	startAngle: number,
+	size: number,
+	t: number
+) {
+	const angle = startAngle + size * t
+	return {
+		x: center.x + radius * Math.cos(angle),
+		y: center.y + radius * Math.sin(angle),
+	}
+}
+```
+
+## Bounding Box for an Arc
+
+We can get a bounding box for an arc by sampling points along the arc.
+
+```ts
+/**
+ * Get a bounding box for an arc.
+ *
+ * @param center - The arc's center.
+ * @param radius - The arc's radius.
+ * @param start - The start point of the arc.
+ * @param size - The size of the arc.
+ */
+export function getCurvedArrowBoundingBox(
+	center: VecLike,
+	radius: number,
+	start: VecLike,
+	size: number
+) {
+	let minX = Infinity
+	let minY = Infinity
+	let maxX = -Infinity
+	let maxY = -Infinity
+
+	const startAngle = Vec2d.Angle(center, start)
+
+	for (let i = 0; i < 20; i++) {
+		const angle = startAngle + size * (i / 19)
+		const x = center.x + radius * Math.cos(angle)
+		const y = center.y + radius * Math.sin(angle)
+
+		minX = Math.min(x, minX)
+		minY = Math.min(y, minY)
+		maxX = Math.max(x, maxX)
+		maxY = Math.max(y, maxY)
+	}
+
+	return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY }
+}
+```
