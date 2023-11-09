@@ -115,9 +115,11 @@ Luckily, [Dan Abramov](https://github.com/gaearon/overreacted.io/pull/797/files)
 
 ## How it works
 
-When you run `npm run dev`, you'll start a regular Next.js dev server _and_ a websocket server. That server will use `fs.watch` to observe changes in a folder where your content is stored. Meanwhile, when the root layout mounts, a hook in the `AutoRefresh` component will connect to the websocket server. Once it's connected, it will set a listener will call `router.refresh()` when it receives a `refresh` message from the websocket server.
+When you run `npm run dev`, you'll start a regular Next.js dev server _and_ a websocket server. That server will use `fs.watch` to observe changes in a folder where your content is stored.
 
-When the server detects a change anywhere in the content directory, the websocket server will send a `refresh` message to its connected clients, which will trigger the listener in in the `AutoRefresh` component and cause the Next.js App Router to refresh.
+Meanwhile, when the root layout mounts, a hook in the `AutoRefresh` component will connect to the websocket server. Once it's connected, it will set a listener that calls `router.refresh()` when it receives a `refresh` message from the websocket server.
+
+When the server detects a change anywhere in the content directory, the websocket server will send a `refresh` message to its connected clients. This will trigger the listener in in the `AutoRefresh` component and cause the Next.js App Router to refresh and display the freshly edited content.
 
 ## Tweaks and modifications
 
