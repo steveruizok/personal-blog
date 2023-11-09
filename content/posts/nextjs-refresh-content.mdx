@@ -1,0 +1,132 @@
+---
+title: 'Refreshing the Next.js App Router When Your Markdown Content Changes'
+date: '11/09/2023'
+hero: '/images/next-hero.png'
+status: 'published'
+description: 'How to refresh the Next.js App Router when content in a folder changes. Yes, websockets.'
+---
+
+Are you writing MDX content for a Next.js blog and want to see live reloads when the content changes? Here's how to do it.
+
+## The Solution
+
+Install some dependencies:
+
+```bash
+npm i -D ws concurrently tsx
+```
+
+Create a `watcher.ts` file in the root of your Next.js project.
+
+```ts
+import fs from 'fs'
+import { WebSocketServer } from 'ws'
+
+const CONTENT_FOLDER = 'content'
+
+fs.watch(
+	CONTENT_FOLDER,
+	{ persistent: true, recursive: true },
+	async (eventType, fileName) => {
+		clients.forEach((ws) => {
+			// do any pre-processing you want to do here...
+			ws.send('refresh')
+		})
+	}
+)
+
+const wss = new WebSocketServer({ port: 3201 })
+
+const clients = new Set<any>()
+
+wss.on('connection', function connection(ws) {
+	clients.add(ws)
+	ws.on('error', console.error)
+	ws.on('close', () => clients.delete(ws))
+})
+```
+
+Create a script in your `package.json` that starts the watcher on `dev`.
+
+```json
+{
+  ...,
+  "scripts": {
+		"dev": "concurrently \"next dev\" \"tsx ./watcher.ts\" --kill-others",
+  }
+}
+```
+
+Create a component named `AutoRefresh`.
+
+```tsx
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+
+let AutoRefresh = ({ children }: { children: any }) => children
+
+if (process.env.NODE_ENV === 'development') {
+	AutoRefresh = ({ children }) => {
+		const router = useRouter()
+
+		useEffect(() => {
+			const ws = new WebSocket('ws://localhost:3201')
+			ws.onmessage = (event) => {
+				if (event.data === 'refresh') {
+					router.refresh()
+				}
+			}
+			return () => {
+				ws.close()
+			}
+		}, [router])
+		return children
+	}
+}
+
+export default AutoRefresh
+```
+
+Wrap your root `layout.tsx` in the `AutoRefresh` component.
+
+```tsx
+async function RootLayout({ children }: { children: any }) {
+	return (
+		<AutoRefresh>
+			<html>...</html>
+		</AutoRefresh>
+	)
+}
+
+export default RootLayout
+```
+
+## The problem
+
+Vercel provides excellent documentation of using Markdown / MDX together with Next.js (including with its new App Router). While it's possible to have `.mdx` files [map 1-1 to pages](https://nextjs.org/docs/pages/building-your-application/configuring/mdx) using the file-based routing system, this is impractical for most projects and especially for projects with many dozens or hundreds of content files. For these projects, the answer has been to use [remote MDX](https://nextjs.org/docs/app/building-your-application/configuring/mdx#remote-mdx) via the Hashicorp library [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote#react-server-components-rsc--nextjs-app-directory-support), where content files are created server-side upon first request.
+
+This is a great solution, but it has one drawback: the Next.js App Router does not refresh when content in the folder changes. This is a problem for content creators who want to see their changes reflected in the browser without having to restart the server or manually refresh the page.
+
+The solution _used_ to be using a library named `next-remote-watch`. However, this library only seems to work with the pages directory and does not work with the new Next.js app router.
+
+Luckily, [Dan Abramov](https://github.com/gaearon/overreacted.io/pull/797/files) found a great solution. Here's the version of that solution that I used on the [tldraw docs site](https://tldraw.dev).
+
+## How it works
+
+When you run `npm run dev`, you'll start a regular Next.js dev server _and_ a websocket server. That server will use `fs.watch` to observe changes in a folder where your content is stored. Meanwhile, when the root layout mounts, a hook in the `AutoRefresh` component will connect to the websocket server. Once it's connected, it will set a listener will call `router.refresh()` when it receives a `refresh` message from the websocket server.
+
+When the server detects a change anywhere in the content directory, the websocket server will send a `refresh` message to its connected clients, which will trigger the listener in in the `AutoRefresh` component and cause the Next.js App Router to refresh.
+
+## Tweaks and modifications
+
+You can do whatever you want inside of `watcher.ts` before dispatching the `refresh` event.
+
+In our case, we respond to a change in the content directory by parsing every file in the content directory and stuffing it into a sqlite database with navigation links and so on—and only when that's done (maybe 12ms later) do we send off the `refresh` event. However, because this is an asyncronous process, and because dev-mode react runs every hook, our watch callback wrapped in a debounce function to avoid trying to do the work twice in a row.
+
+You can also dispatch the `refresh` event whenever you want, such as on an interval or in response to some other listener if you're pulling data from a different source. The general idea is still using websockets to trigger a refresh of the Next.js App Router.
+
+And of course you don't have to use these exact libraries or methods. For example, you can skip `tsx` as a dependency and use plain JavaScript for your watcher script. If you've got a websocket server running and a listener in your root layout, you're good to go.
+
+Did you like this article? [Follow me on TwitterX](https://twitter.com/steveruizok) or [click here](https://together.tldraw.com/) and share the link with a friend.
