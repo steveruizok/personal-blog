@@ -123,10 +123,10 @@ When the server detects a change anywhere in the content directory, the websocke
 
 You can do whatever you want inside of `watcher.ts` before dispatching the `refresh` event.
 
-In our case, we respond to a change in the content directory by parsing every file in the content directory, stuffing it into a sqlite database, fixing navigation links, and so on—and only when that's done (maybe 12ms later) do we send off the `refresh` event. However, because this is an asyncronous process, and because dev-mode react runs every hook, I've wrapped our watch callback in a debounce function to avoid trying to do the work twice in a row.
+In our case, we respond to a change in the content directory by parsing every file in the content directory and stuffing it into a sqlite database with navigation links and so on—and only when that's done (maybe 12ms later) do we send off the `refresh` event. However, because this is an asyncronous process, and because dev-mode react runs every hook, our watch callback wrapped in a debounce function to avoid trying to do the work twice in a row.
 
-You can also dispatch the `refresh` event whenever you want, on an interval or in response to some other listener if you're pulling data from a different source. The general idea is still using websockets to trigger a refresh of the Next.js App Router.
+You can also dispatch the `refresh` event whenever you want, such as on an interval or in response to some other listener if you're pulling data from a different source. The general idea is still using websockets to trigger a refresh of the Next.js App Router.
 
-And of course you don't have to use these exact libraries or methods. For example, you can skip `tsx` as a dependency and use a plain JavaScript for your watcher script. So long as you've got a websocket server running and a listener in your root layout, you're good to go.
+And of course you don't have to use these exact libraries or methods. For example, you can skip `tsx` as a dependency and use plain JavaScript for your watcher script. If you've got a websocket server running and a listener in your root layout, you're good to go.
 
-Did you like this article? [Click here](https://together.tldraw.com/) and share the link with a friend.
+Did you like this article? [Follow me on TwitterX](https://twitter.com/steveruizok) or [click here](https://together.tldraw.com/) and share the link with a friend.
