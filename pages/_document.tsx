@@ -29,11 +29,11 @@ export default class Document extends NextDocument {
           `,
 						}}
 					/>
-					<Analytics />
 				</Head>
 				<body>
 					<Main />
 					<NextScript />
+					<Analytics />
 				</body>
 			</Html>
 		)
