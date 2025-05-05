@@ -1,10 +1,10 @@
-import { scope, components } from "../mdx-components"
-import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote"
+import { scope, components } from "../mdx-components";
+import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
 
 interface MdxProps {
-  mdxSource: MDXRemoteSerializeResult
+  mdxSource: MDXRemoteSerializeResult;
 }
 
 export function Mdx({ mdxSource }: MdxProps) {
-  return <MDXRemote {...mdxSource} scope={scope} components={components} />
+  return <MDXRemote {...mdxSource} scope={scope} components={components} />;
 }

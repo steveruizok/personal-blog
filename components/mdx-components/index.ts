@@ -1,7 +1,7 @@
-import { Figure } from "./figure"
-import { CodeBox } from "./codebox"
-import { Tweet } from "./tweet"
-import { CodeSandbox } from "./codesandbox"
+import { Figure } from "./figure";
+import { CodeBox } from "./codebox";
+import { Tweet } from "./tweet";
+import { CodeSandbox } from "./codesandbox";
 import {
   Heading1,
   Heading2,
@@ -20,12 +20,12 @@ import {
   Video,
   UnorderedList,
   OrderedList,
-} from "./generic"
-import * as Articles from "./articles"
+} from "./generic";
+import * as Articles from "./articles";
 
 export const scope = {
   ...Articles,
-}
+};
 
 export const components = {
   img: Figure,
@@ -50,4 +50,4 @@ export const components = {
   CodeBox,
   Tweet,
   CodeSandbox,
-}
+};

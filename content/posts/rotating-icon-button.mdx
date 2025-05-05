@@ -25,9 +25,9 @@ Let's start by creating a new React app and adding our dependencies. For this ar
 We'll also need a component for our button, `RotatingIconButton`. Our app is going to return this button with our three icons as its children.
 
 ```jsx
-import React from "react"
-import { Sun, CloudRain, Moon } from "react-feather"
-import styled from "styled-components"
+import React from "react";
+import { Sun, CloudRain, Moon } from "react-feather";
+import styled from "styled-components";
 
 export default function App() {
   return (
@@ -36,11 +36,11 @@ export default function App() {
       <CloudRain />
       <Moon />
     </RotatingIconButton>
-  )
+  );
 }
 
 function RotatingIconButton({ children }) {
-  return <button>{children}</button>
+  return <button>{children}</button>;
 }
 ```
 
@@ -68,7 +68,7 @@ const Button = styled.button`
   width: 48px;
   position: relative;
   padding: 0px;
-`
+`;
 ```
 
 Next, I'll create a second component, `Icon`, that we'll use to wrap our icons.
@@ -82,7 +82,7 @@ const Icon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`
+`;
 ```
 
 And now let's put these pieces together in the `RotatingIconButton` component.
@@ -92,10 +92,10 @@ function RotatingIconButton({ children }) {
   return (
     <Button>
       {React.Children.map(children, (child, i) => {
-        return <Icon>{child}</Icon>
+        return <Icon>{child}</Icon>;
       })}
     </Button>
-  )
+  );
 }
 ```
 
@@ -119,17 +119,17 @@ We can create this state using the `useState` React hook, and we'll store the ar
 
 ```jsx
 function RotatingIconButton({ children }) {
-  const [current, setCurrent] = React.useState(0)
+  const [current, setCurrent] = React.useState(0);
 
   return (
     <Button>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
-        return <Icon key={i}>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>;
       })}
     </Button>
-  )
+  );
 }
 ```
 
@@ -139,25 +139,25 @@ Each time we click the button, we'll want to bump up that `current` value so tha
 
 ```jsx
 function RotatingIconButton({ children }) {
-  const [current, setCurrent] = React.useState(0)
+  const [current, setCurrent] = React.useState(0);
 
   function cycleCurrent() {
     if (current === children.length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
   return (
     <Button onClick={cycleCurrent}>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
-        return <Icon key={i}>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>;
       })}
     </Button>
-  )
+  );
 }
 ```
 
@@ -184,7 +184,7 @@ export function RotatingIconButton({ children }) {
   return (
     <Button onClick={cycleCurrent}>
       {Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon
@@ -196,10 +196,10 @@ export function RotatingIconButton({ children }) {
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </Button>
-  )
+  );
 }
 ```
 
@@ -224,7 +224,7 @@ We can use CSS animations instead.
 To use a CSS animation, we'll first need to define the animation as a set of keyframes.[^2] For this animation, we need two sets of keyframes: `riseIn` will move an element from a lower position to its default position; and `riseOut` will move the element from its default position to a higher position.
 
 ```jsx
-import styled, { keyframes } from "styled-components"
+import styled, { keyframes } from "styled-components";
 
 const riseIn = keyframes`
   from {
@@ -233,7 +233,7 @@ const riseIn = keyframes`
   to {
     transform: translateY(0%);
   }
-`
+`;
 
 const riseOut = keyframes`
   from {
@@ -242,7 +242,7 @@ const riseOut = keyframes`
   to {
     transform: translateY(-100%);
   }
-`
+`;
 ```
 
 Now we can modify our `Icon` styled component to use these animations. We'll pass the `Icon` component a new prop, `isCurrent`, that will determine which animation it should use.
@@ -258,7 +258,7 @@ const Icon = styled.div`
   justify-content: center;
   animation-fill-mode: forwards;
   animation-name: ${(props) => (props.isCurrent ? riseIn : riseOut)};
-`
+`;
 ```
 
 Let's see how that looks:
@@ -280,7 +280,7 @@ const Button = styled.button`
   position: relative;
   padding: 0px;
   overflow: hidden;
-`
+`;
 ```
 
 Then we get this:
@@ -317,7 +317,7 @@ const Button = styled.button`
   &:hover {
     background: rgba(144, 144, 144, 0.1);
   }
-`
+`;
 ```
 
 <CodeBox>
@@ -336,13 +336,13 @@ To fix this, we'll need to keep track of whether we're in our first render. For 
 export function RotatingIconButton({ children }) {
   /* snip */
 
-  const isInitial = React.useRef(true)
+  const isInitial = React.useRef(true);
 
   React.useEffect(() => {
-    isInitial.current = false
-  }, [])
+    isInitial.current = false;
+  }, []);
 
-  return <Button onClick={cycleCurrent}>{/* snip */}</Button>
+  return <Button onClick={cycleCurrent}>{/* snip */}</Button>;
 }
 ```
 
@@ -360,7 +360,7 @@ const Icon = styled.div`
   animation-fill-mode: forwards;
   animation-duration: ${(props) => (props.isInitial ? 0 : 400)}ms;
   animation-name: ${(props) => (props.isCurrent ? riseIn : riseOut)};
-`
+`;
 ```
 
 And finally we can pass `isInitial` in through the `Icon`'s props.
@@ -369,25 +369,25 @@ And finally we can pass `isInitial` in through the `Icon`'s props.
 export function RotatingIconButton({ children }) {
   /* snip */
 
-  const isInitial = React.useRef(true)
+  const isInitial = React.useRef(true);
 
   React.useEffect(() => {
-    isInitial.current = false
-  }, [])
+    isInitial.current = false;
+  }, []);
 
   return (
     <Button onClick={cycleCurrent}>
       {Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon key={i} isInitial={isInitial} isCurrent={isCurrent}>
             {child}
           </Icon>
-        )
+        );
       })}
     </Button>
-  )
+  );
 }
 ```
 
@@ -404,4 +404,5 @@ If the tricky part was just the animation, then you should be good to go.
 Thanks for reading, and good luck!
 
 [^1]: A cousin of the microinteraction is something I like to call the "fidget interaction", like the famous [chat room gem](https://diablo.fandom.com/wiki/Chat_Gem) in the Diablo video game. While microinteractions tend to reward or acknowledge certain user behaviors, fidget interactions are pointless: they don't _do_ anything except give us something to do. Try hovering over the black box at the top left of the header.
+
 [^2]: We could define these keyframes in a CSS file and just reference these animations by name, but since we're already using styled-components, let's stick to its way of handling keyframes. For the regular approach, see MDN's excellent guide to [Using CSS Animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations).

@@ -1,11 +1,11 @@
-import React from "react"
-import Head from "next/head"
-import { Page } from "~types"
-import { Layout } from "./layout"
-import { Footer } from "./footer"
+import React from "react";
+import Head from "next/head";
+import { Page } from "~types";
+import { Layout } from "./layout";
+import { Footer } from "./footer";
 
 interface LayoutProps extends Omit<Page, "content"> {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function PageLayout({ data, children }: LayoutProps) {
@@ -35,5 +35,5 @@ export function PageLayout({ data, children }: LayoutProps) {
       <div>{children}</div>
       <Footer />
     </Layout>
-  )
+  );
 }

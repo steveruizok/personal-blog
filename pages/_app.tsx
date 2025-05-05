@@ -1,15 +1,15 @@
-import React from "react"
-import { ThemeProvider } from "next-themes"
-import type { AppProps } from "next/app"
-import useGtag from "~hooks/useGtag"
-import { globalStyles } from "~stitches.config"
-import "~styles/globals.css"
+import React from "react";
+import { ThemeProvider } from "next-themes";
+import type { AppProps } from "next/app";
+import useGtag from "~hooks/useGtag";
+import { globalStyles } from "~stitches.config";
+import "~styles/globals.css";
 
-const themes = ["light", "dim", "dark"]
+const themes = ["light", "dim", "dark"];
 
 function App({ Component, pageProps }: AppProps) {
-  globalStyles()
-  useGtag()
+  globalStyles();
+  useGtag();
 
   return (
     <ThemeProvider
@@ -20,6 +20,6 @@ function App({ Component, pageProps }: AppProps) {
     >
       <Component {...pageProps} />
     </ThemeProvider>
-  )
+  );
 }
-export default App
+export default App;

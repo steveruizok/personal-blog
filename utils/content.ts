@@ -1,8 +1,8 @@
-import { serialize } from "next-mdx-remote/serialize"
-import jsonContent from "../content.json"
-import { generateContent } from "../scripts/generate-content"
-import { Content, Post } from "../types"
-import rehypePrism from "@mapbox/rehype-prism"
+import { serialize } from "next-mdx-remote/serialize";
+import jsonContent from "../content.json";
+import { generateContent } from "../scripts/generate-content";
+import { Content, Post } from "../types";
+import rehypePrism from "@mapbox/rehype-prism";
 
 export async function getMdxSource(source: string) {
   return serialize(source, {
@@ -10,45 +10,45 @@ export async function getMdxSource(source: string) {
     mdxOptions: {
       rehypePlugins: [rehypePrism as any],
     },
-  })
+  });
 }
 
 export function getContent() {
   return process.env.NODE_ENV === "production"
     ? (jsonContent as Content)
-    : generateContent()
+    : generateContent();
 }
 
 export function getPages() {
-  const content = getContent()
-  return content.pages
+  const content = getContent();
+  return content.pages;
 }
 
 export function getPosts() {
-  const content = getContent()
+  const content = getContent();
   return process.env.NODE_ENV === "development"
     ? content.posts
-    : content.posts.filter((post) => post.data.status === "published")
+    : content.posts.filter((post) => post.data.status === "published");
 }
 
 export function getPagePaths() {
   return getPages().map(({ slug }) => ({
     params: { slug },
-  }))
+  }));
 }
 
 export function getPostPaths() {
   return getPosts().map(({ slug }) => ({
     params: { slug },
-  }))
+  }));
 }
 
 export function getPage(slug: string) {
-  return getPages().find((page) => page.slug === slug)!
+  return getPages().find((page) => page.slug === slug)!;
 }
 
 export function getPost(slug: string) {
-  return getPosts().find((post) => post.slug === slug)!
+  return getPosts().find((post) => post.slug === slug)!;
 }
 
 export function getPostList() {
@@ -56,13 +56,13 @@ export function getPostList() {
     url: "/posts/" + post.slug,
     slug: post.slug,
     data: post.data,
-  }))
+  }));
 }
 
 export function getPostLinks(post: Post) {
-  const posts = getPosts()
-  const prev = posts[post.index - 1]
-  const next = posts[post.index + 1]
+  const posts = getPosts();
+  const prev = posts[post.index - 1];
+  const next = posts[post.index + 1];
 
   return {
     prev: prev
@@ -79,5 +79,5 @@ export function getPostLinks(post: Post) {
           data: next.data,
         }
       : null,
-  }
+  };
 }

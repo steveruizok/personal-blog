@@ -1,39 +1,39 @@
-import { Header } from "./header"
-import { styled } from "~stitches.config"
-import * as React from "react"
-import { useScrollPosition } from "~hooks/useScrollPosition"
-import { darkTheme, dimTheme, lightTheme } from "~stitches.config"
-import { useTheme } from "next-themes"
+import { Header } from "./header";
+import { styled } from "~stitches.config";
+import * as React from "react";
+import { useScrollPosition } from "~hooks/useScrollPosition";
+import { darkTheme, dimTheme, lightTheme } from "~stitches.config";
+import { useTheme } from "next-themes";
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  useScrollPosition()
+  useScrollPosition();
 
-  const { theme } = useTheme()
+  const { theme } = useTheme();
 
   React.useEffect(() => {
-    document.body.classList.remove(darkTheme)
-    document.body.classList.remove(dimTheme)
-    document.body.classList.remove(lightTheme)
+    document.body.classList.remove(darkTheme);
+    document.body.classList.remove(dimTheme);
+    document.body.classList.remove(lightTheme);
 
     if (theme === "dark") {
-      document.body.classList.add(darkTheme)
+      document.body.classList.add(darkTheme);
     } else if (theme === "dim") {
-      document.body.classList.add(dimTheme)
+      document.body.classList.add(dimTheme);
     } else {
-      document.body.classList.add(lightTheme)
+      document.body.classList.add(lightTheme);
     }
-  }, [theme])
+  }, [theme]);
 
   return (
     <Container>
       <Header />
       <main>{children}</main>
     </Container>
-  )
+  );
 }
 
 const Container = styled("div", {
@@ -65,4 +65,4 @@ const Container = styled("div", {
     fontSize: "$1",
     lineHeight: 1.32,
   },
-})
+});

@@ -22,15 +22,15 @@ While the last post showed how we might implement these commands when our items 
 Let's say we have an application where we're storing items in a hash table—in JavaScript, a regular object. Because tables (unlike arrays) have no "position" or index for items in the table, we'll need to keep track of that information ourselves.
 
 ```ts
-type Item = { id: string; index: number }
+type Item = { id: string; index: number };
 
-type Items = Record<string, Item>
+type Items = Record<string, Item>;
 
 const itemsExample: Items = {
   a: { id: "a", index: 1 },
   b: { id: "b", index: 2 },
   c: { id: "c", index: 3 },
-}
+};
 ```
 
 In this structure, each item's `index` is stored as a property. In the example above, the item `{ id: "a", index: 1}` has the index of `1`, the item `{ id: "b", index: 2 }` has the index of `2`, etc. Note that the lowest index is `1`, and not `0`. This is a deliberate choice and we'll come back to it in a moment.
@@ -51,8 +51,8 @@ sendBackwards(
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
   },
-  ["c"]
-)
+  ["c"],
+);
 
 // {
 //   a: { id: "a", index: 1 },
@@ -85,8 +85,8 @@ sendBackward(
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
   },
-  ["c"]
-)
+  ["c"],
+);
 
 // {
 //   a: { id: "a", index: 1 },
@@ -109,34 +109,34 @@ In our reordering functions, we'll use the following function to get the indices
 function getIndicesBetween(
   below: number | undefined,
   above: number | undefined,
-  n: number
+  n: number,
 ) {
-  let start: number
-  let step: number
+  let start: number;
+  let step: number;
   if (below !== undefined && above !== undefined) {
     // Put items between
-    step = (above - below) / (n + 1)
-    start = below + step
+    step = (above - below) / (n + 1);
+    start = below + step;
   } else if (below === undefined && above !== undefined) {
     // Put items below (bottom of the list)
-    step = above / (n + 1)
-    start = step
+    step = above / (n + 1);
+    start = step;
   } else if (below !== undefined && above === undefined) {
     // Put items above (top of the list)
-    start = below + 1
-    step = 1
+    start = below + 1;
+    step = 1;
   } else {
-    throw Error("Must have either a below or an above.")
+    throw Error("Must have either a below or an above.");
   }
-  return Array.from(Array(n)).map((_, i) => start + i * step)
+  return Array.from(Array(n)).map((_, i) => start + i * step);
 }
 ```
 
 If we're putting items at the "bottom" of the list, our `below` value will be `undefined` and our `above` value will be lowest `index` among our items. In that case, we'll create new fractions based on that `index`.
 
 ```ts
-getIndicesBetween(undefined, 1, 1) // [0.5]
-getIndicesBetween(undefined, 1, 3) // [0.25, 0.5, 0.75]
+getIndicesBetween(undefined, 1, 1); // [0.5]
+getIndicesBetween(undefined, 1, 3); // [0.25, 0.5, 0.75]
 ```
 
 This is also the reason why we've started our indices from `1` rather than from `0`. We can't cut zero into fractions!
@@ -155,8 +155,8 @@ sendToBack(
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
   },
-  ["c"]
-)
+  ["c"],
+);
 
 // {
 //   a: { id: "a", index: 1 },
@@ -168,8 +168,8 @@ sendToBack(
 If we're putting items at the "top" of the list, then our `above` value will be `undefined` and our `below`value will be the highest`index`among our items. Here we can simply iterate by incrementing the that`index`.
 
 ```ts
-getIndicesBetween(5, undefined, 1) // [6]
-getIndicesBetween(5, undefined, 3) // [6, 7, 8]
+getIndicesBetween(5, undefined, 1); // [6]
+getIndicesBetween(5, undefined, 3); // [6, 7, 8]
 ```
 
 We'll see this in use when we implement `bringToFront` and `bringForward`.
@@ -186,8 +186,8 @@ bringToFront(
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
   },
-  ["a", "b"]
-)
+  ["a", "b"],
+);
 
 // {
 //   a: { id: "a", index: 4 },
@@ -199,8 +199,8 @@ bringToFront(
 If we are moving items _between_ two other items, then the `below` and `above` will be the lower and higher `index` values of the two. Here we'll create fractions based on the difference of the two `index` values.
 
 ```ts
-getIndicesBetween(2, 3, 1) // [2.5]
-getIndicesBetween(2, 3, 3) // [2.25, 2.5, 2.75]
+getIndicesBetween(2, 3, 1); // [2.5]
+getIndicesBetween(2, 3, 3); // [2.25, 2.5, 2.75]
 ```
 
 We might see this pattern with any of our methods.
@@ -217,8 +217,8 @@ bringForward(
     b: { id: "b", index: 2 },
     c: { id: "c", index: 3 },
   },
-  ["a"]
-)
+  ["a"],
+);
 
 // {
 //   a: { id: "a", index: 1.5 },
@@ -242,8 +242,8 @@ bringForward(
     c: { id: "c", index: 3 },
     d: { id: "d", index: 4 },
   },
-  ["a", "b", "d"]
-)
+  ["a", "b", "d"],
+);
 
 // {
 //   a: { id: "a", index: 3.33 },
@@ -259,7 +259,7 @@ One last note: in addition to our `getIndicesBetween` method, we'll also be usin
 
 ```ts
 function sortByIndex(a: Item, b: Item) {
-  return a.index - b.index
+  return a.index - b.index;
 }
 ```
 
@@ -269,27 +269,27 @@ function sortByIndex(a: Item, b: Item) {
 
 ```ts
 function sendToBack(items: Items, ids: string[]): Items {
-  const itemsArray = Object.values(items).sort(sortByIndex)
-  const len = itemsArray.length
-  if (ids.length === len) return items
-  const movingSet = new Set(ids.map((id) => items[id]))
-  let below: number | undefined
-  let above: number | undefined
+  const itemsArray = Object.values(items).sort(sortByIndex);
+  const len = itemsArray.length;
+  if (ids.length === len) return items;
+  const movingSet = new Set(ids.map((id) => items[id]));
+  let below: number | undefined;
+  let above: number | undefined;
   for (const item of itemsArray) {
     if (!movingSet.has(item)) {
-      above = item.index
-      break
+      above = item.index;
+      break;
     }
-    movingSet.delete(item)
-    below = item.index
+    movingSet.delete(item);
+    below = item.index;
   }
-  if (movingSet.size === 0) return items
-  const nextItems = { ...items }
-  const indices = getIndicesBetween(below, above, movingSet.size)
+  if (movingSet.size === 0) return items;
+  const nextItems = { ...items };
+  const indices = getIndicesBetween(below, above, movingSet.size);
   Array.from(movingSet.values())
     .sort(sortByIndex)
-    .forEach((item, i) => (nextItems[item.id].index = indices[i]))
-  return nextItems
+    .forEach((item, i) => (nextItems[item.id].index = indices[i]));
+  return nextItems;
 }
 ```
 
@@ -316,39 +316,39 @@ If we don't find any moving items before we find non-moving items, then the `bel
 Either way, we have our `below`, `above`, and a set containing all of the remaining items to move. We use `getIndicesBetween` to generate new `index` values and assign them to the items in our `movingSet`.
 
 ```ts
-items = sendToBack(items, ["c"]) // c, a, b, d, e
+items = sendToBack(items, ["c"]); // c, a, b, d, e
 ```
 
 ```ts
-items = sendToBack(items, ["b", "d"]) // b, d, a, c, e
+items = sendToBack(items, ["b", "d"]); // b, d, a, c, e
 ```
 
 ### Bring to Front
 
 ```ts
 function bringToFront(items: Items, ids: string[]): Items {
-  const itemsArray = Object.values(items).sort(sortByIndex)
-  const len = itemsArray.length
-  if (ids.length === len) return items
-  let below: number | undefined
-  let above: number | undefined
-  const movingSet = new Set(ids.map((id) => items[id]))
+  const itemsArray = Object.values(items).sort(sortByIndex);
+  const len = itemsArray.length;
+  if (ids.length === len) return items;
+  let below: number | undefined;
+  let above: number | undefined;
+  const movingSet = new Set(ids.map((id) => items[id]));
   for (let i = len - 1; i > -1; i--) {
-    const item = itemsArray[i]
+    const item = itemsArray[i];
     if (!movingSet.has(item)) {
-      below = item.index
-      break
+      below = item.index;
+      break;
     }
-    movingSet.delete(item)
-    above = item.index
+    movingSet.delete(item);
+    above = item.index;
   }
-  if (movingSet.size === 0) return items
-  const nextItems = { ...items }
-  const indices = getIndicesBetween(below, above, movingSet.size)
+  if (movingSet.size === 0) return items;
+  const nextItems = { ...items };
+  const indices = getIndicesBetween(below, above, movingSet.size);
   Array.from(movingSet.values())
     .sort(sortByIndex)
-    .forEach((item, i) => (nextItems[item.id].index = indices[i]))
-  return nextItems
+    .forEach((item, i) => (nextItems[item.id].index = indices[i]));
+  return nextItems;
 }
 ```
 
@@ -367,11 +367,11 @@ Again, if we encounter moving items before we encounter a non-moving item, we re
 />
 
 ```ts
-items = bringToFront(items, ["b"]) // a, c, d, e, b
+items = bringToFront(items, ["b"]); // a, c, d, e, b
 ```
 
 ```ts
-items = bringToFront(items, ["a", "c"]) // b, d, e, a, c
+items = bringToFront(items, ["a", "c"]); // b, d, e, a, c
 ```
 
 ### Send Backward
@@ -419,50 +419,50 @@ Sending an item backward is complex. Here we want to iterate from the top of the
 Then we'll continue iterating until we again reach a selected item, or we reach the front of the list. If we end with items selected, this means that those items are at the back of the list and require no change.
 
 ```ts
-items = sendBackward(items, ["c"]) // a, c, b, d, e
+items = sendBackward(items, ["c"]); // a, c, b, d, e
 ```
 
 ```ts
-items = sendBackward(items, ["b", "c"]) // b, c, a, d, e
+items = sendBackward(items, ["b", "c"]); // b, c, a, d, e
 ```
 
 ```ts
-items = sendBackward(items, ["c", "e"]) // a, c, b, e, d
+items = sendBackward(items, ["c", "e"]); // a, c, b, e, d
 ```
 
 ### Bring Forward
 
 ```ts
 function bringForward(items: Items, ids: string[]): Items {
-  const itemsArray = Object.values(items).sort(sortByIndex)
-  const len = itemsArray.length
-  if (ids.length === len) return items
-  const movingIndices = new Set(ids.map((id) => itemsArray.indexOf(items[id])))
-  let selectIndex = -1
-  let isSelecting = false
-  let below: number | undefined
-  let above: number | undefined
-  let count: number
-  const nextItems = { ...items }
+  const itemsArray = Object.values(items).sort(sortByIndex);
+  const len = itemsArray.length;
+  if (ids.length === len) return items;
+  const movingIndices = new Set(ids.map((id) => itemsArray.indexOf(items[id])));
+  let selectIndex = -1;
+  let isSelecting = false;
+  let below: number | undefined;
+  let above: number | undefined;
+  let count: number;
+  const nextItems = { ...items };
   for (let i = 0; i < len; i++) {
-    const isMoving = movingIndices.has(i)
+    const isMoving = movingIndices.has(i);
     if (!isSelecting && isMoving) {
-      isSelecting = true
-      selectIndex = i
-      above = undefined
+      isSelecting = true;
+      selectIndex = i;
+      above = undefined;
     } else if (isSelecting && !isMoving) {
-      isSelecting = false
-      count = i - selectIndex
-      below = itemsArray[i].index
-      above = itemsArray[i + 1]?.index
-      const indices = getIndicesBetween(below, above, count)
+      isSelecting = false;
+      count = i - selectIndex;
+      below = itemsArray[i].index;
+      above = itemsArray[i + 1]?.index;
+      const indices = getIndicesBetween(below, above, count);
       for (let k = 0; k < count; k++) {
-        const item = itemsArray[selectIndex + k]
-        items[item.id].index = indices[k]
+        const item = itemsArray[selectIndex + k];
+        items[item.id].index = indices[k];
       }
     }
   }
-  return nextItems
+  return nextItems;
 }
 ```
 
@@ -474,15 +474,15 @@ The `bringForward` method is implemented in a similar way, but here we iterate f
 />
 
 ```ts
-items = bringForward(items, ["b"]) // a, c, b, d, e
+items = bringForward(items, ["b"]); // a, c, b, d, e
 ```
 
 ```ts
-items = bringForward(items, ["b", "c"]) // a, d, b, c, e
+items = bringForward(items, ["b", "c"]); // a, d, b, c, e
 ```
 
 ```ts
-items = bringForward(items, ["a", "c"]) // b, a, d, c, e
+items = bringForward(items, ["a", "c"]); // b, a, d, c, e
 ```
 
 ## Wrapup
@@ -494,33 +494,33 @@ There is one issue, however, and you may have spotted it already: how many times
 With the implementation shown here, that number is 52.
 
 ```ts
-let below = 1
-let above = 2
+let below = 1;
+let above = 2;
 for (let i = 0; i < 53; i++) {
-  above = below + (above - below) / 2
+  above = below + (above - below) / 2;
 }
-below // 1
-above // 1.0000000000000002
-below < above // true
+below; // 1
+above; // 1.0000000000000002
+below < above; // true
 ```
 
 ```ts
-let below = 1
-let above = 2
+let below = 1;
+let above = 2;
 for (let i = 0; i < 53; i++) {
-  above = below + (above - below) / 2
+  above = below + (above - below) / 2;
 }
-below // 1
-above // 1
-below < above // false
+below; // 1
+above; // 1
+below < above; // false
 ```
 
 In JavaScript at least, you can split a number 52 times before the number loses precision and returns to an integer. In our case, this means that there is a certain limit to the number of times we could put items between other items.
 
 ```ts
 for (let i = 0; i < 53; i++) {
-  const sorted = Object.values(items).sort((a, b) => a.index - b.index)
-  items = sendBackward(items, [sorted[2].id])
+  const sorted = Object.values(items).sort((a, b) => a.index - b.index);
+  items = sendBackward(items, [sorted[2].id]);
 }
 // Indexes are: 1, 1.0000000000000002, 1, 4, 5, 6, 7
 ```
@@ -541,8 +541,8 @@ bringForward(
     c: { id: "c", index: "a2" },
     d: { id: "d", index: "a3" },
   },
-  ["b"]
-)
+  ["b"],
+);
 
 // {
 //   a: { id: "a", index: "a0"},

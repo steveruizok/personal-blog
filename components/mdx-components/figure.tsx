@@ -1,34 +1,34 @@
-import { useRouter } from "next/router"
-import React from "react"
-import Image from "next/image"
-import { styled } from "~stitches.config"
-import { Text } from "~components/text"
+import { useRouter } from "next/router";
+import React from "react";
+import Image from "next/image";
+import { styled } from "~stitches.config";
+import { Text } from "~components/text";
 
 interface FigureProps {
-  src: string
-  alt: string
-  title: string
-  isVideo?: boolean
+  src: string;
+  alt: string;
+  title: string;
+  isVideo?: boolean;
 }
 
 export function Figure({ src, alt, title, isVideo }: FigureProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleVideoClick = React.useCallback(
     (e: React.MouseEvent<HTMLVideoElement>) => {
-      const elm = e.currentTarget
+      const elm = e.currentTarget;
       if (elm.paused) {
-        e.currentTarget.play()
+        e.currentTarget.play();
       } else {
-        e.currentTarget.pause()
+        e.currentTarget.pause();
       }
     },
-    []
-  )
+    [],
+  );
 
   const handleDoubleClick = React.useCallback(() => {
-    router.push(src)
-  }, [router, src])
+    router.push(src);
+  }, [router, src]);
 
   if (isVideo) {
     return (
@@ -41,7 +41,7 @@ export function Figure({ src, alt, title, isVideo }: FigureProps) {
         onClick={handleVideoClick}
         onDoubleClick={handleDoubleClick}
       />
-    )
+    );
   }
 
   return (
@@ -60,7 +60,7 @@ export function Figure({ src, alt, title, isVideo }: FigureProps) {
         {title}
       </Text>
     </>
-  )
+  );
 }
 
 const ImageWrapper = styled("div", {
@@ -72,4 +72,4 @@ const ImageWrapper = styled("div", {
   justifyContent: "center",
   mt: "$3",
   backgroundColor: "#F8FAFA",
-})
+});

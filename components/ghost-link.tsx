@@ -1,4 +1,4 @@
-import { styled } from "~stitches.config"
+import { styled } from "~stitches.config";
 
 export const GhostLink = styled("a", {
   textDecoration: "none",
@@ -6,4 +6,4 @@ export const GhostLink = styled("a", {
   "&:hover": {
     textDecoration: "none",
   },
-})
+});

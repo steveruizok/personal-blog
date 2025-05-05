@@ -1,10 +1,10 @@
-import * as React from "react"
-import { styled } from "~stitches.config"
-import { PostListItem } from "~types"
-import { PostLinkSmall } from "./post-link-small"
+import * as React from "react";
+import { styled } from "~stitches.config";
+import { PostListItem } from "~types";
+import { PostLinkSmall } from "./post-link-small";
 
 interface PostListSmallProps {
-  posts: PostListItem[]
+  posts: PostListItem[];
 }
 
 export function PostListSmall({ posts }: PostListSmallProps) {
@@ -16,7 +16,7 @@ export function PostListSmall({ posts }: PostListSmallProps) {
         </li>
       ))}
     </List>
-  )
+  );
 }
 
 const List = styled("ul", {
@@ -26,4 +26,4 @@ const List = styled("ul", {
   listStyleType: "none",
   m: 0,
   p: 0,
-})
+});

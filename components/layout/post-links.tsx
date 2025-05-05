@@ -1,11 +1,11 @@
-import * as React from "react"
-import { styled } from "~stitches.config"
-import { PostListItem } from "~types"
-import { PostListSmall } from "./post-list-small"
+import * as React from "react";
+import { styled } from "~stitches.config";
+import { PostListItem } from "~types";
+import { PostListSmall } from "./post-list-small";
 
 interface PostLinksProps {
-  next: PostListItem | null
-  prev: PostListItem | null
+  next: PostListItem | null;
+  prev: PostListItem | null;
 }
 
 export function PostLinks({ next, prev }: PostLinksProps) {
@@ -19,7 +19,7 @@ export function PostLinks({ next, prev }: PostLinksProps) {
       </TwitterLink>
       <PostListSmall posts={[next, prev].filter(Boolean) as PostListItem[]} />
     </Container>
-  )
+  );
 }
 
 const Container = styled("div", {
@@ -27,14 +27,14 @@ const Container = styled("div", {
   display: "flex",
   flexDirection: "column",
   gap: "$5",
-})
+});
 
 const SmallIcon = styled("div", {
   display: "inline-block",
   backgroundColor: "$text",
   height: 16,
   width: 16,
-})
+});
 
 const TwitterLink = styled("a", {
   display: "flex",
@@ -54,4 +54,4 @@ const TwitterLink = styled("a", {
     height: 32,
     transition: "all .2s ease-in-out",
   },
-})
+});

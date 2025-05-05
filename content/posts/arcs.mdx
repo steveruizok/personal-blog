@@ -1,9 +1,9 @@
 ---
-title: 'All About Arcs'
-date: '05/19/2022'
-hero: '/images/arcs/arcs.png'
-status: 'published'
-description: 'Hard-won helpers for working with arcs.'
+title: "All About Arcs"
+date: "05/19/2022"
+hero: "/images/arcs/arcs.png"
+status: "published"
+description: "Hard-won helpers for working with arcs."
 ---
 
 An arc is a section of a circle.
@@ -33,24 +33,25 @@ Our first step is to find a circle that passes through the three points.
 
 ```ts
 function getCircleFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
-	const u = -2 * (a.x * (b.y - c.y) - a.y * (b.x - c.x) + b.x * c.y - c.x * b.y)
+  const u =
+    -2 * (a.x * (b.y - c.y) - a.y * (b.x - c.x) + b.x * c.y - c.x * b.y);
 
-	const center = {
-		x:
-			((a.x * a.x + a.y * a.y) * (c.y - b.y) +
-				(b.x * b.x + b.y * b.y) * (a.y - c.y) +
-				(c.x * c.x + c.y * c.y) * (b.y - a.y)) /
-			u,
-		y:
-			((a.x * a.x + a.y * a.y) * (b.x - c.x) +
-				(b.x * b.x + b.y * b.y) * (c.x - a.x) +
-				(c.x * c.x + c.y * c.y) * (a.x - b.x)) /
-			u,
-	}
+  const center = {
+    x:
+      ((a.x * a.x + a.y * a.y) * (c.y - b.y) +
+        (b.x * b.x + b.y * b.y) * (a.y - c.y) +
+        (c.x * c.x + c.y * c.y) * (b.y - a.y)) /
+      u,
+    y:
+      ((a.x * a.x + a.y * a.y) * (b.x - c.x) +
+        (b.x * b.x + b.y * b.y) * (c.x - a.x) +
+        (c.x * c.x + c.y * c.y) * (a.x - b.x)) /
+      u,
+  };
 
-	const radius = Math.hypot(center.y - a.y, center.x - a.x)
+  const radius = Math.hypot(center.y - a.y, center.x - a.x);
 
-	return { center, radius }
+  return { center, radius };
 }
 ```
 
@@ -60,11 +61,11 @@ Next we need to find an angle for the arc: how much of the circle is taken up by
 
 ```ts
 function getThetaFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
-	const ab = Math.hypot(a.y - b.y, a.x - b.x)
-	const bc = Math.hypot(b.y - c.y, b.x - c.x)
-	const ca = Math.hypot(c.y - a.y, c.x - a.x)
+  const ab = Math.hypot(a.y - b.y, a.x - b.x);
+  const bc = Math.hypot(b.y - c.y, b.x - c.x);
+  const ca = Math.hypot(c.y - a.y, c.x - a.x);
 
-	return Math.acos((bc * bc + ca * ca - ab * ab) / (2 * bc * ca)) * 2
+  return Math.acos((bc * bc + ca * ca - ab * ab) / (2 * bc * ca)) * 2;
 }
 ```
 
@@ -72,7 +73,7 @@ function getThetaFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
 
 ```ts
 function largeArcFlag(theta: number) {
-	return +(Math.PI > theta)
+  return +(Math.PI > theta);
 }
 ```
 
@@ -105,7 +106,7 @@ Finally we can find the size of our part of the arc in radians. Our sweep flag w
  * @param radius The radius of the arc in distance units.
  */
 function getSize(angle: number, sweepFlag: number) {
-	return (Math.PI * 2 - angle) * (sweepFlag ? 1 : -1)
+  return (Math.PI * 2 - angle) * (sweepFlag ? 1 : -1);
 }
 ```
 
@@ -121,7 +122,7 @@ And the size of the arc allows us to find its length. The arc is a section of a 
  * @param radius The radius of the arc in distance units.
  */
 function getArcLength(theta: number, radius: number) {
-	return theta * radius
+  return theta * radius;
 }
 ```
 
@@ -139,13 +140,13 @@ We can turn our arc data into an SVG path like this:
  * @param smallArcFlag - Whether the arc is a clockwise arc.
  */
 function getArcPath(
-	start: VecLike,
-	end: VecLike,
-	radius: number,
-	largeArcFlag: number,
-	smallArcFlag: number
+  start: VecLike,
+  end: VecLike,
+  radius: number,
+  largeArcFlag: number,
+  smallArcFlag: number,
 ) {
-	return `M${start.x},${start.y}A${radius} ${radius} 0 ${largeArcFlag} ${smallArcFlag} ${end.x},${end.y}`
+  return `M${start.x},${start.y}A${radius} ${radius} 0 ${largeArcFlag} ${smallArcFlag} ${end.x},${end.y}`;
 }
 ```
 
@@ -164,17 +165,17 @@ We can get a point on an arc by starting at the start angle and moving along the
  * @param t - The point along the arc to get.
  */
 export function getPointOnArc(
-	center: VecLike,
-	radius: number,
-	startAngle: number,
-	size: number,
-	t: number
+  center: VecLike,
+  radius: number,
+  startAngle: number,
+  size: number,
+  t: number,
 ) {
-	const angle = startAngle + size * t
-	return {
-		x: center.x + radius * Math.cos(angle),
-		y: center.y + radius * Math.sin(angle),
-	}
+  const angle = startAngle + size * t;
+  return {
+    x: center.x + radius * Math.cos(angle),
+    y: center.y + radius * Math.sin(angle),
+  };
 }
 ```
 
@@ -192,29 +193,29 @@ We can get a bounding box for an arc by sampling points along the arc.
  * @param size - The size of the arc.
  */
 export function getCurvedArrowBoundingBox(
-	center: VecLike,
-	radius: number,
-	start: VecLike,
-	size: number
+  center: VecLike,
+  radius: number,
+  start: VecLike,
+  size: number,
 ) {
-	let minX = Infinity
-	let minY = Infinity
-	let maxX = -Infinity
-	let maxY = -Infinity
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
 
-	const startAngle = Vec2d.Angle(center, start)
+  const startAngle = Vec2d.Angle(center, start);
 
-	for (let i = 0; i < 20; i++) {
-		const angle = startAngle + size * (i / 19)
-		const x = center.x + radius * Math.cos(angle)
-		const y = center.y + radius * Math.sin(angle)
+  for (let i = 0; i < 20; i++) {
+    const angle = startAngle + size * (i / 19);
+    const x = center.x + radius * Math.cos(angle);
+    const y = center.y + radius * Math.sin(angle);
 
-		minX = Math.min(x, minX)
-		minY = Math.min(y, minY)
-		maxX = Math.max(x, maxX)
-		maxY = Math.max(y, maxY)
-	}
+    minX = Math.min(x, minX);
+    minY = Math.min(y, minY);
+    maxX = Math.max(x, maxX);
+    maxY = Math.max(y, maxY);
+  }
 
-	return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY }
+  return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
 }
 ```

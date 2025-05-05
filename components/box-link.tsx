@@ -1,4 +1,4 @@
-import { styled } from "~stitches.config"
+import { styled } from "~stitches.config";
 
 export const BoxLink = styled("a", {
   display: "block",
@@ -24,4 +24,4 @@ export const BoxLink = styled("a", {
     p: "$2",
     mx: "-$2",
   },
-})
+});

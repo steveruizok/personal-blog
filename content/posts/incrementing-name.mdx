@@ -58,10 +58,10 @@ Here's the solution:
 
 ```ts
 // Will return "(1)" from "Blog Post (1)"
-const INCREMENT = new RegExp(/\s\((\d+)\)$/)
+const INCREMENT = new RegExp(/\s\((\d+)\)$/);
 
 // Will return "1" from "(1)"
-const INCREMENT_INT = new RegExp(/\d+(?=\)$)/)
+const INCREMENT_INT = new RegExp(/\d+(?=\)$)/);
 
 /**
  * Get an incremented name (e.g. New page (2)) from a name (e.g. New page), based on an array of
@@ -71,17 +71,17 @@ const INCREMENT_INT = new RegExp(/\d+(?=\)$)/)
  * @param others The array of existing names.
  */
 export function getName(name: string, others: string[]) {
-  const set = new Set(others)
+  const set = new Set(others);
 
-  let result = name
+  let result = name;
 
   while (set.has(result)) {
     result = INCREMENT.exec(result)?.[1]
       ? result.replace(INCREMENT_INT, (m) => (+m + 1).toString())
-      : `${result} (1)`
+      : `${result} (1)`;
   }
 
-  return result
+  return result;
 }
 ```
 

@@ -1,4 +1,4 @@
-import { styled } from "~stitches.config"
+import { styled } from "~stitches.config";
 
 export const Text = styled("p", {
   fontSize: "$2",
@@ -30,4 +30,4 @@ export const Text = styled("p", {
       },
     },
   },
-})
+});

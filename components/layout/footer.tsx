@@ -1,7 +1,7 @@
-import { styled } from "~stitches.config"
-import { Text } from "../text"
+import { styled } from "~stitches.config";
+import { Text } from "../text";
 
-const date = new Date()
+const date = new Date();
 
 export function Footer() {
   return (
@@ -9,7 +9,7 @@ export function Footer() {
       <Text variant="detail">Steve Ruiz © {date.getFullYear()}</Text>
       <a href="https://github.com/sponsors/steveruizok">hey click here</a>
     </FooterContainer>
-  )
+  );
 }
 
 const FooterContainer = styled("div", {
@@ -23,4 +23,4 @@ const FooterContainer = styled("div", {
     textDecoration: "none",
     opacity: 0.8,
   },
-})
+});

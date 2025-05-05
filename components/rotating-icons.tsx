@@ -1,32 +1,32 @@
-import { Children, useRef, useEffect } from "react"
-import { styled } from "~stitches.config"
-import { IconButton } from "./icon-button"
+import { Children, useRef, useEffect } from "react";
+import { styled } from "~stitches.config";
+import { IconButton } from "./icon-button";
 
 export function RotatingIcons({
   current,
   children,
   ...rest
 }: {
-  current: number
-  children: React.ReactNode
+  current: number;
+  children: React.ReactNode;
 } & Pick<React.HTMLProps<HTMLButtonElement>, "onClick" | "title">) {
-  const icons = Children.toArray(children)
+  const icons = Children.toArray(children);
 
-  const rPrevious = useRef(current)
+  const rPrevious = useRef(current);
 
   useEffect(() => {
-    rPrevious.current = current
-  }, [current])
+    rPrevious.current = current;
+  }, [current]);
 
-  const isInitial = current === rPrevious.current
-  const previous = current === 0 ? icons.length - 1 : current - 1
+  const isInitial = current === rPrevious.current;
+  const previous = current === 0 ? icons.length - 1 : current - 1;
 
   return (
     <IconButton {...rest}>
       {icons.map((child, i) => {
-        const isCurrent = i === current
-        const isPrevious = i === previous
-        const isInstant = isInitial || !(isCurrent || isPrevious)
+        const isCurrent = i === current;
+        const isPrevious = i === previous;
+        const isInstant = isInitial || !(isCurrent || isPrevious);
 
         return (
           <Icon
@@ -38,10 +38,10 @@ export function RotatingIcons({
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </IconButton>
-  )
+  );
 }
 
 const Icon = styled("div", {
@@ -55,4 +55,4 @@ const Icon = styled("div", {
   width: "100%",
   animationFillMode: "forwards",
   animationDuration: "400ms",
-})
+});

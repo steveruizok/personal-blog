@@ -1,4 +1,4 @@
-import { styled } from "~stitches.config"
+import { styled } from "~stitches.config";
 
 export const Icon = styled("div", {
   height: 32,
@@ -8,4 +8,4 @@ export const Icon = styled("div", {
   "&:hover": {
     animation: "forwards .2s rotate",
   },
-})
+});

@@ -1,1 +1,18 @@
-{"hello":{"slug":"hello","content":"\n# Hello\n\nhi\n","data":{"title":"Dragging Shapes","date":"10/20/2021","hero":"/images/dragging/dragging_3.png","status":"published","description":"How to make shapes snap and align."}},"perfect-snapping":{"slug":"perfect-snapping","content":"Hello\n","data":{}}}
+{
+  "hello": {
+    "slug": "hello",
+    "content": "\n# Hello\n\nhi\n",
+    "data": {
+      "title": "Dragging Shapes",
+      "date": "10/20/2021",
+      "hero": "/images/dragging/dragging_3.png",
+      "status": "published",
+      "description": "How to make shapes snap and align."
+    }
+  },
+  "perfect-snapping": {
+    "slug": "perfect-snapping",
+    "content": "Hello\n",
+    "data": {}
+  }
+}

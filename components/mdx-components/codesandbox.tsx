@@ -1,14 +1,14 @@
-import { useTheme } from "next-themes"
-import { CodeBox } from "./codebox"
+import { useTheme } from "next-themes";
+import { CodeBox } from "./codebox";
 
 export function CodeSandbox({
   url,
   height = 500,
 }: {
-  url: string
-  height?: number
+  url: string;
+  height?: number;
 }) {
-  const { theme } = useTheme()
+  const { theme } = useTheme();
 
   return (
     <CodeBox>
@@ -28,5 +28,5 @@ export function CodeSandbox({
         sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
       ></iframe>
     </CodeBox>
-  )
+  );
 }

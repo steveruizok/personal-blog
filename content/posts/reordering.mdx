@@ -22,11 +22,11 @@ In this article, I'll cover the most straightforward implementation in an app th
 Let's say we have an application where we're storing our items in an array:
 
 ```ts
-type Item = { id: string }
+type Item = { id: string };
 
-type Items = Item[]
+type Items = Item[];
 
-const itemsExample: Items = [{ id: "a" }, { id: "b" }, { id: "c" }]
+const itemsExample: Items = [{ id: "a" }, { id: "b" }, { id: "c" }];
 ```
 
 In this structure, each item's "order" is represented by that item's index in the array. In the example above, the item `{ id: "a" }` has the index of `0`, the item `{ id: "b" }` has the index of `1`, etc.
@@ -39,14 +39,14 @@ Now that we have our data worked out, let's look at how we would implement our f
 
 ```ts
 function sendToBack(items: Item[], ids: string[]) {
-  const movingIds = new Set(ids)
-  const moving: Item[] = []
-  const notMoving: Item[] = []
+  const movingIds = new Set(ids);
+  const moving: Item[] = [];
+  const notMoving: Item[] = [];
   for (const item of items) {
-    const arr = movingIds.has(item.id) ? moving : notMoving
-    arr.push(item)
+    const arr = movingIds.has(item.id) ? moving : notMoving;
+    arr.push(item);
   }
-  return moving.concat(notMoving)
+  return moving.concat(notMoving);
 }
 ```
 
@@ -55,8 +55,8 @@ For `sendToBack`, we would want the new `items` array to be all of the moving it
 This works for single items as well as for multiple items:
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendToBack(items, ["c"]) // c, a, b, d
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = sendToBack(items, ["c"]); // c, a, b, d
 ```
 
 <Figure
@@ -65,8 +65,8 @@ items = sendToBack(items, ["c"]) // c, a, b, d
 />
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendToBack(items, ["b", "d"]) // b, d, a, c
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = sendToBack(items, ["b", "d"]); // b, d, a, c
 ```
 
 <Figure
@@ -78,22 +78,22 @@ items = sendToBack(items, ["b", "d"]) // b, d, a, c
 
 ```ts
 function bringToFront(items: Item[], ids: string[]) {
-  const movingIds = new Set(ids)
-  const moving: Item[] = []
-  const notMoving: Item[] = []
+  const movingIds = new Set(ids);
+  const moving: Item[] = [];
+  const notMoving: Item[] = [];
   for (const item of items) {
-    const arr = movingIds.has(item.id) ? moving : notMoving
-    arr.push(item)
+    const arr = movingIds.has(item.id) ? moving : notMoving;
+    arr.push(item);
   }
-  return notMoving.concat(moving)
+  return notMoving.concat(moving);
 }
 ```
 
 For `bringToFront`, we perform the same work as `sendToBack`, except this time adding the moving items to the end of the static items array. Again, both arrays preserve their items' order from the input array.
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringToFront(items, ["b"]) // a, c, d, b
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = bringToFront(items, ["b"]); // a, c, d, b
 ```
 
 <Figure
@@ -102,8 +102,8 @@ items = bringToFront(items, ["b"]) // a, c, d, b
 />
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringToFront(items, ["a", "c"]) // b, d, a, c
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = bringToFront(items, ["a", "c"]); // b, d, a, c
 ```
 
 <Figure
@@ -115,31 +115,31 @@ items = bringToFront(items, ["a", "c"]) // b, d, a, c
 
 ```ts
 function sendBackward(items: Item[], ids: string[]) {
-  const movingIds = new Set(ids)
-  const indices: number[] = []
+  const movingIds = new Set(ids);
+  const indices: number[] = [];
   items.forEach((item, i) => {
     if (movingIds.has(item.id)) {
-      indices.push(i)
+      indices.push(i);
     }
-  })
-  const result = items.slice()
+  });
+  const result = items.slice();
   indices.forEach((index) => {
-    const movingItem = result[index]
-    const neighborBelow = result[index - 1]
+    const movingItem = result[index];
+    const neighborBelow = result[index - 1];
     if (neighborBelow && !movingIds.has(neighborBelow.id)) {
-      result[index] = neighborBelow
-      result[index - 1] = movingItem
+      result[index] = neighborBelow;
+      result[index - 1] = movingItem;
     }
-  })
-  return result
+  });
+  return result;
 }
 ```
 
 Sending an item backward is a little more complex. Here we want to iterate through each moving item's original index and try to swap the item we find at that index in the results array with its neighbor at the index below. If there is no neighbor item, then this means we're trying to move the first item in the list; and if the neighbor is also moving, then this means we haven't yet been able to move any items down.
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendBackward(items, ["c"]) // a, c, b, d
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = sendBackward(items, ["c"]); // a, c, b, d
 ```
 
 <Figure
@@ -148,8 +148,8 @@ items = sendBackward(items, ["c"]) // a, c, b, d
 />
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = sendBackward(items, ["b", "c"]) // b, c, a, c
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = sendBackward(items, ["b", "c"]); // b, c, a, c
 ```
 
 <Figure
@@ -161,31 +161,31 @@ items = sendBackward(items, ["b", "c"]) // b, c, a, c
 
 ```ts
 function bringForward(items: Item[], ids: string[]) {
-  const movingIds = new Set(ids)
-  const indices: number[] = []
+  const movingIds = new Set(ids);
+  const indices: number[] = [];
   items.forEach((item, i) => {
     if (movingIds.has(item.id)) {
-      indices.push(i)
+      indices.push(i);
     }
-  })
-  const result = items.slice()
+  });
+  const result = items.slice();
   indices.reverse().forEach((index) => {
-    const movingItem = result[index]
-    const neighborAbove = result[index + 1]
+    const movingItem = result[index];
+    const neighborAbove = result[index + 1];
     if (neighborAbove && !movingIds.has(neighborAbove.id)) {
-      result[index] = neighborAbove
-      result[index + 1] = movingItem
+      result[index] = neighborAbove;
+      result[index + 1] = movingItem;
     }
-  })
-  return result
+  });
+  return result;
 }
 ```
 
 The `bringForward` method is implemented in a similar way, but reversing the indices array so that we iterate down from the highest index to the lowest, and swapping each item with the item above it in the results array.
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringForward(items, ["b"]) // a, c, b, d
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = bringForward(items, ["b"]); // a, c, b, d
 ```
 
 <Figure
@@ -194,8 +194,8 @@ items = bringForward(items, ["b"]) // a, c, b, d
 />
 
 ```ts
-let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }]
-items = bringForward(items, ["b", "c"]) // b, a, d, c
+let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+items = bringForward(items, ["b", "c"]); // b, a, d, c
 ```
 
 <Figure
@@ -209,7 +209,7 @@ Moving items in an array has some upsides and some downsides. An advantage is th
 
 ```tsx
 for (const item of items) {
-  canvas.paintItem(item)
+  canvas.paintItem(item);
 }
 ```
 
@@ -224,10 +224,10 @@ for (const item of items) {
 The main disadvantage comes from the difficulty of accessing a particular item within the array, which requires a search through the array.
 
 ```ts
-const items = [{ id: "a" }, { id: "b" }, { id: "c" }]
+const items = [{ id: "a" }, { id: "b" }, { id: "c" }];
 
 function getItem(id: string) {
-  return items.find((item) => item.id === id)
+  return items.find((item) => item.id === id);
 }
 ```
 
@@ -238,10 +238,10 @@ const items = {
   a: { id: "a", index: 1 },
   b: { id: "b", index: 2 },
   c: { id: "c", index: 3 },
-}
+};
 
 function getItem(id: string) {
-  return items[id]
+  return items[id];
 }
 ```
 

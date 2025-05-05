@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Icon } from "~components/icon"
-import { ThemeSwitch } from "~components/theme-switch"
-import { styled } from "~stitches.config"
+import Link from "next/link";
+import { Icon } from "~components/icon";
+import { ThemeSwitch } from "~components/theme-switch";
+import { styled } from "~stitches.config";
 
 export function Header() {
   return (
@@ -19,13 +19,10 @@ export function Header() {
         <li>
           <Link href="/about">About</Link>
         </li>
-        <li>
-          <Link href="/archive">Archive</Link>
-        </li>
       </ol>
       <ThemeSwitch />
     </Container>
-  )
+  );
 }
 
 const Container = styled("header", {
@@ -69,11 +66,11 @@ const Container = styled("header", {
     m: 0,
     p: 0,
   },
-})
+});
 
 const Lockup = styled("a", {
   display: "flex",
   alignItems: "center",
   gap: "$1",
   flexGrow: 2,
-})
+});

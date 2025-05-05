@@ -26,14 +26,14 @@ We'll define a bounding box like this:
 
 ```ts
 interface AABB {
-  minX: number
-  midX: number
-  maxX: number
-  minY: number
-  midY: number
-  maxY: number
-  width: number
-  height: number
+  minX: number;
+  midX: number;
+  maxX: number;
+  minY: number;
+  midY: number;
+  maxY: number;
+  width: number;
+  height: number;
 }
 ```
 
@@ -47,9 +47,9 @@ So if our shapes look like this:
 
 ```ts
 interface Shape {
-  id: string
-  point: number[]
-  size: number[]
+  id: string;
+  point: number[];
+  size: number[];
 }
 ```
 
@@ -66,7 +66,7 @@ function getAABB({ point: [x, y], size: [w, h] }: Shape) {
     maxY: y + h,
     width: w,
     height: h,
-  }
+  };
 }
 ```
 
@@ -74,9 +74,9 @@ And if our app state looks like this:
 
 ```ts
 interface State {
-  shapes: Shape[]
-  selection: Shape[]
-  viewport: AABB
+  shapes: Shape[];
+  selection: Shape[];
+  viewport: AABB;
 }
 ```
 
@@ -84,10 +84,10 @@ Then with a few helper functions...
 
 ```ts
 const boundsContain = (a: AABB, b: AABB) =>
-  a.minX < b.minX && a.minY < b.minY && a.maxY > b.maxY && a.maxX > b.maxX
+  a.minX < b.minX && a.minY < b.minY && a.maxY > b.maxY && a.maxX > b.maxX;
 
 const boundsCollide = (a: AABB, b: AABB) =>
-  !(a.maxX < b.minX || a.minX > b.maxX || a.maxY < b.minY || a.minY > b.maxY)
+  !(a.maxX < b.minX || a.minX > b.maxX || a.maxY < b.minY || a.minY > b.maxY);
 ```
 
 We could find the "snappable" bounding boxes like this:
@@ -96,15 +96,15 @@ We could find the "snappable" bounding boxes like this:
 function getSnappableAABBs(
   shapes: Shape[],
   selection: Shape[],
-  viewport: AABB
+  viewport: AABB,
 ) {
   return shapes
     .filter((shape) => !selection.includes(shape))
     .map(getAABB)
     .filter(
       (bounds) =>
-        boundsContain(viewport, bounds) || boundsCollide(viewport, bounds)
-    )
+        boundsContain(viewport, bounds) || boundsCollide(viewport, bounds),
+    );
 }
 ```
 
@@ -116,10 +116,10 @@ Here we'll need one more helper function:
 
 ```ts
 const expandBounds = (a: AABB, b: AABB) => {
-  const minX = Math.min(a.minX, b.minX)
-  const maxX = Math.max(a.maxX, b.maxX)
-  const minY = Math.min(a.minY, b.minY)
-  const maxY = Math.max(a.maxY, b.maxY)
+  const minX = Math.min(a.minX, b.minX);
+  const maxX = Math.max(a.maxX, b.maxX);
+  const minY = Math.min(a.minY, b.minY);
+  const maxY = Math.max(a.maxY, b.maxY);
 
   return {
     minX,
@@ -130,8 +130,8 @@ const expandBounds = (a: AABB, b: AABB) => {
     maxY,
     width: maxX - minX,
     height: maxY - minY,
-  }
-}
+  };
+};
 ```
 
 And we can use it like so:
@@ -139,9 +139,9 @@ And we can use it like so:
 ```ts
 function getCommonAABB(shapes: Shape[]) {
   return shapes.map(getAABB).reduce((a, b, i) => {
-    if (i === 0) return b
-    return expandBounds(a, b)
-  }, {} as AABB)
+    if (i === 0) return b;
+    return expandBounds(a, b);
+  }, {} as AABB);
 }
 ```
 
@@ -154,7 +154,7 @@ As we said in the introduction, a snap happens when the selected bounding box _a
 First, let's say that the length of "almost" is 5.
 
 ```ts
-const isCloseEnough = (distance: number) => Math.abs(distance) < 5
+const isCloseEnough = (distance: number) => Math.abs(distance) < 5;
 ```
 
 Our selection can have at most two snaps: one for its `x` axis and one for its `y` axis. The selection can snap to different shapes on either axis.
@@ -169,15 +169,15 @@ In our code, we can define a snap like this:
 
 ```ts
 interface SnapX {
-  target: AABB
-  from: "midX" | "minX" | "maxX"
-  to: "midX" | "minX" | "maxX"
+  target: AABB;
+  from: "midX" | "minX" | "maxX";
+  to: "midX" | "minX" | "maxX";
 }
 
 interface SnapY {
-  target: AABB
-  from: "midY" | "minY" | "maxY"
-  to: "midY" | "minY" | "maxY"
+  target: AABB;
+  from: "midY" | "minY" | "maxY";
+  to: "midY" | "minY" | "maxY";
 }
 ```
 
@@ -191,34 +191,34 @@ Not all snaps are equal. We want to preference snaps in this order:
 If we define these as constants, starting with the mids:
 
 ```ts
-const xs = ["midX", "minX", "maxX"] as const
-const ys = ["midY", "minY", "maxY"] as const
+const xs = ["midX", "minX", "maxX"] as const;
+const ys = ["midY", "minY", "maxY"] as const;
 ```
 
 Then we can find our snap points like this:
 
 ```ts
 function findSnaps(bounds: AABB, others: AABB[]) {
-  let snapX: SnapX
-  let snapY: SnapY
+  let snapX: SnapX;
+  let snapY: SnapY;
 
   others.forEach((target) => {
     xs.forEach((from) =>
       xs.forEach((to) => {
-        if (snapX || !isCloseEnough(bounds[from] - others[to])) return
-        snapX = { target, from, to }
-      })
-    )
+        if (snapX || !isCloseEnough(bounds[from] - others[to])) return;
+        snapX = { target, from, to };
+      }),
+    );
 
     ys.forEach((from) =>
       ys.forEach((to) => {
-        if (snapY || !isCloseEnough(bounds[from] - others[to])) return
-        snapY = { target, from, to }
-      })
-    )
-  })
+        if (snapY || !isCloseEnough(bounds[from] - others[to])) return;
+        snapY = { target, from, to };
+      }),
+    );
+  });
 
-  return { snapX, snapY }
+  return { snapX, snapY };
 }
 ```
 
@@ -237,7 +237,7 @@ function getOffsetFromSnaps(bounds: AABB, snapX: SnapX, snapY: SnapY) {
   return [
     snapX ? bounds[snapX.from] - snapX.target[snapX.to] : 0,
     snapY ? bounds[snapY.from] - snapX.target[snapY.to] : 0,
-  ]
+  ];
 }
 ```
 
@@ -259,39 +259,39 @@ We can get those points like this:
 
 ```ts
 function getSnapLines(bounds: AABB, snapX?: SnapX, snapY?: SnapY) {
-  const pointsX: number[][] = []
-  const pointsY: number[][] = []
+  const pointsX: number[][] = [];
+  const pointsY: number[][] = [];
 
   if (snapX) {
-    const x = bounds[snapX.from]
-    pointsX.push([x, snapX.target.minY], [x, snapX.target.maxY])
+    const x = bounds[snapX.from];
+    pointsX.push([x, snapX.target.minY], [x, snapX.target.maxY]);
 
     if (snapX.from === "midX") {
-      pointsX.push([x, bounds.midY])
+      pointsX.push([x, bounds.midY]);
     } else {
-      pointsX.push([x, bounds.minY], [x, bounds.maxY])
+      pointsX.push([x, bounds.minY], [x, bounds.maxY]);
     }
 
-    pointsX.sort((a, b) => a[1] - b[1])
+    pointsX.sort((a, b) => a[1] - b[1]);
   }
 
   if (snapY) {
-    const y = bounds[snapY.from]
-    pointsY.push([snapY.target.minX, y], [snapY.target.maxX, y])
+    const y = bounds[snapY.from];
+    pointsY.push([snapY.target.minX, y], [snapY.target.maxX, y]);
 
     if (snapY.from === "midY") {
-      pointsY.push([bounds.midY, y])
+      pointsY.push([bounds.midY, y]);
     } else {
-      pointsY.push([bounds.minY, y], [bounds.maxY, y])
+      pointsY.push([bounds.minY, y], [bounds.maxY, y]);
     }
 
-    pointsY.sort((a, b) => a[0] - b[0])
+    pointsY.sort((a, b) => a[0] - b[0]);
   }
 
   return {
     pointsX,
     pointsY,
-  }
+  };
 }
 ```
 

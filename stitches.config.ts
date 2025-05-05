@@ -1,4 +1,4 @@
-import { createStitches } from "@stitches/react"
+import { createStitches } from "@stitches/react";
 
 export const {
   styled,
@@ -139,9 +139,9 @@ export const {
       transition: `background-color ${value}s`,
     }),
   },
-})
+});
 
-export const lightTheme = createTheme({})
+export const lightTheme = createTheme({});
 
 export const dimTheme = createTheme({
   colors: {
@@ -167,7 +167,7 @@ export const dimTheme = createTheme({
     syntaxLink: "#79b8ff",
     syntaxHeader: "#f97583",
   },
-})
+});
 
 export const darkTheme = createTheme({
   colors: {
@@ -195,7 +195,7 @@ export const darkTheme = createTheme({
     syntaxLink: "#79b8ff",
     syntaxHeader: "#f97583",
   },
-})
+});
 
 export const globalStyles = globalCss({
   "*": {
@@ -387,4 +387,4 @@ export const globalStyles = globalCss({
   ".token.builtin": {
     color: "$syntaxLink",
   },
-})
+});

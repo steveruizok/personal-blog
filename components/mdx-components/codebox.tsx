@@ -1,4 +1,4 @@
-import { styled } from "~stitches.config"
+import { styled } from "~stitches.config";
 
 export const CodeBox = styled("div", {
   display: "flex",
@@ -34,4 +34,4 @@ export const CodeBox = styled("div", {
     top: 8,
     right: 12,
   },
-})
+});

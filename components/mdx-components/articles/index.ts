@@ -1,3 +1,3 @@
-import * as RotatingIconButton from "./rotating-icon-button"
+import * as RotatingIconButton from "./rotating-icon-button";
 
-export { RotatingIconButton }
+export { RotatingIconButton };

@@ -1,7 +1,7 @@
-import * as React from "react"
-import { styled } from "~stitches.config"
+import * as React from "react";
+import { styled } from "~stitches.config";
 
-export { Sun, CloudRain, Moon } from "react-feather"
+export { Sun, CloudRain, Moon } from "react-feather";
 
 export const Button = styled("button", {
   height: 48,
@@ -16,7 +16,7 @@ export const Button = styled("button", {
   borderRadius: "2px",
   outline: "none",
   padding: 0,
-})
+});
 
 export const Button2 = styled("button", {
   height: 48,
@@ -34,7 +34,7 @@ export const Button2 = styled("button", {
   "&:hover": {
     background: "rgba(144, 144, 144, .1)",
   },
-})
+});
 
 export const Icon = styled("div", {
   position: "absolute",
@@ -45,82 +45,82 @@ export const Icon = styled("div", {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-})
+});
 
 export const RotatingIconButton = ({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) => {
-  const [current, setCurrent] = React.useState(0)
+  const [current, setCurrent] = React.useState(0);
 
-  const rPrevious = React.useRef(current)
+  const rPrevious = React.useRef(current);
 
   React.useEffect(() => {
-    rPrevious.current = current
-  }, [current])
+    rPrevious.current = current;
+  }, [current]);
 
   function cycleCurrent() {
     if (current === React.Children.toArray(children).length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
-  const previous = rPrevious.current
-  const isInitial = current === previous
+  const previous = rPrevious.current;
+  const isInitial = current === previous;
 
   return (
     <Button>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
-        return <Icon key={i}>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>;
       })}
     </Button>
-  )
-}
+  );
+};
 
 export function RotatingIconButtonSimple({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <Button>
       {React.Children.map(children, (child, i) => {
-        return <Icon key={i}>{child}</Icon>
+        return <Icon key={i}>{child}</Icon>;
       })}
     </Button>
-  )
+  );
 }
 
 export function RotatingIconButtonWithTransition({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [current, setCurrent] = React.useState(0)
+  const [current, setCurrent] = React.useState(0);
 
-  const rPrevious = React.useRef(current)
+  const rPrevious = React.useRef(current);
 
   React.useEffect(() => {
-    rPrevious.current = current
-  }, [current])
+    rPrevious.current = current;
+  }, [current]);
 
   function cycleCurrent() {
     if (current === React.Children.toArray(children).length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
   return (
     <Button onClick={cycleCurrent}>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon
@@ -132,31 +132,31 @@ export function RotatingIconButtonWithTransition({
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </Button>
-  )
+  );
 }
 
 export function RotatingIconButtonWithCSSAnimation({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [current, setCurrent] = React.useState(0)
+  const [current, setCurrent] = React.useState(0);
 
   function cycleCurrent() {
     if (current === React.Children.toArray(children).length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
   return (
     <Button onClick={cycleCurrent}>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon
@@ -169,31 +169,31 @@ export function RotatingIconButtonWithCSSAnimation({
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </Button>
-  )
+  );
 }
 
 export function RotatingIconButtonWithCSSAnimationNoOverflow({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [current, setCurrent] = React.useState(0)
+  const [current, setCurrent] = React.useState(0);
 
   function cycleCurrent() {
     if (current === React.Children.toArray(children).length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
   return (
     <Button onClick={cycleCurrent} style={{ overflow: "hidden" }}>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon
@@ -206,36 +206,36 @@ export function RotatingIconButtonWithCSSAnimationNoOverflow({
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </Button>
-  )
+  );
 }
 
 export function RotatingIconButtonWithCSSAnimationInitial({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [current, setCurrent] = React.useState(0)
-  const [isInitial, setIsInitial] = React.useState(true)
+  const [current, setCurrent] = React.useState(0);
+  const [isInitial, setIsInitial] = React.useState(true);
 
   function cycleCurrent() {
     if (isInitial) {
-      setIsInitial(false)
+      setIsInitial(false);
     }
 
     if (current === React.Children.toArray(children).length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
   return (
     <Button onClick={cycleCurrent} style={{ overflow: "hidden" }}>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon
@@ -248,36 +248,36 @@ export function RotatingIconButtonWithCSSAnimationInitial({
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </Button>
-  )
+  );
 }
 
 export function RotatingIconButtonWithCSSAnimationFinal({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [current, setCurrent] = React.useState(0)
-  const [isInitial, setIsInitial] = React.useState(true)
+  const [current, setCurrent] = React.useState(0);
+  const [isInitial, setIsInitial] = React.useState(true);
 
   function cycleCurrent() {
     if (isInitial) {
-      setIsInitial(false)
+      setIsInitial(false);
     }
 
     if (current === React.Children.toArray(children).length - 1) {
-      setCurrent(0)
+      setCurrent(0);
     } else {
-      setCurrent(current + 1)
+      setCurrent(current + 1);
     }
   }
 
   return (
     <Button2 onClick={cycleCurrent} style={{ overflow: "hidden" }}>
       {React.Children.map(children, (child, i) => {
-        const isCurrent = i === current
+        const isCurrent = i === current;
 
         return (
           <Icon
@@ -290,8 +290,8 @@ export function RotatingIconButtonWithCSSAnimationFinal({
           >
             {child}
           </Icon>
-        )
+        );
       })}
     </Button2>
-  )
+  );
 }

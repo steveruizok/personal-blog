@@ -33,23 +33,23 @@ Being a [Next.js](https://nextjs.org/) project, creating the endpoint was no pro
 ```ts
 // pages/api/create.ts
 
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextApiRequest, NextApiResponse } from "next";
 
 type storageJson = {
-  pageId: string
-  document: TDDocument
-}
+  pageId: string;
+  document: TDDocument;
+};
 
 export default async function CreateMultiplayerRoom(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     // 1. Get an authentication token from Liveblocks
     // 2. Create the Liveblocks storage JSON
     // 3. Post the JSON and token to Liveblocks
   } catch (e) {
-    res.send({ status: "error", message: e.message })
+    res.send({ status: "error", message: e.message });
   }
 }
 ```
@@ -69,8 +69,8 @@ Here's what they look like in my `.env` file:
 ```ts
 // .env
 
-NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_API_KEY = pk_live_whatever
-LIVEBLOCKS_SECRET_KEY = sk_live_whatever
+NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_API_KEY = pk_live_whatever;
+LIVEBLOCKS_SECRET_KEY = sk_live_whatever;
 ```
 
 Ok, back to my `pages/api/creates.ts` endpoint. With my keys in the environment, I next needed to get my authentication token from Liveblocks via their [authorize endpoint](https://liveblocks.io/docs/api-reference/rest-api-endpoints#Authentication).
@@ -81,7 +81,7 @@ const { token } = await fetch("https://liveblocks.io/api/authorize", {
     Authorization: `Bearer ${process.env.LIVEBLOCKS_SECRET_KEY}`,
     "Content-Type": "application/json",
   },
-}).then((d) => d.json())
+}).then((d) => d.json());
 ```
 
 The authorize endpoint responds with the web token I'd need to communicate with Liveblocks' storage API.
@@ -91,7 +91,7 @@ The authorize endpoint responds with the web token I'd need to communicate with 
 Before I could `POST` my data to the Liveblocks storage API endpoint, however, I first needed to turn my tldraw document object into the JSON format that Liveblocks expects to receive.
 
 ```ts
-const { pageId, document } = JSON.parse(req.body) as RequestBody
+const { pageId, document } = JSON.parse(req.body) as RequestBody;
 
 const storageJson = {
   liveblocksType: "LiveObject",
@@ -110,13 +110,13 @@ const storageJson = {
       data: {},
     },
   },
-}
+};
 
-const page = document.pages[pageId]
+const page = document.pages[pageId];
 
-storageJson.data.shapes.data = page.shapes ?? {}
-storageJson.data.bindings.data = page.bindings ?? {}
-storageJson.data.assets.data = document.assets ?? {}
+storageJson.data.shapes.data = page.shapes ?? {};
+storageJson.data.bindings.data = page.bindings ?? {};
+storageJson.data.assets.data = document.assets ?? {};
 ```
 
 Luckily our models are fairly similar (tables of objects keyed under their `id`) so this wasn't much work.
@@ -126,7 +126,7 @@ Luckily our models are fairly similar (tables of objects keyed under their `id`)
 Finally, with my authentication token and my storage JSON ready, I could create a unique ID for the `roomId`, stringify my `storageJson`, and post it to the Liveblocks API endpoint.
 
 ```ts
-const roomId = Utils.uniqueId()
+const roomId = Utils.uniqueId();
 
 const result = await fetch(
   `https://liveblocks.net/api/v1/room/${roomId}/storage`,
@@ -137,8 +137,8 @@ const result = await fetch(
       Authorization: `Bearer ${auth.token}`,
       "Content-Type": "application/json",
     },
-  }
-)
+  },
+);
 ```
 
 If all went well, my API endpoint would reply to the original tldraw client application's request with a response that contained the new project's URL, based on the `roomId`.
@@ -150,9 +150,9 @@ if (result.status === 200) {
     status: "success",
     message: result.statusText,
     url: "/r/" + roomId,
-  })
+  });
 } else {
-  throw Error(result.statusText)
+  throw Error(result.statusText);
 }
 ```
 
@@ -173,7 +173,7 @@ fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
     Authorization: `Bearer ${auth.token}`,
     "Content-Type": "application/json",
   },
-})
+});
 ```
 
 ```ts
@@ -183,7 +183,7 @@ fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
     Authorization: `Bearer ${auth.token}`,
     "Content-Type": "application/json",
   },
-})
+});
 ```
 
 Thanks for reading!

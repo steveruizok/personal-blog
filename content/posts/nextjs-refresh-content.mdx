@@ -1,9 +1,9 @@
 ---
-title: 'Refreshing the Next.js App Router When Your Markdown Content Changes'
-date: '11/09/2023'
-hero: '/images/next-hero.png'
-status: 'published'
-description: 'How to refresh the Next.js App Router when content in a folder changes. Yes, websockets.'
+title: "Refreshing the Next.js App Router When Your Markdown Content Changes"
+date: "11/09/2023"
+hero: "/images/next-hero.png"
+status: "published"
+description: "How to refresh the Next.js App Router when content in a folder changes. Yes, websockets."
 ---
 
 Are you writing MDX content for a Next.js blog and want to see live reloads when the content changes? Here's how to do it.
@@ -19,31 +19,31 @@ npm i -D ws concurrently tsx
 Create a `watcher.ts` file in the root of your Next.js project.
 
 ```ts
-import fs from 'fs'
-import { WebSocketServer } from 'ws'
+import fs from "fs";
+import { WebSocketServer } from "ws";
 
-const CONTENT_FOLDER = 'content'
+const CONTENT_FOLDER = "content";
 
 fs.watch(
-	CONTENT_FOLDER,
-	{ persistent: true, recursive: true },
-	async (eventType, fileName) => {
-		clients.forEach((ws) => {
-			// do any pre-processing you want to do here...
-			ws.send('refresh')
-		})
-	}
-)
+  CONTENT_FOLDER,
+  { persistent: true, recursive: true },
+  async (eventType, fileName) => {
+    clients.forEach((ws) => {
+      // do any pre-processing you want to do here...
+      ws.send("refresh");
+    });
+  },
+);
 
-const wss = new WebSocketServer({ port: 3201 })
+const wss = new WebSocketServer({ port: 3201 });
 
-const clients = new Set<any>()
+const clients = new Set<any>();
 
-wss.on('connection', function connection(ws) {
-	clients.add(ws)
-	ws.on('error', console.error)
-	ws.on('close', () => clients.delete(ws))
-})
+wss.on("connection", function connection(ws) {
+  clients.add(ws);
+  ws.on("error", console.error);
+  ws.on("close", () => clients.delete(ws));
+});
 ```
 
 Create a script in your `package.json` that starts the watcher on `dev`.
@@ -60,47 +60,47 @@ Create a script in your `package.json` that starts the watcher on `dev`.
 Create a component named `AutoRefresh`.
 
 ```tsx
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-let AutoRefresh = ({ children }: { children: any }) => children
+let AutoRefresh = ({ children }: { children: any }) => children;
 
-if (process.env.NODE_ENV === 'development') {
-	AutoRefresh = ({ children }) => {
-		const router = useRouter()
+if (process.env.NODE_ENV === "development") {
+  AutoRefresh = ({ children }) => {
+    const router = useRouter();
 
-		useEffect(() => {
-			const ws = new WebSocket('ws://localhost:3201')
-			ws.onmessage = (event) => {
-				if (event.data === 'refresh') {
-					router.refresh()
-				}
-			}
-			return () => {
-				ws.close()
-			}
-		}, [router])
-		return children
-	}
+    useEffect(() => {
+      const ws = new WebSocket("ws://localhost:3201");
+      ws.onmessage = (event) => {
+        if (event.data === "refresh") {
+          router.refresh();
+        }
+      };
+      return () => {
+        ws.close();
+      };
+    }, [router]);
+    return children;
+  };
 }
 
-export default AutoRefresh
+export default AutoRefresh;
 ```
 
 Wrap your root `layout.tsx` in the `AutoRefresh` component.
 
 ```tsx
 async function RootLayout({ children }: { children: any }) {
-	return (
-		<AutoRefresh>
-			<html>...</html>
-		</AutoRefresh>
-	)
+  return (
+    <AutoRefresh>
+      <html>...</html>
+    </AutoRefresh>
+  );
 }
 
-export default RootLayout
+export default RootLayout;
 ```
 
 ## The problem

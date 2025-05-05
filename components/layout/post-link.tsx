@@ -1,11 +1,11 @@
-import * as React from "react"
-import { PostListItem } from "~types"
-import Image from "next/image"
-import Link from "next/link"
-import { styled } from "~stitches.config"
+import * as React from "react";
+import { PostListItem } from "~types";
+import Image from "next/image";
+import Link from "next/link";
+import { styled } from "~stitches.config";
 
 interface PostLinkProps {
-  post: PostListItem
+  post: PostListItem;
 }
 
 export function PostLink({ post }: PostLinkProps) {
@@ -26,7 +26,7 @@ export function PostLink({ post }: PostLinkProps) {
         </Content>
       </LinkContainer>
     </Link>
-  )
+  );
 }
 
 const Content = styled("div", {
@@ -47,7 +47,7 @@ const Content = styled("div", {
     fontSize: "$0",
     opacity: 0.5,
   },
-})
+});
 
 const LinkContainer = styled("a", {
   p: "$1",
@@ -60,4 +60,4 @@ const LinkContainer = styled("a", {
   // "&:hover": {
   //   border: "2px solid $codeText",
   // },
-})
+});

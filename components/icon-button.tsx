@@ -1,5 +1,5 @@
-import { styled } from "~stitches.config"
-import { Button } from "./button"
+import { styled } from "~stitches.config";
+import { Button } from "./button";
 
 export const IconButton = styled(Button, {
   p: 0,
@@ -21,4 +21,4 @@ export const IconButton = styled(Button, {
       bg: "$hover",
     },
   },
-})
+});

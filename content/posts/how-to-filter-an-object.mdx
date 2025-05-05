@@ -12,7 +12,7 @@ In JavaScript:
 
 ```js
 function filterObject(obj, fn) {
-  return Object.fromEntries(Object.entries(obj).filter(fn))
+  return Object.fromEntries(Object.entries(obj).filter(fn));
 }
 ```
 
@@ -20,31 +20,31 @@ It's a bit trickier in TypeScript:
 
 ```ts
 type Entry<T> = {
-  [K in keyof T]: [K, T[K]]
-}[keyof T]
+  [K in keyof T]: [K, T[K]];
+}[keyof T];
 
 function filterObject<T extends object>(
   obj: T,
-  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
+  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean,
 ) {
   return Object.fromEntries(
-    (Object.entries(obj) as Entry<T>[]).filter(fn)
-  ) as Partial<T>
+    (Object.entries(obj) as Entry<T>[]).filter(fn),
+  ) as Partial<T>;
 }
 ```
 
 In either case, we can use our `filterObject` helper to return a new copy of an object with certain keys removed. Our filter function works just like `Array.filter`, except that its callback function's first parameter will be the property's key value pair as array (`[key, value]`).
 
 ```ts
-const author = { name: "Steve", age: 93, height: 241 }
+const author = { name: "Steve", age: 93, height: 241 };
 
-const onlySteves = filterObject(author, ([k, v]) => v === "Steve")
+const onlySteves = filterObject(author, ([k, v]) => v === "Steve");
 // { name: "Steve" }
 
-const onlyNumbers = filterObject(author, ([k, v]) => typeof v === "number")
+const onlyNumbers = filterObject(author, ([k, v]) => typeof v === "number");
 // { age: 93, height: 241 }
 
-const onlyNames = filterObject(author, ([k, v]) => k === "name")
+const onlyNames = filterObject(author, ([k, v]) => k === "name");
 // { name: "Steve" }
 ```
 
@@ -55,24 +55,24 @@ If you wanted to do this by hand (or perhaps in older browsers without polyfills
 ```ts
 function filterObject2<T extends object>(
   obj: T,
-  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
+  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean,
 ): Partial<T> {
-  const next = { ...obj }
+  const next = { ...obj };
 
-  const entries: Entry<T>[] = []
+  const entries: Entry<T>[] = [];
 
   for (const key in obj) {
-    entries.push([key, obj[key]])
+    entries.push([key, obj[key]]);
   }
 
   for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i]
+    const entry = entries[i];
     if (!fn(entry, i, entries)) {
-      delete next[entry[0]]
+      delete next[entry[0]];
     }
   }
 
-  return next
+  return next;
 }
 ```
 

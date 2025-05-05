@@ -1,10 +1,10 @@
-import * as React from "react"
-import { styled } from "~stitches.config"
-import { PostListItem } from "~types"
-import { PostLink } from "./post-link"
+import * as React from "react";
+import { styled } from "~stitches.config";
+import { PostListItem } from "~types";
+import { PostLink } from "./post-link";
 
 interface PostListProps {
-  posts: PostListItem[]
+  posts: PostListItem[];
 }
 
 export function PostList({ posts }: PostListProps) {
@@ -16,7 +16,7 @@ export function PostList({ posts }: PostListProps) {
         </li>
       ))}
     </List>
-  )
+  );
 }
 
 const List = styled("ul", {
@@ -27,4 +27,4 @@ const List = styled("ul", {
   display: "flex",
   flexDirection: "column",
   gap: "$5",
-})
+});

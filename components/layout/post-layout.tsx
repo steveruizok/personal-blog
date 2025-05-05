@@ -1,20 +1,20 @@
-import React from "react"
-import { Post, PostListItem } from "../../types"
-import { Layout } from "./layout"
-import Link from "next/link"
-import Image from "next/image"
-import { PostLinks } from "./post-links"
-import { Footer } from "./footer"
-import Head from "next/head"
-import { GhostLink } from "~components/ghost-link"
-import { Text } from "~components/text"
-import { AuthorLink } from "~components/author-link"
-import { styled } from "~stitches.config"
+import React from "react";
+import { Post, PostListItem } from "../../types";
+import { Layout } from "./layout";
+import Link from "next/link";
+import Image from "next/image";
+import { PostLinks } from "./post-links";
+import { Footer } from "./footer";
+import Head from "next/head";
+import { GhostLink } from "~components/ghost-link";
+import { Text } from "~components/text";
+import { AuthorLink } from "~components/author-link";
+import { styled } from "~stitches.config";
 
 interface LayoutProps extends Omit<Post, "content"> {
-  next: PostListItem | null
-  prev: PostListItem | null
-  children: React.ReactNode
+  next: PostListItem | null;
+  prev: PostListItem | null;
+  children: React.ReactNode;
 }
 
 export function PostLayout({
@@ -80,7 +80,7 @@ export function PostLayout({
       <PostLinks next={next} prev={prev} />
       <Footer />
     </Layout>
-  )
+  );
 }
 
 const PostHeader = styled("header", {
@@ -89,4 +89,4 @@ const PostHeader = styled("header", {
     mb: "$4",
     fontSize: "$0",
   },
-})
+});
