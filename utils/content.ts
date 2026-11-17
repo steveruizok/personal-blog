@@ -3,12 +3,18 @@ import jsonContent from "../content.json";
 import { generateContent } from "../scripts/generate-content";
 import { Content, Post } from "../types";
 import rehypePrism from "@mapbox/rehype-prism";
+import remarkGfm from "remark-gfm";
+import rehypeUnwrapImages from "rehype-unwrap-images";
 
 export async function getMdxSource(source: string) {
   return serialize(source, {
     scope: {},
+    // The content is our own, so allow JS expressions (e.g. props like `width={300}`).
+    blockJS: false,
     mdxOptions: {
-      rehypePlugins: [rehypePrism as any],
+      remarkPlugins: [remarkGfm],
+      // Images render as <Figure> (block elements), so don't wrap them in <p>.
+      rehypePlugins: [rehypeUnwrapImages, rehypePrism as any],
     },
   });
 }

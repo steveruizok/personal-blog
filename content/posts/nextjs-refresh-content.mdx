@@ -119,13 +119,13 @@ When you run `npm run dev`, you'll start a regular Next.js dev server _and_ a we
 
 Meanwhile, when the root layout mounts, a hook in the `AutoRefresh` component will connect to the websocket server. Once it's connected, it will set a listener that calls `router.refresh()` when it receives a `refresh` message from the websocket server.
 
-When the server detects a change anywhere in the content directory, the websocket server will send a `refresh` message to its connected clients. This will trigger the listener in in the `AutoRefresh` component and cause the Next.js App Router to refresh and display the freshly edited content.
+When the server detects a change anywhere in the content directory, the websocket server will send a `refresh` message to its connected clients. This will trigger the listener in the `AutoRefresh` component and cause the Next.js App Router to refresh and display the freshly edited content.
 
 ## Tweaks and modifications
 
 You can do whatever you want inside of `watcher.ts` before dispatching the `refresh` event.
 
-In our case, we respond to a change in the content directory by parsing every file in the content directory and stuffing it into a sqlite database with navigation links and so on—and only when that's done (maybe 12ms later) do we send off the `refresh` event. However, because this is an asyncronous process, and because dev-mode react runs every hook, our watch callback wrapped in a debounce function to avoid trying to do the work twice in a row.
+In our case, we respond to a change in the content directory by parsing every file in the content directory and stuffing it into a sqlite database with navigation links and so on—and only when that's done (maybe 12ms later) do we send off the `refresh` event. However, because this is an asynchronous process, and because dev-mode react runs every hook, our watch callback is wrapped in a debounce function to avoid trying to do the work twice in a row.
 
 You can also dispatch the `refresh` event whenever you want, such as on an interval or in response to some other listener if you're pulling data from a different source. The general idea is still using websockets to trigger a refresh of the Next.js App Router.
 

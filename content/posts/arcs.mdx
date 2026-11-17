@@ -13,15 +13,15 @@ It has quite a lot of information:
 - the **center** of the circle of which the arc is a part
 - the **radius** of the circle in distance units
 - a **start point** on the circle where the arc begins
-- an **end point** on the circle where the arc end
+- an **end point** on the circle where the arc ends
 - a **start angle** between the center and start point
 - an **end angle** between the center and end point
 - the **size** of the arc in radians
 - the **length** of the arc in distance units
 - a **large arc flag** that specifies whether the arc takes up the big or small part of the circle
-- a **sweep flag** that specifices whether the arc goes in the clockwise or counterclockwise direction
+- a **sweep flag** that specifies whether the arc goes in the clockwise or counterclockwise direction
 
-Depending on how you're working with your arc, you may start off knowing some of this information and just need to find the rest. For example, you may know the center, radius, and start and angle angles, but need to find the size or length of the arc.
+Depending on how you're working with your arc, you may start off knowing some of this information and just need to find the rest. For example, you may know the center, radius, and start and end angles, but need to find the size or length of the arc.
 
 When working with arrows, I often need to find an arc based on three points: the start, end, and some middle point. This article contains lots of math for working with arcs, most of which comes from that "three points" use-case.
 
@@ -90,7 +90,7 @@ The sweep flag determines whether the arc goes in the clockwise or counterclockw
  * @param c The third point
  */
 function getSweepFlagFromThreePoints(a: VecLike, b: VecLike, c: VecLike) {
-	return = +((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0)
+	return +((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0)
 }
 ```
 
@@ -103,7 +103,7 @@ Finally we can find the size of our part of the arc in radians. Our sweep flag w
  * Get the angle of an arc.
  *
  * @param angle The angle of the arc.
- * @param radius The radius of the arc in distance units.
+ * @param sweepFlag The sweep flag of the arc.
  */
 function getSize(angle: number, sweepFlag: number) {
   return (Math.PI * 2 - angle) * (sweepFlag ? 1 : -1);
@@ -136,17 +136,18 @@ We can turn our arc data into an SVG path like this:
  *
  * @param start - The start point of the arc.
  * @param end - The end point of the arc.
+ * @param radius - The radius of the arc.
  * @param largeArcFlag - Whether the arc is a large arc.
- * @param smallArcFlag - Whether the arc is a clockwise arc.
+ * @param sweepFlag - Whether the arc is a clockwise arc.
  */
 function getArcPath(
   start: VecLike,
   end: VecLike,
   radius: number,
   largeArcFlag: number,
-  smallArcFlag: number,
+  sweepFlag: number,
 ) {
-  return `M${start.x},${start.y}A${radius} ${radius} 0 ${largeArcFlag} ${smallArcFlag} ${end.x},${end.y}`;
+  return `M${start.x},${start.y}A${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${end.x},${end.y}`;
 }
 ```
 
@@ -160,7 +161,7 @@ We can get a point on an arc by starting at the start angle and moving along the
  *
  * @param center - The arc's center.
  * @param radius - The arc's radius.
- * @param startAngle - The start point of the arc.
+ * @param startAngle - The start angle of the arc.
  * @param size - The size of the arc.
  * @param t - The point along the arc to get.
  */

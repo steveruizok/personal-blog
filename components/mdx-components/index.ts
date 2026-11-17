@@ -24,10 +24,12 @@ import {
 import * as Articles from "./articles";
 
 export const scope = {
-  ...Articles,
+  ...(Articles as Record<string, any>),
 };
 
 export const components = {
+  // MDX 2+ resolves member expressions like <RotatingIconButton.Sun> from components
+  ...(Articles as Record<string, any>),
   img: Figure,
   h1: Heading1,
   h2: Heading2,

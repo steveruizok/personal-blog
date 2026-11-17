@@ -10,7 +10,7 @@ import LightDarkSwitch from "../../components/theme-switch";
 
 As a designer, I've spent my career borrowing development tools to build prototypes that needed a level of interactivity or data that couldn't be done in design tools alone. I was always more of a chainsaw artist than arborist, however, and so I skipped many of the projects that other developers start off with.
 
-Recently, as the tools have become easier and more interesting, I've started drifting moving from making models to building actual projects meant to be used in production. And I've wanted a place to write about what I'm learning...
+Recently, as the tools have become easier and more interesting, I've started drifting from making models to building actual projects meant to be used in production. And I've wanted a place to write about what I'm learning...
 
 So welcome to my first blog.[^1]
 
@@ -18,9 +18,9 @@ So welcome to my first blog.[^1]
 
 Making a website like this blog means solving several different problems, such as how content should be turned into code, how elements of the site should be styled and themed, and how the website should get uploaded onto the internet.
 
-While all of the solutions need to work together, a developer can use different technologies to solve each problem. They could write their own solution for each one, but would usually choose from the thousands of free and open-source solutions shared by other experts developers.
+While all of the solutions need to work together, a developer can use different technologies to solve each problem. They could write their own solution for each one, but would usually choose from the thousands of free and open-source solutions shared by other expert developers.
 
-The result is a "stack" of technologies that is tuned to the specific needs of the website. The stack also expresses the constraints of the project, like budget and time, as well more subjective things, like the developer's interests and their preferred ways of working.
+The result is a "stack" of technologies that is tuned to the specific needs of the website. The stack also expresses the constraints of the project, like budget and time, as well as more subjective things, like the developer's interests and their preferred ways of working.
 
 Here's my stack.
 
@@ -67,7 +67,7 @@ While React code is easy to read and write, browsers like Chrome and Safari can'
   </head>
   <body>
     <main>
-      <h1 className="post-header">My First Post</h1>
+      <h1 class="post-header">My First Post</h1>
       <p>Welcome to my blog!</p>
     </main>
   </body>
@@ -128,7 +128,7 @@ designer who writes about design, code, and everything in between. I
 live in London but I'm originally from Chicago. It's been a _long_
 year, hasn't it?
 
-Anyway, I thanks for reading!
+Anyway, thanks for reading!
 ```
 
 That's much easier to read, write, and edit. It also contains a section at the top, between the two `---` lines, called the file's "frontmatter". I'll come back to this later, but this frontmatter text allows me to define custom properties for the post, such as its title, date, and hero image, that I can use elsewhere in my layout.
@@ -149,7 +149,7 @@ While Markdown is great for regular written content, it's limited to _just_ writ
 
 Again, I'm not the first person to feel this way.
 
-In 2018, after a few years of early experiments, [Guillermo Rauch](@rauchg) [proposed](https://spectrum.chat/frontend/general/mdx-proposal~1021be59-2738-4511-aceb-c66921050b9a) a new syntax called MDX.[^3] In the same way that Markdown converts text to HTML, MDX would convert text to React components, thereby giving authors much more control over how their content is rendered as well as allowing for inline React components.
+In 2018, after a few years of early experiments, [Guillermo Rauch](https://twitter.com/rauchg) [proposed](https://web.archive.org/web/20220129082543/https://spectrum.chat/frontend/general/mdx-proposal~1021be59-2738-4511-aceb-c66921050b9a) a new syntax called MDX.[^3] In the same way that Markdown converts text to HTML, MDX would convert text to React components, thereby giving authors much more control over how their content is rendered as well as allowing for inline React components.
 
 ```md
 # Example
@@ -234,9 +234,9 @@ In 2019, [Brent Jackson](https://twitter.com/jxnblk) defined a [theme specificat
 
 When I began this blog, I used theme-ui to define a theme and then built my components using [emotion](https://emotion.sh/), the styling library that powers theme-ui.
 
-Later on, I switched to [Stiches](http://stitches.dev), a newly released library by the team at [Modulz](https://www.modulz.app/).[^4] Like theme-ui, it follows Jackson's theme specification; however, it has its own styling engine that may work better with the project's "static" approach.
+Later on, I switched to [Stitches](https://github.com/stitchesjs/stitches), a newly released library by the team at [Modulz](https://web.archive.org/web/20211223172405/https://modulz.app/).[^4] Like theme-ui, it follows Jackson's theme specification; however, it has its own styling engine that may work better with the project's "static" approach.
 
-My site has a core configuration that defines tokens for colors, sizes, spaces and breakpoints, and two themes that overwrite the configuration's colors tokens. Both the configuration and the themes are pretty basic.
+My site has a core configuration that defines tokens for colors, sizes, spaces and breakpoints, and two themes that overwrite the configuration's color tokens. Both the configuration and the themes are pretty basic.
 
 ```js
 const { styled, css } = createStyled({
@@ -262,7 +262,7 @@ const { styled, css } = createStyled({
 });
 ```
 
-My components are more complex. They include theme from the theme along with different properties defined for each breakpoint.
+My components are more complex. They include tokens from the theme along with different properties defined for each breakpoint.
 
 ```ts
 const Container = styled(Grid, {

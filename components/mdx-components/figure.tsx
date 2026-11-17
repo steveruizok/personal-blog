@@ -49,11 +49,16 @@ export function Figure({ src, alt, title, isVideo }: FigureProps) {
       <ImageWrapper onDoubleClick={handleDoubleClick}>
         <Image
           src={src}
-          alt={alt}
+          alt={alt || title || ""}
           title={title}
           width={720}
           height={400}
-          objectFit="contain"
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            aspectRatio: "720 / 400",
+            objectFit: "contain",
+          }}
         />
       </ImageWrapper>
       <Text variant="caption" css={{ mb: "$5", textAlign: "center" }}>

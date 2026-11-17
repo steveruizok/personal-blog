@@ -98,7 +98,7 @@ items = bringToFront(items, ["b"]); // a, c, d, b
 
 <Figure
   src="/images/reordering/bring_to_front.png"
-  alt="A diagram showing the result of moving c to front in items a, b, c, d."
+  alt="A diagram showing the result of moving b to front in items a, b, c, d."
 />
 
 ```ts
@@ -149,7 +149,7 @@ items = sendBackward(items, ["c"]); // a, c, b, d
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
-items = sendBackward(items, ["b", "c"]); // b, c, a, c
+items = sendBackward(items, ["b", "c"]); // b, c, a, d
 ```
 
 <Figure
@@ -195,7 +195,7 @@ items = bringForward(items, ["b"]); // a, c, b, d
 
 ```ts
 let items = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
-items = bringForward(items, ["b", "c"]); // b, a, d, c
+items = bringForward(items, ["b", "c"]); // a, d, b, c
 ```
 
 <Figure
@@ -231,7 +231,7 @@ function getItem(id: string) {
 }
 ```
 
-This can be impractical for apps that need to store many items, or that require a more efficient way of accessing items. This is usually done with a hash table (such as a `Map`, or plain object) or another from of associative structure.
+This can be impractical for apps that need to store many items, or that require a more efficient way of accessing items. This is usually done with a hash table (such as a `Map`, or plain object) or another form of associative structure.
 
 ```ts
 const items = {
@@ -253,4 +253,4 @@ This adds some new trickiness and I'll cover that in the next post.
 
 ---
 
-Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).
+Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com/steveruizok). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).

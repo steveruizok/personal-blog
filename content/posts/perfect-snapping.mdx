@@ -8,7 +8,7 @@ description: "How to make shapes snap and align."
 
 In this post, I'm going to walk through how you might implement one of my favorite features in design apps: snapping.
 
-In a design app, snapping happens when you're dragging or resizing some selected on the canvas. If the app detects that your selection _almost_ aligns with some other shape, then it will adjust your selection so that it _does_ align.
+In a design app, snapping happens when you're dragging or resizing some selected shapes on the canvas. If the app detects that your selection _almost_ aligns with some other shape, then it will adjust your selection so that it _does_ align.
 
 If we want to implement snapping in our own app, then **what we're after is this offset**—the distance to move the selection so that it snaps to the right place.
 
@@ -205,14 +205,14 @@ function findSnaps(bounds: AABB, others: AABB[]) {
   others.forEach((target) => {
     xs.forEach((from) =>
       xs.forEach((to) => {
-        if (snapX || !isCloseEnough(bounds[from] - others[to])) return;
+        if (snapX || !isCloseEnough(bounds[from] - target[to])) return;
         snapX = { target, from, to };
       }),
     );
 
     ys.forEach((from) =>
       ys.forEach((to) => {
-        if (snapY || !isCloseEnough(bounds[from] - others[to])) return;
+        if (snapY || !isCloseEnough(bounds[from] - target[to])) return;
         snapY = { target, from, to };
       }),
     );
@@ -236,7 +236,7 @@ To find the offset, we can subtract the edges that snapped together. If we didn'
 function getOffsetFromSnaps(bounds: AABB, snapX: SnapX, snapY: SnapY) {
   return [
     snapX ? bounds[snapX.from] - snapX.target[snapX.to] : 0,
-    snapY ? bounds[snapY.from] - snapX.target[snapY.to] : 0,
+    snapY ? bounds[snapY.from] - snapY.target[snapY.to] : 0,
   ];
 }
 ```
@@ -280,9 +280,9 @@ function getSnapLines(bounds: AABB, snapX?: SnapX, snapY?: SnapY) {
     pointsY.push([snapY.target.minX, y], [snapY.target.maxX, y]);
 
     if (snapY.from === "midY") {
-      pointsY.push([bounds.midY, y]);
+      pointsY.push([bounds.midX, y]);
     } else {
-      pointsY.push([bounds.minY, y], [bounds.maxY, y]);
+      pointsY.push([bounds.minX, y], [bounds.maxX, y]);
     }
 
     pointsY.sort((a, b) => a[0] - b[0]);

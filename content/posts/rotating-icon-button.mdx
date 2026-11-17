@@ -3,14 +3,14 @@ title: "Making a Rotating Icon Button in React"
 date: "9/9/2020"
 hero: "/images/anastasia-taioglou-EEDLURXCpqg-unsplash.jpg"
 status: "published"
-description: "A tutorial on building my this blog's theme-switching microinteraction."
+description: "A tutorial on building this blog's theme-switching microinteraction."
 ---
 
 If you haven't already, try changing the theme on this blog by clicking the button in the top right corner of the webpage. You'll notice a fun detail: as you cycle between the themes, the icons will "rotate" in from bottom to top.
 
 Kinda cool, right?
 
-In design, We call these little details _microinteractions_[^1]. Small, surprising and hopefully delightful, these animations can give an outsized amount of character to an otherwise boring, functional user interface.
+In design, we call these little details _microinteractions_[^1]. Small, surprising and hopefully delightful, these animations can give an outsized amount of character to an otherwise boring, functional user interface.
 
 In this post, I'll show you how to build a rotating icon button like mine in React. If you're just looking for the code, feel free to skip to the end or [click here](https://codesandbox.io/s/festive-fog-hnnqy?from-embed) for the code sandbox.
 
@@ -113,7 +113,7 @@ Now let's work out our button's state.
 
 ## The Button State
 
-Out button can have any number of children but we only want it to show one child at a time. The button will need to keep track of which of these children is its _currently active_ child.
+Our button can have any number of children but we only want it to show one child at a time. The button will need to keep track of which of these children is its _currently active_ child.
 
 We can create this state using the `useState` React hook, and we'll store the array index of the button's currently active child. As we render each child, we can compare its index against this value to see whether that child is the currently active one.
 
@@ -169,7 +169,7 @@ On each render, we want our icons to perform two different animations depending 
 
 If the icon is our new currently active icon, we want it to move from below the button up to the center of the button. If not, we'll instead want it to move from the center of the button to up above the button; or, if it's already above the button, to stay where it is.
 
-We'll use the Icon element's `transfrom` property to make these moves, but we have two options for how to actually animate the element: the `transition` property and the `animation` property.
+We'll use the Icon element's `transform` property to make these moves, but we have two options for how to actually animate the element: the `transition` property and the `animation` property.
 
 Let's look at `transition` first.
 
@@ -183,7 +183,7 @@ export function RotatingIconButton({ children }) {
 
   return (
     <Button onClick={cycleCurrent}>
-      {Children.map(children, (child, i) => {
+      {React.Children.map(children, (child, i) => {
         const isCurrent = i === current;
 
         return (
@@ -215,7 +215,7 @@ Here's what that code (with its snips unsnipped) will give us:
 
 That's admittedly fun—but it isn't what we wanted. Rather than everything moving in and out from the top, we wanted the new active icon to come in from the bottom.
 
-This is a problem for the `transition` property. It doesn't give us a way to "jump" to our "from" position before transitioning to our "to" position, so we've have no way of getting from above to below without crossing back down through the middle. We could do some clever tricks here with effect hooks, `requestAnimationFrame`, and timings... but we don't have to.
+This is a problem for the `transition` property. It doesn't give us a way to "jump" to our "from" position before transitioning to our "to" position, so we have no way of getting from above to below without crossing back down through the middle. We could do some clever tricks here with effect hooks, `requestAnimationFrame`, and timings... but we don't have to.
 
 We can use CSS animations instead.
 
@@ -377,11 +377,11 @@ export function RotatingIconButton({ children }) {
 
   return (
     <Button onClick={cycleCurrent}>
-      {Children.map(children, (child, i) => {
+      {React.Children.map(children, (child, i) => {
         const isCurrent = i === current;
 
         return (
-          <Icon key={i} isInitial={isInitial} isCurrent={isCurrent}>
+          <Icon key={i} isInitial={isInitial.current} isCurrent={isCurrent}>
             {child}
           </Icon>
         );

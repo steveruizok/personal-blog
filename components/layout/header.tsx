@@ -6,12 +6,10 @@ import { styled } from "~stitches.config";
 export function Header() {
   return (
     <Container>
-      <Link href="/" passHref>
-        <Lockup>
-          <Icon />
-          <h1>Steve Ruiz</h1>
-        </Lockup>
-      </Link>
+      <Lockup href="/">
+        <Icon />
+        <h1>Steve Ruiz</h1>
+      </Lockup>
       <ol>
         <li>
           <Link href="/">Home</Link>
@@ -68,7 +66,7 @@ const Container = styled("header", {
   },
 });
 
-const Lockup = styled("a", {
+const Lockup = styled(Link, {
   display: "flex",
   alignItems: "center",
   gap: "$1",

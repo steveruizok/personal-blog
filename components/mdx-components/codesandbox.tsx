@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { CodeBox } from "./codebox";
 
@@ -8,13 +9,29 @@ export function CodeSandbox({
   url: string;
   height?: number;
 }) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+
+  // The theme is only known on the client, so wait until hydration before
+  // loading the iframe (avoids a mismatch and a double load for dark themes).
+  const isClient = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+
+  if (!isClient) {
+    return (
+      <CodeBox>
+        <div style={{ height }} />
+      </CodeBox>
+    );
+  }
 
   return (
     <CodeBox>
       <iframe
         src={`https://codesandbox.io/embed/${url}?fontsize=14&hidenavigation=1&theme=${
-          theme === "light" ? "light" : "dark"
+          resolvedTheme === "light" ? "light" : "dark"
         }`}
         style={{
           width: "100%",
@@ -30,3 +47,5 @@ export function CodeSandbox({
     </CodeBox>
   );
 }
+
+const noopSubscribe = () => () => {};

@@ -4,7 +4,7 @@ import { styled } from "~stitches.config";
 export function Tweet({ id }: { id: string }) {
   return (
     <Centered>
-      <TweetEmbed id={id} />
+      <TweetEmbed tweetId={id} />
     </Centered>
   );
 }

@@ -3,7 +3,7 @@ title: "Copy to Multiplayer Project"
 date: "05/19/2022"
 hero: "/images/copy-to-liveblocks/copy-to-liveblocks.png"
 status: "published"
-description: "How I used Liveblock's Storage APIs to create a new feature."
+description: "How I used Liveblocks' Storage APIs to create a new feature."
 ---
 
 I recently implemented a feature in [tldraw](https://tldraw.com "tldraw") that lets a user copy the contents of their current page into a new multiplayer project. There are still some issues around images and videos (as these need to be converted and uploaded separately) but it should be a pretty handy feature if you want to share a project or collaborate on something. Just send the link!
@@ -26,7 +26,7 @@ To make this feature work, I first needed to create an API endpoint on tldraw.co
   title="We'll need to communicate between the tldraw client application, an API endpoint in tldraw.com, and the Liveblocks API endpoints."
 />
 
-> 🚀 Remember, tldraw is open source! You can find the finished endpoint [here](https://github.com/tldraw/tldraw/blob/main/apps/www/pages/api/create.ts).
+> 🚀 Remember, tldraw is open source! You can find the finished endpoint [here](https://github.com/tldraw/tldraw/blob/c3fe36c2e79ebb93a917f5f02467823152de8e81/apps/www/pages/api/create.ts).
 
 Being a [Next.js](https://nextjs.org/) project, creating the endpoint was no problem. I made a new file at `/pages/api/create.ts` that expected to receive data from the application in the request body. In my case, the body is going to contain the user's tldraw `document` and their current `pageId`.
 
@@ -35,7 +35,7 @@ Being a [Next.js](https://nextjs.org/) project, creating the endpoint was no pro
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-type storageJson = {
+type RequestBody = {
   pageId: string;
   document: TDDocument;
 };
@@ -73,7 +73,7 @@ NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_API_KEY = pk_live_whatever;
 LIVEBLOCKS_SECRET_KEY = sk_live_whatever;
 ```
 
-Ok, back to my `pages/api/creates.ts` endpoint. With my keys in the environment, I next needed to get my authentication token from Liveblocks via their [authorize endpoint](https://liveblocks.io/docs/api-reference/rest-api-endpoints#Authentication).
+Ok, back to my `pages/api/create.ts` endpoint. With my keys in the environment, I next needed to get my authentication token from Liveblocks via their [authorize endpoint](https://liveblocks.io/docs/api-reference/rest-api-endpoints#Authentication).
 
 ```ts
 const { token } = await fetch("https://liveblocks.io/api/authorize", {
@@ -134,7 +134,7 @@ const result = await fetch(
     method: "POST",
     body: JSON.stringify(storageJson),
     headers: {
-      Authorization: `Bearer ${auth.token}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   },
@@ -158,19 +158,19 @@ if (result.status === 200) {
 
 The client would then navigate to the URL—and the user would see their same page content ready for them in the multiplayer editor.
 
-> 🔗 You can see the application code for this feature [here](https://github.com/tldraw/tldraw/blob/main/packages/tldraw/src/components/TopPanel/MultiplayerMenu/MultiplayerMenu.tsx).
+> 🔗 You can see the application code for this feature [here](https://github.com/tldraw/tldraw/blob/a9750d9dc6ef41c5654ed52832f6168fd5ef92b6/packages/tldraw/src/components/TopPanel/MultiplayerMenu/MultiplayerMenu.tsx).
 
 ## Other APIs
 
-As a final note, there are a few other Liveblocks APIs related to storage that I may use in the future. In addition to creating storage for a room via a `POST`, I could also `GET` the storage for room or `DELETE` its data instead. Eventually, I may use the other two in order to avoid situations where a user tries to copy to a `roomId` that already exists.
+As a final note, there are a few other Liveblocks APIs related to storage that I may use in the future. In addition to creating storage for a room via a `POST`, I could also `GET` the storage for a room or `DELETE` its data instead. Eventually, I may use the other two in order to avoid situations where a user tries to copy to a `roomId` that already exists.
 
-For completeness sake, here's the code I'd use for `GET` and `DELETE`:
+For completeness' sake, here's the code I'd use for `GET` and `DELETE`:
 
 ```ts
 fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
   method: "GET",
   headers: {
-    Authorization: `Bearer ${auth.token}`,
+    Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   },
 });
@@ -180,7 +180,7 @@ fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
 fetch(`https://liveblocks.net/api/v1/room/${roomId}/storage`, {
   method: "DELETE",
   headers: {
-    Authorization: `Bearer ${auth.token}`,
+    Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   },
 });

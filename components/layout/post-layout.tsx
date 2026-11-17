@@ -57,11 +57,9 @@ export function PostLayout({
       </Head>
       <article>
         <PostHeader>
-          <Link href={"/posts/" + slug} passHref>
-            <GhostLink>
-              <h1>{data.title}</h1>
-            </GhostLink>
-          </Link>
+          <GhostLink as={Link} href={"/posts/" + slug}>
+            <h1>{data.title}</h1>
+          </GhostLink>
           <time dateTime={data.date}>{data.date}</time>
         </PostHeader>
         {data.hero && (
@@ -71,8 +69,13 @@ export function PostLayout({
             title={data.title}
             width={720}
             height={400}
-            layout="intrinsic"
-            objectFit="cover"
+            loading="eager"
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+              aspectRatio: "720 / 400",
+              objectFit: "cover",
+            }}
           />
         )}
         <main>{children}</main>

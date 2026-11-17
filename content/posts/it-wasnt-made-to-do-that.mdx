@@ -6,7 +6,7 @@ status: "published"
 description: "A survey of the bizarre prototypes designers can now make in Figma."
 ---
 
-This week [Figma](https://figma.com) launched their [Interactive Components ](https://help.figma.com/hc/en-us/articles/360061175334-Create-interactive-components-with-Variants) feature in beta. The response from the design community has been uh, surprising.
+This week [Figma](https://figma.com) launched their [Interactive Components](https://help.figma.com/hc/en-us/articles/360061175334-Create-interactive-components-with-Variants) feature in beta. The response from the design community has been uh, surprising.
 
 <Tweet id="1367501450683834372" />
 
@@ -32,7 +32,7 @@ Or, more specifically, **why make this in Figma?**
 
 Personally, I'm a big fan of making stuff with the wrong tools. Projects like [Poom](https://freds72.itch.io/poom) inspire me. A long time ago, I made a kind of [Minecraft game in Framer](https://framer.cloud/TDhUi/).
 
-Pushing constraints and building wild prototypes is fun, but Figma is a special case because its prototypes don't work like anything else. To learn more about why these new protoypes are exciting (or ridiculous, depending on your perspective) let's go back and look at how we got here.
+Pushing constraints and building wild prototypes is fun, but Figma is a special case because its prototypes don't work like anything else. To learn more about why these new prototypes are exciting (or ridiculous, depending on your perspective) let's go back and look at how we got here.
 
 ## Draw a Noodle
 
@@ -42,7 +42,7 @@ In 2017, Figma [released](https://www.figma.com/blog/figma-2-0-now-with-prototyp
 
 While the team has continued adding to this part of the app, it hasn't changed much. Prototyping in Figma has always been about **creating links between Frames**.
 
-In fall of 2020, Figma released [Component Variants](https://www.figma.com/best-practices/creating-and-organizing-Variants/), a new feature that lets a designer create related snapshots of a Component.
+In fall of 2020, Figma released [Component Variants](https://web.archive.org/web/20220120105110/https://www.figma.com/best-practices/creating-and-organizing-variants/), a new feature that lets a designer create related snapshots of a Component.
 
 <Figure
   src="/images/it-wasnt-made-for-that/figma-0.png"
@@ -73,7 +73,7 @@ Clicking a link would change the current Frame.
 
 <Figure
   src="/images/it-wasnt-made-for-that/figma-a-1.svg"
-  alt="A diagram a link to News, with News as the new current Frame."
+  alt="A diagram showing a link to News, with News as the new current Frame."
 />
 
 And that was pretty much it. Building a prototype like this was easy to learn and easy to use. But it had two problems.
@@ -112,7 +112,7 @@ Once a designer had modeled each state as its own Frame, a user could "change th
 
 <Figure
   src="/images/it-wasnt-made-for-that/figma-b-1.svg"
-  alt="A diagram showing six Frames: three for light mode and three for dark mode."
+  alt="A diagram showing links between the six Frames, connecting the light mode and dark mode versions."
 />
 
 As you can imagine, this doesn't mix well with the first problem.
@@ -128,12 +128,12 @@ Adding a "dusk" mode would require yet another duplication, or three more Frames
 
 <Figure
   src="/images/it-wasnt-made-for-that/figma-b-3.svg"
-  alt="A diagram showing 18 arrows between the six Frames."
+  alt="A diagram showing the six Frames duplicated for a logged-in state, making 12 Frames with arrows between them."
 />
 
 Given enough time and coffee, I could in theory prototype a working game of checkers in Figma using only links between Frames—but it would require about 500 quintillion Frames to do it, and an even greater number of links.
 
-More realistically, once I'd built a medium-sized prototype with both light mode, dark mode, and an authentication state, I would never again change that design. Whatever I'd wired up would ship, sorry.
+More realistically, once I'd built a medium-sized prototype with light mode, dark mode, and an authentication state, I would never again change that design. Whatever I'd wired up would ship, sorry.
 
 ### Enter Interactive Components
 
@@ -148,7 +148,7 @@ While [@mingyaaa](https://twitter.com/mingyaaa)'s [game of Go](https://www.figma
 
 The fundamental problem hasn't changed: modeling a Component with multiple properties still means creating different Variants for each combination of the Component's properties. However, by pushing the problem down into Components, Interactive Components greatly reduces the number of combinations.
 
-Prototypes that were impossible (or impractical) before are now comparitively easy to put together. That's good for everyone.
+Prototypes that were impossible (or impractical) before are now comparatively easy to put together. That's good for everyone.
 
 ## Prototyping Anything?
 
@@ -158,7 +158,7 @@ For example, Design XStream's [text input](https://www.figma.com/community/file/
 
 <Figure
   src="/images/it-wasnt-made-for-that/figma-d-0.png"
-  alt="A screenshot of the Single Character Component, showing interactions."
+  alt="A screenshot of the Single Letter Component, showing interactions."
 />
 
 In other words, Figma isn't actually storing the text you type; it's just changing the Variant of each of those Components. There's no way to use that data outside of the component.
@@ -167,10 +167,10 @@ In other words, Figma isn't actually storing the text you type; it's just changi
 
 <Tweet id="1367024814062530560" />
 
-Ok, so prototyping in Figma isn't perfect. But as these prototype show, you _can_ do a lot with Interactive Components. While I'll still use other tools for more serious prototyping, Figma's limitations do make for some excellent creative constraints.
+Ok, so prototyping in Figma isn't perfect. But as these prototypes show, you _can_ do a lot with Interactive Components. While I'll still use other tools for more serious prototyping, Figma's limitations do make for some excellent creative constraints.
 
 Interactive Components might not have been meant to make text inputs or games, but when you give talented people simple tools to use, they can make some pretty amazing things. And I _am_ sure that the feature was made to be fun—and in that sense, mission accomplished!
 
 ---
 
-[^1] Technically speaking, Figma also keeps track of the user's visited Frames. This "navigation stack" works like a stack of cards: clicking a link would add a new Frame to the stack, and going back would remove the current Frame from the stack. Whichever way you went, the Frame on top of the stack would always become the new current Frame.
+[^1]: Technically speaking, Figma also keeps track of the user's visited Frames. This "navigation stack" works like a stack of cards: clicking a link would add a new Frame to the stack, and going back would remove the current Frame from the stack. Whichever way you went, the Frame on top of the stack would always become the new current Frame.

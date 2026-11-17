@@ -12,7 +12,7 @@ In this article, I'll walk through everything involved in implementing the patte
 
 > 👋 Just want to look at some code? [Click here](https://codesandbox.io/s/zoom-ui-example-ep0cf) for the CodeSandbox.
 
-# Core Concepts
+## Core Concepts
 
 Let's start with some core concepts.
 
@@ -26,7 +26,7 @@ The **screen** is where we see what the camera sees.
 
 The **viewport** is the part of the canvas that is visible on the screen.
 
-![](/images/zoom-ui/viewport-screen.jpg "A diagram showing the relationship between the canvas, the camera, and the viewport.")
+![](/images/zoom-ui/viewport-screen.jpg "A diagram showing the relationship between the screen and the viewport, which extends down and right from the camera.")
 
 Note that the viewport is not centered around the camera. Instead, the viewport extends _down
 and right_ from the camera.
@@ -109,8 +109,8 @@ function getViewport(camera: Camera, box: Box): Box {
     minY: topLeft.y,
     maxX: bottomRight.x,
     maxY: bottomRight.y,
-    height: bottomRight.x - topLeft.x,
-    width: bottomRight.y - topLeft.y,
+    width: bottomRight.x - topLeft.x,
+    height: bottomRight.y - topLeft.y,
   };
 }
 ```
@@ -239,7 +239,7 @@ function zoomIn(camera: Camera): Camera {
 
   const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-  return zoomCameraTo(camera, center, camera.z - nextZoom);
+  return zoomCameraTo(camera, center, nextZoom);
 }
 ```
 
@@ -251,7 +251,7 @@ function zoomOut(camera: Camera): Camera {
 
   const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-  return zoomCameraTo(camera, center, camera.z - nextZoom);
+  return zoomCameraTo(camera, center, nextZoom);
 }
 ```
 
@@ -259,7 +259,9 @@ And to reset the zoom:
 
 ```ts
 function resetZoom(camera: Camera): Camera {
-  return zoomCamera(camera, center, camera.z - 1);
+  const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+  return zoomCameraTo(camera, center, 1);
 }
 ```
 
@@ -285,7 +287,7 @@ ctx.translate(camera.x, camera.y);
 
 ## Conclusion
 
-That's the basics of a zoom UI. Many zoom UIs will also have the option to zooming to content or to selected content, but those functions will be different depending on how the rest of your app is set up.
+That's the basics of a zoom UI. Many zoom UIs will also have the option of zooming to content or to selected content, but those functions will be different depending on how the rest of your app is set up.
 
 Here's a [CodeSandbox](https://codesandbox.io/s/zoom-ui-example-ep0cf) showing an SVG implementation for all of the code in this article.
 

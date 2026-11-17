@@ -10,22 +10,25 @@ interface PostLinkProps {
 
 export function PostLink({ post }: PostLinkProps) {
   return (
-    <Link href={post.url} passHref>
-      <LinkContainer>
+    <LinkContainer href={post.url}>
         <Image
           src={post.data.hero}
           alt={post.data.title}
           width={720}
           height={400}
-          objectFit="cover"
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            aspectRatio: "720 / 400",
+            objectFit: "cover",
+          }}
         />
         <Content>
           <h3>{post.data.title}</h3>
           <p>{post.data.description}</p>
           <time dateTime={post.data.date}>{post.data.date}</time>
         </Content>
-      </LinkContainer>
-    </Link>
+    </LinkContainer>
   );
 }
 
@@ -49,7 +52,7 @@ const Content = styled("div", {
   },
 });
 
-const LinkContainer = styled("a", {
+const LinkContainer = styled(Link, {
   p: "$1",
   mx: "-$1",
   display: "grid",

@@ -16,11 +16,11 @@ In this post, I'm going to quickly cover how to drag a shape on a canvas, or in 
 
 ## Picking the Right Delta
 
-When a user drags a shape, its our job to calculcate the shape's new position based on whatever browser event we've received. On the web, this is usually a mouse move, touch move, or pointer move; but it could also be a scroll, pan, or zoom event, too.
+When a user drags a shape, it's our job to calculate the shape's new position based on whatever browser event we've received. On the web, this is usually a mouse move, touch move, or pointer move; but it could also be a scroll, pan, or zoom event, too.
 
 <Figure src="/images/dragging/dragging_3.png" />
 
-Many applications calculate this new position by finding the pointer's movement—the difference between the pointer's _current_ point and its _previous_ point)—and adding this to the shape's current position. While this works, it's a bad idea. :(
+Many applications calculate this new position by finding the pointer's movement—the difference between the pointer's _current_ point and its _previous_ point—and adding this to the shape's current position. While this works, it's a bad idea. :(
 
 <Figure src="/images/dragging/dragging_2.png" />
 

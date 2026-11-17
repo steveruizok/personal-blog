@@ -10,7 +10,7 @@ Here's a fun problem that I ran into while working on [tldraw](https://tldraw.co
 
 ## The Problem
 
-In tldraw, when you create a new page, and if there's already a page with that name, then we want the second page's name to end with an incremented value, e.g. `"Blog Post (1)"`.
+In tldraw, when you create a new page and there's already a page with that name, then we want the second page's name to end with an incremented value, e.g. `"Blog Post (1)"`.
 
 ```ts
 const existing = ["Blog Post"]
@@ -30,7 +30,7 @@ function getName("Blog Post", existing) {
 }
 ```
 
-We only want to match against the part of the name that exludes the incremented value. So adding `"Blog Post!"` should not get incremented, even if `"Blog Post"` exists already:
+We only want to match against the part of the name that excludes the incremented value. So adding `"Blog Post!"` should not get incremented, even if `"Blog Post"` exists already:
 
 ```ts
 const existing = ["Blog Post"]
@@ -40,7 +40,7 @@ function getName("Blog Post!", existing) {
 }
 ```
 
-...and "Blog Post (1)!" should not prevent us from making a `"Blog Post (1)"`.
+...and `"Blog Post (1)!"` should not prevent us from making a `"Blog Post (1)"`.
 
 ```ts
 const existing = ["Blog Post", "Blog Post (1)!"]
@@ -87,13 +87,13 @@ export function getName(name: string, others: string[]) {
 
 How does it work?
 
-We call the `getName` function with the input name (`name`) and an array of exising names (`others`) that may or may not contain matches. We first turn that array into a Set, so that we can check for a value without iteration.
+We call the `getName` function with the input name (`name`) and an array of existing names (`others`) that may or may not contain matches. We first turn that array into a Set, so that we can check for a value without iteration.
 
 In a while loop, we check if the `others` includes the current `result`.
 
 If the `others` set has the current `result`, then we mutate the `result`: either by adding a `" (1)"` if the result isn't already incremented, or else, if the result is already incremented, by incrementing the number between the parentheses.
 
-Then our `while` loop checks again. This allows for higher increments: we may have we've just turned `"Blog Post"` into `"Blog Post (1)"`, but the array might include _that_ name, too; and so we need to keep going until we can't find a match.
+Then our `while` loop checks again. This allows for higher increments: we may have just turned `"Blog Post"` into `"Blog Post (1)"`, but the array might include _that_ name, too; and so we need to keep going until we can't find a match.
 
 Once we have a unique name, we can return the result.
 

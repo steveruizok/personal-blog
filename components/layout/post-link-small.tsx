@@ -10,7 +10,7 @@ interface PostLinkSmallProps {
 
 export function PostLinkSmall({ post }: PostLinkSmallProps) {
   return (
-    <Link href={post.url} passHref>
+    <Link href={post.url}>
       <LinkContainer>
         <ImageContainer css={{ backgroundImage: `url("${post.data.hero}")` }} />
         <Content>

@@ -1,4 +1,4 @@
-import { Children, useRef, useEffect } from "react";
+import { Children, useState } from "react";
 import { styled } from "~stitches.config";
 import { IconButton } from "./icon-button";
 
@@ -12,13 +12,14 @@ export function RotatingIcons({
 } & Pick<React.HTMLProps<HTMLButtonElement>, "onClick" | "title">) {
   const icons = Children.toArray(children);
 
-  const rPrevious = useRef(current);
+  // Skip the animation until `current` first changes (i.e. on initial load).
+  const [prevCurrent, setPrevCurrent] = useState(current);
+  const [isInitial, setIsInitial] = useState(true);
 
-  useEffect(() => {
-    rPrevious.current = current;
-  }, [current]);
-
-  const isInitial = current === rPrevious.current;
+  if (current !== prevCurrent) {
+    setPrevCurrent(current);
+    setIsInitial(false);
+  }
   const previous = current === 0 ? icons.length - 1 : current - 1;
 
   return (

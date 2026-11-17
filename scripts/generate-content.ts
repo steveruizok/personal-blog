@@ -68,9 +68,5 @@ export function generateContent() {
     .map((result, i) => ({ ...result, index: i }))
     .forEach((result) => content.posts.push(result));
 
-  fs.writeFileSync(path.join(rootDir, "content.json"), JSON.stringify(content));
-
   return content;
 }
-
-generateContent();

@@ -3,10 +3,10 @@ title: "Reordering Part 2: Tables and Fractional Indexing"
 date: "02/14/2022"
 hero: "/images/reordering-2/bring_forward_1.png"
 status: "published"
-description: "Implementing reordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) in using fractional indexing."
+description: "Implementing reordering commands (Send to Back, Send Backward, Bring Forward, and Bring to Front) using fractional indexing."
 ---
 
-In a [previous blog post](https://www.steveruiz.me/posts/reordering), we looked at implementating four common reordering commands in a zoom UI or canvas app. Those commands are:
+In a [previous blog post](https://www.steveruiz.me/posts/reordering), we looked at implementing four common reordering commands in a zoom UI or canvas app. Those commands are:
 
 1. **Send to Back**
 2. **Send Backward**
@@ -45,7 +45,7 @@ How should we implement changes to our `index` properties? A simple approach cou
 />
 
 ```ts
-sendBackwards(
+sendBackward(
   {
     a: { id: "a", index: 1 },
     b: { id: "b", index: 2 },
@@ -99,7 +99,7 @@ In the example above, we've changed the order without changing items `a` or `b`,
 
 > As we'll see at the end of this post, our indexes don't even need to be numbers!
 
-Now that we have our stategy understood, let's look at implementations.
+Now that we have our strategy understood, let's look at implementations.
 
 ## Getting Indices Between
 
@@ -132,7 +132,7 @@ function getIndicesBetween(
 }
 ```
 
-If we're putting items at the "bottom" of the list, our `below` value will be `undefined` and our `above` value will be lowest `index` among our items. In that case, we'll create new fractions based on that `index`.
+If we're putting items at the "bottom" of the list, our `below` value will be `undefined` and our `above` value will be the lowest `index` among our items. In that case, we'll create new fractions based on that `index`.
 
 ```ts
 getIndicesBetween(undefined, 1, 1); // [0.5]
@@ -165,7 +165,7 @@ sendToBack(
 // }
 ```
 
-If we're putting items at the "top" of the list, then our `above` value will be `undefined` and our `below`value will be the highest`index`among our items. Here we can simply iterate by incrementing the that`index`.
+If we're putting items at the "top" of the list, then our `above` value will be `undefined` and our `below` value will be the highest `index` among our items. Here we can simply iterate by incrementing that `index`.
 
 ```ts
 getIndicesBetween(5, undefined, 1); // [6]
@@ -397,11 +397,11 @@ function sendBackward(items: Items, ids: string[]): Items {
       isSelecting = false
       count = selectIndex - i
       above = itemsArray[i].index
-      below itemsArray[i - 1]?.index
+      below = itemsArray[i - 1]?.index
       const indices = getIndicesBetween(below, above, count)
       for (let k = 0; k < count; k++) {
         const item = itemsArray[i + k + 1]
-        items[item.id].index = indices[k]
+        nextItems[item.id].index = indices[k]
       }
     }
   }
@@ -458,7 +458,7 @@ function bringForward(items: Items, ids: string[]): Items {
       const indices = getIndicesBetween(below, above, count);
       for (let k = 0; k < count; k++) {
         const item = itemsArray[selectIndex + k];
-        items[item.id].index = indices[k];
+        nextItems[item.id].index = indices[k];
       }
     }
   }
@@ -496,7 +496,7 @@ With the implementation shown here, that number is 52.
 ```ts
 let below = 1;
 let above = 2;
-for (let i = 0; i < 53; i++) {
+for (let i = 0; i < 52; i++) {
   above = below + (above - below) / 2;
 }
 below; // 1
@@ -554,7 +554,7 @@ bringForward(
 
 This method for representing indices is described in detail in [an article](https://observablehq.com/@dgreensp/implementing-fractional-indexing) by David Greenspan. It lets us split indices pretty much indefinitely.
 
-While I won't reproduce the code here, I have reproduced it in a [separate CodeSandbox](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg). The methods operate in the same was as described in this article and the code is virtually identical: the only difference is how indices are represented and how our `getIndicesBetween` method generates indices.
+While I won't reproduce the code here, I have reproduced it in a [separate CodeSandbox](https://codesandbox.io/s/table-items-fractional-index-examples-wj0mg). The methods operate in the same way as described in this article and the code is virtually identical: the only difference is how indices are represented and how our `getIndicesBetween` method generates indices.
 
 And with that, I believe we've covered everything there is to know about implementing our four reordering methods.
 
@@ -562,4 +562,4 @@ And with that, I believe we've covered everything there is to know about impleme
 
 ---
 
-Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).
+Thanks for reading! For more like this, follow me on [Twitter](https://twitter.com/steveruizok). To support my work and nudge me toward more blogging, sponsor me on [Github](https://github.com/sponsors/steveruizok).

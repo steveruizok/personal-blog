@@ -10,7 +10,7 @@ Ever notice in [Figma](https://figma.com) that if you rotate a few shapes and th
 
 <Figure
   src="/images/rotating-shapes/figma-drift.mp4"
-  alt="A video recorded from Figmashowing the change in position after rotating four selected shapes and then rotating them back."
+  alt="A video recorded from Figma showing the change in position after rotating four selected shapes and then rotating them back."
   isVideo
 />
 
@@ -34,7 +34,7 @@ Side note: most other design tools don't support this kind of rotation. Shapes e
 
 <Figure
   src="/images/rotating-shapes/pitch-rotation.mp4"
-  alt="A video recorded from Excalidraw showing the change in position after rotating four selected shapes and then rotating them back."
+  alt="A video recorded from Pitch showing four selected shapes being rotated."
   isVideo
 />
 
@@ -56,7 +56,7 @@ However, the rotated shapes probably have a different average center; which mean
 
 Honestly, I was extremely glad to find this in Figma and other apps because I was worried it was a bug in my own rotation implementation.
 
-It is even a bug though? It's weird that rotating a group and then rotating it back doesn't put them back in the same place. Let's fix it!
+Is it even a bug, though? It's weird that rotating a group and then rotating it back doesn't put them back in the same place. Let's fix it!
 
 <Figure
   src="/images/rotating-shapes/tldraw-fixed.mp4"
@@ -64,7 +64,7 @@ It is even a bug though? It's weird that rotating a group and then rotating it b
   isVideo
 />
 
-And here's the fix: once a user starts a rotation, we hold onto the the center point; if the user rotates again, we re-use that same point; and we only give it up once the user makes a new selection.
+And here's the fix: once a user starts a rotation, we hold onto the center point; if the user rotates again, we re-use that same point; and we only give it up once the user makes a new selection.
 
 <Figure
   src="/images/rotating-shapes/canva-fixed.mp4"
@@ -72,7 +72,7 @@ And here's the fix: once a user starts a rotation, we hold onto the the center p
   isVideo
 />
 
-To their credit, [canva](https://canva.com) seems to be solving the problem is the same way. The original rotation point is preserved until a user makes a new selection.
+To their credit, [Canva](https://canva.com) seems to be solving the problem in the same way. The original rotation point is preserved until a user makes a new selection.
 
 Ok, that's it! Hope you enjoyed this extra-obscure edition of design tool micro-UX. If you catch any rotation-related bugs in [tldraw](https://tldraw.com), let me know!
 
